@@ -18,7 +18,8 @@ DATABASES = {
 }
 ALLOWED_HOSTS = ['127.0.0.1']
 ```
-`ALLOWED_HOSTS` should be configured to a list of domains that the server is allowed to serve [more information](https://docs.djangoproject.com/en/1.10/ref/settings/)
+`ALLOWED_HOSTS` should be configured to a list of domains that the server is allowed to serve ([more information](https://docs.djangoproject.com/en/1.10/ref/settings/)).
+
 Additional database settings and engines can be found [here](https://docs.djangoproject.com/en/1.10/ref/settings/#std:setting-DATABASES)
 
 For development the line `DEBUG = True` can be added to the file.
