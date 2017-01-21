@@ -35,6 +35,8 @@ class LogBook(models.Model):
 #Category of the log entry
 class Category(models.Model):
     name = models.CharField(max_length=200)
+    def __str__(self):
+        return str(self.name)
 
 class LogEntry(models.Model):
     book = models.ForeignKey(LogBook, on_delete=models.PROTECT)
