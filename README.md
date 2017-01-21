@@ -1,7 +1,9 @@
 # Guild Volenteering
-An alternative to physical logbooks for Guild Volenteering UWA to allow students to enter their voulnteering hours .
+An alternative to physical logbooks for Guild Volenteering UWA to allow students to enter their voulnteering hours.
 
-The django project requires that some local setting be configured for database access. To do this create a new file in the gvs directory called `local_settings.py`
+The django project requires that some local setting be configured for database access. 
+To do this create a new file in the gvs directory called `local_settings.py`
+
 **Example contents for a mysql server:**
 
 ```
