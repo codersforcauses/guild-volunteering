@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+for model in [LBUser, Organisation, Supervisor, LogBook, Category, LogEntry]:
+    admin.site.register(model)
