@@ -140,3 +140,6 @@ $RECYCLE.BIN/
 
 #local config
 local_settings.py
+
+#vim
+*.sw?
