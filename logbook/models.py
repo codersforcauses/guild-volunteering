@@ -10,6 +10,7 @@ class LBUser(models.Model):
 class Organisation(models.Model):
     name = models.CharField(max_length=200)
     # more fields here once we get that email with the csv of organisations
+    # UPDATE logbook.admin so org has calista code field in it
     def __str__(self):
         return str(self.name)
 
@@ -47,6 +48,17 @@ class LogEntry(models.Model):
     end = models.DateTimeField('task end')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    UNAPPROVED = 'Unapproved'
+    PENDING = 'Pending'
+    APPROVED = 'Approved'
+    STATUS_CHOICES = (
+        # Has not been submitted for approval or was denied (use last modified time).
+            (UNAPPROVED, 'Unapproved'),
+            (PENDING, 'Pending'), # Awaiting approval.
+            (APPROVED, 'Approved'), # Supervisor has approved the log entry.
+        )
+    status = models.CharField(choices = STATUS_CHOICES, max_length = 15, default = UNAPPROVED)
     def __str__(self):
         return str(self.book) + " - " + self.description
     readonly_fields = ('created_at','updated_at',)
