@@ -1,7 +1,11 @@
 from django import forms
-from .models import *
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
+
+from .models import *
+
 import re
+
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
 class StundetNumField(forms.CharField):
@@ -17,6 +21,10 @@ class SignupForm(forms.Form):
     passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password Again'}))
     def clean(self):
         cleaned_data = super().clean()
+        # Check if user exists
+        if User.objects.filter(username=cleaned_data.get('studentNum')).exists():
+            raise forms.ValidationError('User already exists')
+        # Check that passwords match
         password = cleaned_data.get('password')
         passwordVerify = cleaned_data.get('passwordVerify')
         if password == '':
