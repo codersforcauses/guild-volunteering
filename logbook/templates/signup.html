@@ -63,9 +63,9 @@
 
         <form class="form-signin" role="form" method="post" action=".">
             {% csrf_token %}
-            <h2 class="form-signin-heading">Please sign in</h2>
-            {{ loginForm.as_p }}
-            <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit" >Sign in</button>
+            <h2 class="form-signin-heading">Create Account</h2>
+            {{ signupForm.as_p }}
+            <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit" >Create</button>
         </form>
       </div>
     </div>
