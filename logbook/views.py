@@ -11,7 +11,8 @@ def indexView(request):
     if not request.user.is_authenticated():
         return redirect('login')
     else:
-        return render(request, 'index.html', {})
+        logbooks = LogBook.objects.filter(user__user = request.user)
+        return render(request, 'index.html', {'logbooks':logbooks})
 
 def loginView(request):
     if request.method == 'POST':
