@@ -17,7 +17,7 @@ class OrganisationAdmin(admin.ModelAdmin):
     list_display = ['name',]
 
 class SupervisorAdmin(admin.ModelAdmin):
-    list_display = ['email','user','validated','organisation',]
+    list_display = ['user','email','validated','organisation',]
 
 admin.site.register(LogBook, LogBookAdmin)
 admin.site.register(LogEntry, LogEntryAdmin)
