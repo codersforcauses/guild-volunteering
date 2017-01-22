@@ -12,8 +12,10 @@ class SignupForm(forms.Form):
     studentNum = StundetNumField(label='')
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
     passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password again'}))
-    def validate(self):
-        super().validate()
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        passwordVerify = cleaned_data.get('passwordVerify')
         if password == '':
             raise forms.ValidationError('Password cannot be empty')
         if password != passwordVerify:
