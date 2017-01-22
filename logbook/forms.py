@@ -8,10 +8,13 @@ class StundetNumField(forms.CharField):
     default_validators = [RegexValidator(regex=studentNumRegex, message='Enter a valid student number')]
     widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Student Number'}) # bootstrap class for styling
 
+class PasswordField(forms.CharField):
+    widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'})
+
 class SignupForm(forms.Form):
     studentNum = StundetNumField(label='')
-    password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
-    passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password again'}))
+    password = PasswordField(label='')
+    passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password Again'}))
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get('password')
@@ -23,4 +26,4 @@ class SignupForm(forms.Form):
             
 class LoginForm(forms.Form):
     studentNum = StundetNumField(label='')
-    password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
+    password = PasswordField(label='')
