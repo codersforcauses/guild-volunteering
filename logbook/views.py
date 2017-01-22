@@ -6,7 +6,12 @@ from django.contrib.auth.decorators import login_required
 from .forms import *
 
 def indexView(request):
-    return render(request, 'index.html', {})
+
+    # If we use a decorator, it doesn't redirect at all.
+    if not request.user.is_authenticated():
+        return redirect('login')
+    else:
+        return render(request, 'index.html', {})
 
 def loginView(request):
     if request.method == 'POST':
@@ -39,4 +44,12 @@ def signupView(request):
 @login_required
 def logoutView(request):
     logout(request)
-    return redirect('index')
+    return redirect('login')
+
+@login_required
+def profileView(request):
+
+    # Staff member can view analytics in profile or in index
+    if request.user.is_staff:
+
+    return render(request, 'profile.html', {})
