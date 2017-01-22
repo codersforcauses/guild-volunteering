@@ -59,7 +59,7 @@
 
     <div class="container-fluid">
       <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
+        <div class="col-sm-2 col-md-1 sidebar">
           <ul class="nav nav-sidebar">
             <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
             <li><a href="#">Reports</a></li>
@@ -79,7 +79,7 @@
             <li><a href="">Another nav item</a></li>
           </ul>
         </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-10 col-sm-offset-2 col-md-11 col-md-offset-1 main">
           <h1 class="page-header">Dashboard</h1>
 
           <div class="row placeholders">
@@ -110,6 +110,7 @@
             <table class="table table-striped">
               <thead>
                 <tr>
+		  <th>#</th>
                   <th>Category</th>
                   <th>Description</th>
                   <th>Supervisor</th>
@@ -121,7 +122,8 @@
                 </tr>
               </thead>
               <tbody>
-		<tr>
+		<tr class = "danger">
+		    <td><input type="checkbox" name="logentry" value="2432"></td>
 		    <td>Education/Tutoring</td>
                     <td>I taught.</td>
                     <td>Claire</td>
@@ -130,6 +132,17 @@
                     <td>2017-02-01 15:00:00</td>
                     <td>2017-02-3 11:00:00</td>
                     <td>Unapproved</td>
+		</tr>
+		<tr class = "success">
+		    <td><input type="checkbox" name="logentry" value="2432"></td>
+		    <td>Education/Tutoring</td>
+                    <td>I tutored.</td>
+                    <td>Claire</td>
+                    <td>2017-01-24 09:00:00</td>
+                    <td>2017-01-24 10:00:00</td>
+                    <td>2017-02-01 15:00:00</td>
+                    <td>2017-02-3 11:00:00</td>
+                    <td>Approved</td>
 		</tr>
               </tbody>
             </table>
