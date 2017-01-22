@@ -51,5 +51,6 @@ def profileView(request):
 
     # Staff member can view analytics in profile or in index
     if request.user.is_staff:
+        print('Staff User')
 
     return render(request, 'profile.html', {})
