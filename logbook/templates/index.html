@@ -18,7 +18,7 @@
           <ul class="nav nav-sidebar">
 	        {% if logbooks %}
 		    {% for logbook in logbooks %}
-	        	<li><a href="/logbook/{{ logbook.id }}">{{ logbook.name }}</a></li>
+	        	<li><a href="./{{user.username}}/{{logbook.id}}">{{ logbook.name }}</a></li>
 		    {% endfor %}
 		{% endif %}
 		<li><a href="#addbook">Add Log Book</a></li>
@@ -34,8 +34,8 @@
               <thead>
                 <tr>
 		  <th>#</th>
-                  <th>Organisation</th>
                   <th>Name</th>
+                  <th>Organisation</th>
                   <th>Description</th>
                   <th>Created</th>
                   <th>Last Updated</th>
@@ -46,8 +46,8 @@
 		    {% for logbook in logbooks %}
 		    	<tr class = "">
 		    	    <td><input type="checkbox" name="logbook-{{logbook.id}}" value="{{ logbook.id }}"></td>
-		    	    <td>{{ logbook.organisation }}</td>
-                    	    <td>{{ logbook.name }}</td>
+                    	    <td><a href="./{{user.username}}/{{logbook.id}}">{{ logbook.name }}</a></td>
+			    <td>{{ logbook.organisation }}</td>
                     	    <td>{{ logentry.description }}</td>
                     	    <td>{{ logbook.created_at }}</td>
                     	    <td>{{ logbook.updated_at }}</td>
