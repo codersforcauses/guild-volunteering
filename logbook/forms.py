@@ -22,3 +22,15 @@ class SignupForm(forms.Form):
 class LoginForm(forms.Form):
     studentNum = StundetNumField(label='')
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
+
+class LogBookForm(forms.Form):
+    bookName = forms.CharField(label='')
+    bookDescription = forms.CharField(label='')
+
+class LogEntryForm(forms.Form):
+    category = forms.ModelChoiceField(queryset = Category.objects.all())
+    description = forms.CharField(label = '')
+    # Allow user to select supervisor from a list of supervisors 
+    supervisor = forms.ModelChoiceField(widget = forms.HiddenInput(), queryset = Supervisor.objects.all())
+    start = forms.DateTimeField()
+    end = forms.DateTimeField()
