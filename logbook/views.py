@@ -25,6 +25,24 @@ def indexView(request):
             logbooks = LogBook.objects.filter(user__user = request.user)
             return render(request, 'index.html', {'logbooks':logbooks})
 
+@login_required
+def logentryView(request, username, logbook_id):
+
+    logentries = {}
+    logbook = {}
+    logbooks = {}
+    
+    try:
+        logbooks = LogBook.objects.filter(user__user = request.user)
+        logbook = logbooks.get(id = logbook_id)
+        logentries = LogEntry.objects.filter(book = logbook_id)
+
+    except LogEntry.DoesNotExist:
+        pass
+
+    return render(request, 'logentry.html', {'entries':logentries,
+                                             'logbooks':logbooks,'book':logbook})
+
 def loginView(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)

@@ -1,0 +1,73 @@
+<html lang="en">
+
+{% extends 'base.html' %}
+
+    {% block titleblock %}
+	{% if book %}
+	     {{ book.name }}
+	{% else %}
+	    LogEntries
+	{% endif %}
+    {% endblock %}
+
+    {% block sideblock %}
+	<div class="col-sm-4 col-md-2 sidebar">
+	  <h3>Manage Entries</h3>
+          <ul class="nav nav-sidebar">
+	      <li><a href="#add_entry">Add Entry</a></li>
+	      <li><a href="#edit_entry">Edit Entry</a></li>
+	      <li><a href="#submit_entries">Submit Entry/s</a></li>
+	      <li><a href="#delete_entries">Delete Entry/s</a></li>
+          </ul>
+	
+	  <h3>Log Books</h3>
+          <ul class="nav nav-sidebar">
+	        {% if logbooks %}
+		    {% for logbook in logbooks %}
+	        	<li><a href="/logbook/{{ user.username }}/{{ logbook.id }}">{{ logbook.name }}</a></li>
+		    {% endfor %}
+		{% endif %}
+		<li><a href="#addbook">Add Log Book</a></li>
+          </ul>
+        </div>
+
+    {% endblock %}
+
+    {% block bodyblock %}
+	<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
+	    {% if book %}
+	  	<h1 class="page-header">Log Entries For: {{ book.name }}</h1>
+		<h3 class="sub-heading">{{ book.description }}</h3>
+	    {% else %}
+		<h1 class="page-header">Manage Entries</h1>
+	    {% endif %}
+	    <div class="table-responsive">
+            	<table class="table table-striped">
+             	    <thead>
+                	<tr>
+		  	    <th>#</th>
+                  	    <th>Category</th>
+                  	    <th>Supervisor</th>
+                  	    <th>Start Time</th>
+                  	    <th>End Time</th>
+                  	    <th>Status</th>
+                	</tr>
+              	    </thead>
+              	    <tbody>	
+			{% if entries %}
+		    	    {% for logentry in entries %}
+				<tr class = "">
+		    	    	    <td><input type="checkbox" name="logentry" value="{{ logentry.id }}"></td>
+		    	    	    <td>{{ logentry.category }}</td>
+                    	    	    <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
+                    	    	    <td>{{ logentry.start }}</td>
+                    	    	    <td>{{ logentry.end }}</td>
+                    	    	    <td>{{ logentry.status }}</td>
+				</tr>
+		   	    {% endfor %}
+			{% endif %}
+		    </tbody>
+		</table>
+	    </div>
+	</div>
+    {% endblock %}
