@@ -1,6 +1,8 @@
 from django import forms
-from .models import *
 from django.core.validators import RegexValidator, EmailValidator
+from django.contrib.auth.models import User
+from .models import *
+
 import re
 
 studentNumRegex = re.compile(r'^[0-9]{8}$')
@@ -16,13 +18,21 @@ class EmailField(forms.CharField):
 class UsernameField(forms.CharField):
     widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Student Number/Username'})
 
+class PasswordField(forms.CharField):
+    widget = forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'})
 
 class SignupForm(forms.Form):
     studentNum = StundetNumField(label='')
-    password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
-    passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password again'}))
-    def validate(self):
-        super().validate()
+    password = PasswordField(label='')
+    passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password Again'}))
+    def clean(self):
+        cleaned_data = super().clean()
+        # Check if user exists
+        if User.objects.filter(username=cleaned_data.get('studentNum')).exists():
+            raise forms.ValidationError('User already exists')
+        # Check that passwords match
+        password = cleaned_data.get('password')
+        passwordVerify = cleaned_data.get('passwordVerify')
         if password == '':
             raise forms.ValidationError('Password cannot be empty')
         if password != passwordVerify:
@@ -32,8 +42,14 @@ class SupervisorSignupForm(forms.Form):
     email = EmailField(label='')
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
     passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password again'}))
-    def validate(self):
-        super().validate()
+    def clean(self):
+        cleaned_data = super().clean()
+        # Check if user exists
+        if User.objects.filter(username=cleaned_data.get('username')).exists():
+            raise forms.ValidationError('User already exists')
+        # Check that passwords match
+        password = cleaned_data.get('password')
+        passwordVerify = cleaned_data.get('passwordVerify')
         if password == '':
             raise forms.ValidationError('Password cannot be empty')
         if password != passwordVerify:
