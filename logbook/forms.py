@@ -1,19 +1,32 @@
 from django import forms
-from .models import *
 from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
+
+from .models import *
+
 import re
+
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
 class StundetNumField(forms.CharField):
     default_validators = [RegexValidator(regex=studentNumRegex, message='Enter a valid student number')]
     widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Student Number'}) # bootstrap class for styling
 
+class PasswordField(forms.CharField):
+    widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'})
+
 class SignupForm(forms.Form):
     studentNum = StundetNumField(label='')
-    password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
-    passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password again'}))
-    def validate(self):
-        super().validate()
+    password = PasswordField(label='')
+    passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password Again'}))
+    def clean(self):
+        cleaned_data = super().clean()
+        # Check if user exists
+        if User.objects.filter(username=cleaned_data.get('studentNum')).exists():
+            raise forms.ValidationError('User already exists')
+        # Check that passwords match
+        password = cleaned_data.get('password')
+        passwordVerify = cleaned_data.get('passwordVerify')
         if password == '':
             raise forms.ValidationError('Password cannot be empty')
         if password != passwordVerify:
@@ -21,7 +34,7 @@ class SignupForm(forms.Form):
             
 class LoginForm(forms.Form):
     studentNum = StundetNumField(label='')
-    password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
+    password = PasswordField(label='')
 
 class LogBookForm(forms.Form):
     bookName = forms.CharField(label='')
