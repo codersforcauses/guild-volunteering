@@ -21,15 +21,13 @@ class UsernameField(forms.CharField):
 class PasswordField(forms.CharField):
     widget = forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'})
 
-class SignupForm(forms.Form):
-    studentNum = StundetNumField(label='')
+class SignupFormBase(forms.Form):
+    username = forms.CharField() # have to declare here otherwise order of form elements will be weird
     password = PasswordField(label='')
     passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password Again'}))
     def clean(self):
         cleaned_data = super().clean()
-        # Check if user exists
-        if User.objects.filter(username=cleaned_data.get('studentNum')).exists():
-            raise forms.ValidationError('User already exists')
+
         # Check that passwords match
         password = cleaned_data.get('password')
         passwordVerify = cleaned_data.get('passwordVerify')
@@ -38,22 +36,16 @@ class SignupForm(forms.Form):
         if password != passwordVerify:
             raise forms.ValidationError('Passwords do not match')
 
-class SupervisorSignupForm(forms.Form):
-    email = EmailField(label='')
-    password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
-    passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password again'}))
-    def clean(self):
-        cleaned_data = super().clean()
-        # Check if user exists
+        #check if user exists
         if User.objects.filter(username=cleaned_data.get('username')).exists():
             raise forms.ValidationError('User already exists')
-        # Check that passwords match
-        password = cleaned_data.get('password')
-        passwordVerify = cleaned_data.get('passwordVerify')
-        if password == '':
-            raise forms.ValidationError('Password cannot be empty')
-        if password != passwordVerify:
-            raise forms.ValidationError('Passwords do not match')
+        return cleaned_data
+
+class SignupForm(SignupFormBase):
+    username = StundetNumField(label='')
+
+class SupervisorSignupForm(SignupFormBase):
+    username = EmailField(label='')
             
 class LoginForm(forms.Form):
     username = UsernameField(label='')

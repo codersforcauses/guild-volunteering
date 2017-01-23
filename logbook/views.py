@@ -44,8 +44,8 @@ def signupView(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
-            user = User.objects.create_user(form.cleaned_data['studentNum'],
-                                            form.cleaned_data['studentNum'] + '@student.uwa.edu.au',
+            user = User.objects.create_user(form.cleaned_data['username'],
+                                            form.cleaned_data['username'] + '@student.uwa.edu.au',
                                             form.cleaned_data['password'])
             user.save()
             group = Group.objects.get(name='LBStudent')
@@ -65,8 +65,8 @@ def supervisorSignupView(request):
     if request.method == 'POST':
         form = SupervisorSignupForm(request.POST)
         if form.is_valid():
-            user = User.objects.create_user(form.cleaned_data['email'],
-                                            form.cleaned_data['email'],
+            user = User.objects.create_user(form.cleaned_data['username'],
+                                            form.cleaned_data['username'],
                                             form.cleaned_data['password'])
             user.save()
             group = Group.objects.get(name='LBSupervisor')
