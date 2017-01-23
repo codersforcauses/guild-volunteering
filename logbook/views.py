@@ -5,14 +5,25 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import *
 
+def is_supervisor(user):
+    try:
+        user.supervisor.validated
+        return True
+    except:
+        return False
+
 def indexView(request):
 
     # If we use a decorator, it doesn't redirect at all.
     if not request.user.is_authenticated():
         return redirect('login')
     else:
-        logbooks = LogBook.objects.filter(user__user = request.user)
-        return render(request, 'index.html', {'logbooks':logbooks})
+        if is_supervisor(request.user):
+            logentries = LogEntry.objects.filter(supervisor__user = request.user)
+            return render(request, 'super_index.html', {'logentries':logentries})
+        else:
+            logbooks = LogBook.objects.filter(user__user = request.user)
+            return render(request, 'index.html', {'logbooks':logbooks})
 
 def loginView(request):
     if request.method == 'POST':
