@@ -1,0 +1,41 @@
+<html lang="en">
+
+{% extends 'base.html' %}
+    {% block titleblock %}GVS - LogEntries{% endblock %}
+
+    {% block bodyblock %}
+
+	<div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+		  <th>#</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Supervisor</th>
+                  <th>Start Time</th>
+                  <th>End Time</th>
+                  <th>Created</th>
+                  <th>Last Updated</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>		
+
+		{% if logentries %}
+		    {% for logentry in logentries %}
+			<tr class = "">
+		    	    <td><input type="checkbox" name="logentry" value="{{ logentry.id }}"></td>
+		    	    <td>{{ logentry.category }}</td>
+                    	    <td>{{ logentry.description }}</td>
+                    	    <td>{{ logentry.supervisor }}</td>
+                    	    <td>{{ logentry.start }}</td>
+                    	    <td>{{ logentry.end }}</td>
+                    	    <td>{{ logentry.created_at }}</td>
+                    	    <td>{{ logentry.updated_at }}</td>
+                    	    <td>{{ logentry.status }}</td>
+			</tr>
+		   {% endfor %}
+		{% endif %}
+		</tbody>
+	{% endblock %}

@@ -5,13 +5,24 @@
     {% block titleblock %}Guild Volunteering System{% endblock %}
 
     {% block sideblock %}
+
+	<script type="text/javascript">
+	    var current = document.getElementById('overview');
+	    current.style.display = 'none';
+	    function showStuff(id) {
+		document.getElementById(id).style.display = '';
+		current.style.display = 'none';
+		current = document.getElementById(id);
+		}
+    	</script>	
+
 	<div class="col-sm-4 col-md-2 sidebar">
 	  
 	  <h3>Overview</h3>
           <ul class="nav nav-sidebar">
               <li class="active"><a href=".">Manage Log Books</a><span class="sr-only">(current)</span></li>
-              <li><a href="/logbook/#statistics">Statistics</a></li>
-              <li><a href="/logbook/#export">Export Log Books</a></li>
+              <li><a href="/logbook/#statistics" onclick = showStuff('statistics')>Statistics</a></li>
+              <li><a href="/logbook/#export" onclick = showStuff('export')>Export Log Books</a></li>
           </ul>
 	
 	  <h3>Log Books</h3>
@@ -27,36 +38,68 @@
     {% endblock %}
 
     {% block bodyblock %}
-	<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Manage Your Log Books</h1>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-		  <th>#</th>
-                  <th>Organisation</th>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>Created</th>
-                  <th>Last Updated</th>
-                </tr>
-              </thead>
-              <tbody>
-		{% if logbooks %}
-		    {% for logbook in logbooks %}
-		    	<tr class = "">
-		    	    <td><input type="checkbox" name="logbook-{{logbook.id}}" value="{{ logbook.id }}"></td>
-		    	    <td>{{ logbook.organisation }}</td>
-                    	    <td>{{ logbook.name }}</td>
-                    	    <td>{{ logentry.description }}</td>
-                    	    <td>{{ logbook.created_at }}</td>
-                    	    <td>{{ logbook.updated_at }}</td>
-			</tr>
-		    {% endfor %}
-		{% endif %}
-              </tbody>
-            </table>
-          </div>
+	<div id="" class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
+	    <div id="overview">
+                <h1 class="page-header">Manage Your Log Books</h1>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+		  	        <th>#</th>
+                  		<th>Organisation</th>
+                  		<th>Name</th>
+                  		<th>Description</th>
+                  		<th>Created</th>
+                  		<th>Last Updated</th>
+                	    </tr>
+              		</thead>
+              		<tbody>
+			    {% if logbooks %}
+		    		{% for logbook in logbooks %}
+		    		    <tr class = "">
+		    	    	    	<td><input type="checkbox" name="logbook-{{logbook.id}}" value="{{ logbook.id }}"></td>
+		    	    	    	<td>{{ logbook.organisation }}</td>
+                    	    	    	<td>{{ logbook.name }}</td>
+                    	    	    	<td>{{ logentry.description }}</td>
+                    	    	    	<td>{{ logbook.created_at }}</td>
+                    	    	    	<td>{{ logbook.updated_at }}</td>
+				    </tr>
+				    <tr class = "">
+		    	    	    	<td><input type="checkbox" name="logbook-{{logbook.id}}" value="{{ logbook.id }}"></td>
+		    	    	    	<td>{{ logbook.organisation }}</td>
+                    	    	    	<td>{{ logbook.name }}</td>
+                    	    	    	<td>{{ logentry.description }}</td>
+                    	    	    	<td>{{ logbook.created_at }}</td>
+                    	    	    	<td>{{ logbook.updated_at }}</td>
+				    </tr>
+				    <tr class = "">
+		    	    	    	<td><input type="checkbox" name="logbook-{{logbook.id}}" value="{{ logbook.id }}"></td>
+		    	    	    	<td>{{ logbook.organisation }}</td>
+                    	    	    	<td>{{ logbook.name }}</td>
+                    	    	    	<td>{{ logentry.description }}</td>
+                    	    	    	<td>{{ logbook.created_at }}</td>
+                    	    	    	<td>{{ logbook.updated_at }}</td>
+				    </tr>
+				    <tr class = "">
+		    	    	    	<td><input type="checkbox" name="logbook-{{logbook.id}}" value="{{ logbook.id }}"></td>
+		    	    	    	<td>{{ logbook.organisation }}</td>
+                    	    	    	<td>{{ logbook.name }}</td>
+                    	    	    	<td>{{ logentry.description }}</td>
+                    	    	    	<td>{{ logbook.created_at }}</td>
+                    	    	    	<td>{{ logbook.updated_at }}</td>
+				    </tr>
+		    		{% endfor %}
+			    {% endif %}
+              		</tbody>
+            	    </table>
+          	</div>
+	    </div>
+	    <div id="statistics" style="display:none;">
+		<h1 class="page-header">Statistics</h1>
+	    </div>
+	    <div id="export" style="display:none;">
+		<h1 class="page-header">Export Log Books</h1>
+	    </div>
 	</div>
 
     {% endblock %}
