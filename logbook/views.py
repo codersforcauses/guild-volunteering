@@ -26,7 +26,7 @@ def indexView(request):
             return render(request, 'index.html', {'logbooks':logbooks})
 
 @login_required
-def logentryView(request, username, logbook_id):
+def logentryView(request, username, logbook_name_slug):
 
     logentries = {}
     logbook = {}
@@ -34,8 +34,8 @@ def logentryView(request, username, logbook_id):
     
     try:
         logbooks = LogBook.objects.filter(user__user = request.user)
-        logbook = logbooks.get(id = logbook_id)
-        logentries = LogEntry.objects.filter(book = logbook_id)
+        logbook = logbooks.get(name_slug = logbook_name_slug)
+        logentries = LogEntry.objects.filter(book = logbook.id)
 
     except LogEntry.DoesNotExist:
         pass
