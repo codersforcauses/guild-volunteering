@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.template.defaultfilters import slugify
 
 class LBUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
@@ -27,9 +28,15 @@ class LogBook(models.Model):
     user = models.ForeignKey(LBUser, on_delete=models.PROTECT)
     organisation = models.ForeignKey(Organisation, on_delete=models.SET_NULL, null=True, default=None )
     name = models.CharField(max_length=200)
+    name_slug = models.SlugField(blank=True,default=None)
     description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        self.name_slug = slugify(self.name)
+        super(LogBook,self).save(*args,**kwargs)
+    
     def __str__(self):
         return str(self.user) + " - " + self.name
     readonly_fields = ('created_at','updated_at',)
