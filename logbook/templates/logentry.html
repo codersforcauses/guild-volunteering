@@ -11,26 +11,29 @@
     {% endblock %}
 
     {% block sideblock %}
-	<div class="col-sm-4 col-md-2 sidebar">
-	  <h3>Manage Entries</h3>
-          <ul class="nav nav-sidebar">
-	      <li><a href="#add_entry">Add Entry</a></li>
-	      <li><a href="#edit_entry">Edit Entry</a></li>
-	      <li><a href="#submit_entries">Submit Entry/s</a></li>
-	      <li><a href="#delete_entries">Delete Entry/s</a></li>
-          </ul>
-	
-	  <h3>Log Books</h3>
-          <ul class="nav nav-sidebar">
-	        {% if logbooks %}
-		    {% for logbook in logbooks %}
-	        	<li><a href="/logbook/{{ user.username }}/{{ logbook.id }}">{{ logbook.name }}</a></li>
-		    {% endfor %}
-		{% endif %}
-		<li><a href="#addbook">Add Log Book</a></li>
-          </ul>
+	<div class="col-sm-4 col-md-2 sidebar" id="sidebar">
+            <ul class="nav" id="menu" style="display: inline-block;">
+                <li>
+                    <a href="#" data-target="#item1" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Manage Entries</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
+                    <ul class="nav nav-stacked collapse left-submenu" id="item1">
+                        <li><a href="#add_entry">Add Entry</a></li>
+	      		<li><a href="#edit_entry">Edit Entry</a></li>
+	      		<li><a href="#submit_entries">Submit Entry/s</a></li>
+	      		<li><a href="#delete_entries">Delete Entry/s</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Log Books</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
+		    <ul class="nav nav-stacked collapse" id="item2">
+                        {% if logbooks %}
+		    	    {% for logbook in logbooks %}
+	        		<li><a href="/logbook/{{ user.username }}/{{ logbook.name_slug }}">{{ logbook.name }}</a></li>
+		    	    {% endfor %}
+			{% endif %}
+                    </ul>
+                </li>
+            </ul>
         </div>
-
     {% endblock %}
 
     {% block bodyblock %}
