@@ -1,4 +1,4 @@
-# Guild Volenteering
+# Guild Volunteering
 An alternative to physical logbooks for Guild Volenteering UWA to allow students to enter their voulnteering hours.
 
 The django project requires that some local setting be configured for database access. 
