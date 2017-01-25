@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 # Database
 from .forms import *
 from django.db import transaction
+from django.db.models import F
 
 # User authentication
 from django.contrib.auth import authenticate, login, logout
@@ -18,8 +19,10 @@ def indexView(request):
         return redirect('login')
     else:
         if is_supervisor(request.user):
-            logentries = LogEntry.objects.filter(supervisor__user = request.user)
-            return render(request, 'super_index.html', {'logentries':logentries})
+            entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').distinct()
+            #use books to get the student numbers
+            logbooks = LogBook.objects.filter(id__in = entries)
+            return render(request, 'super_index.html', {'logbooks':logbooks})
         else:
             logbooks = LogBook.objects.filter(user__user = request.user)
             return render(request, 'index.html', {'logbooks':logbooks})
