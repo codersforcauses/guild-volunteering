@@ -72,9 +72,17 @@ def modelActions(request, model, permissionCheck):
             except model.DoesNotExist:
                 pass
             if permissionCheck(request.user, m, 'submit'):
-                if m.status == 'Unapproved':
-                    m.status = 'Pending'
-                    m.save()
+                try:
+                    if m.status == 'Unapproved':
+                        m.status = 'Pending'
+                        m.save()
+                # Then it is a logbook (surely a 'safer' way to do this?) 
+                except:
+                    logentries = LogEntry.objects.filter(book=m.id)
+                    for log in logentries:
+                        if log.status == 'Unapproved':
+                            log.status = 'Pending'
+                            log.save()
 
 def logbookPermissionCheck(user, logbook, action):
     user = LBUser.objects.get(user=user)
