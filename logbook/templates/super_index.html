@@ -13,39 +13,31 @@
               <li><a href="/logbook/#statistics">Statistics</a></li>
               <li><a href="/logbook/#export">Export Log Books</a></li>
           </ul>
-	
-	  <h3>Log Books</h3>
-          <ul class="nav nav-sidebar">
-	        {% if logbooks %}
-		    {% for logbook in logbooks %}
-	        	<li><a href="/logbook/{{ logbook.id }}">{{ logbook.name }}</a></li>
-		    {% endfor %}
-		{% endif %}
-		<li><a href="#addbook">Add Log Book</a></li>
-          </ul>
         </div>
     {% endblock %}
 
     {% block bodyblock %}
 	<div class="col-sm-10 col-sm-offset-2 col-md-11 col-md-offset-1 main">
-          <h1 class="page-header">Manage Your Log Books</h1>
+          <h1 class="page-header">Manage Your Students</h1>
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
                 <tr>
-		  <th>#</th>
-                  <th>Category</th>
+		  <th>Book Name</th>
+                  <th>User</th>
                   <th>Description</th>
-                  <th>Supervisor</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-                  <th>Created</th>
-                  <th>Last Updated</th>
-                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
-		
+		{% if logbooks %}
+		  {% for logbook in logbooks %}
+		  <tr>
+		      <td>{{ logbook.name }}</td>
+		      <td><a href="./{{ logbook.user.user.username }}/{{ logbook.name_slug }}">{{ logbook.user.user.username }} - {{ logbook.user.user.first_name }} {{ logbook.user.user.last_name }}</a></td>
+		      <td>{{ logbook.description }}</td>
+		  </tr>
+		  {% endfor %}
+		{% endif %}
               </tbody>
             </table>
           </div>

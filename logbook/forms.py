@@ -1,7 +1,6 @@
 from django import forms
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, EmailValidator
 from django.contrib.auth.models import User
-
 from .models import *
 
 import re
@@ -12,18 +11,23 @@ class StundetNumField(forms.CharField):
     default_validators = [RegexValidator(regex=studentNumRegex, message='Enter a valid student number')]
     widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Student Number'}) # bootstrap class for styling
 
-class PasswordField(forms.CharField):
-    widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'})
+class EmailField(forms.CharField):
+    default_validators = [EmailValidator()]
+    widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Email'})
 
-class SignupForm(forms.Form):
-    studentNum = StundetNumField(label='')
+class UsernameField(forms.CharField):
+    widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Student Number/Username'})
+
+class PasswordField(forms.CharField):
+    widget = forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'})
+
+class SignupFormBase(forms.Form):
+    username = forms.CharField() # have to declare here otherwise order of form elements will be weird
     password = PasswordField(label='')
     passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password Again'}))
     def clean(self):
         cleaned_data = super().clean()
-        # Check if user exists
-        if User.objects.filter(username=cleaned_data.get('studentNum')).exists():
-            raise forms.ValidationError('User already exists')
+
         # Check that passwords match
         password = cleaned_data.get('password')
         passwordVerify = cleaned_data.get('passwordVerify')
@@ -31,10 +35,21 @@ class SignupForm(forms.Form):
             raise forms.ValidationError('Password cannot be empty')
         if password != passwordVerify:
             raise forms.ValidationError('Passwords do not match')
+
+        #check if user exists
+        if User.objects.filter(username=cleaned_data.get('username')).exists():
+            raise forms.ValidationError('User already exists')
+        return cleaned_data
+
+class SignupForm(SignupFormBase):
+    username = StundetNumField(label='')
+
+class SupervisorSignupForm(SignupFormBase):
+    username = EmailField(label='')
             
 class LoginForm(forms.Form):
-    studentNum = StundetNumField(label='')
-    password = PasswordField(label='')
+    username = UsernameField(label='')
+    password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
 
 class LogBookForm(forms.Form):
     bookName = forms.CharField(label='')

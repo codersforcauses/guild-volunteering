@@ -1,7 +1,15 @@
 from django.shortcuts import render, redirect
 
+# Database
+from .forms import *
+from django.db import transaction
+from django.db.models import F
+
+# User authentication
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, Group
+
 from django.http import HttpResponseForbidden
 
 from .forms import *
@@ -12,7 +20,7 @@ import string
 
 # For testing until merged with proper supervisor code
 def is_supervisor(user):
-        return False
+    return user.groups.filter(name='LBSupervisor').exists()
 
 def makeHeaders(unformattedHeaderNames, currentOrder):
     '''
@@ -67,15 +75,16 @@ def logentryPermissionCheck(user, logentry, action):
     user = LBUser.objects.get(user=user)
     return user == logentry.book.user
 
-
 def indexView(request):
     # If we use a decorator, it doesn't redirect at all.
     if not request.user.is_authenticated():
         return redirect('login')
     else:
         if is_supervisor(request.user):
-            logentries = LogEntry.objects.filter(supervisor__user = request.user)
-            return render(request, 'super_index.html', {'logentries':logentries})
+            entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').distinct()
+            #use books to get the student numbers
+            logbooks = LogBook.objects.filter(id__in = entries)
+            return render(request, 'super_index.html', {'logbooks':logbooks})
         else:
             if request.method == 'POST':
                 modelActions(request, LogBook, logbookPermissionCheck)
@@ -88,8 +97,6 @@ def indexView(request):
             logbooks = LogBook.objects.filter(user__user=request.user)
             logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
             return render(request, 'index.html', {'logbooks':logbooks, 'headers':headers})
-
-
 
 @login_required
 def logentryView(request, username, logbook_name_slug):
@@ -126,28 +133,55 @@ def loginView(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            user = authenticate(username=form.cleaned_data['studentNum'], password=form.cleaned_data['password'])
+            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
             if user is not None:
                 login(request, user)
                 return redirect('index')
     else:
         form = LoginForm()
-    # If data did not validate will re-render the page with the same form
-    # Form now has an error message
     return render(request, 'login.html', {'loginForm':form})
 
+@transaction.atomic
 def signupView(request):
+    '''
+    View for handling student registration
+    '''
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
-            user = User.objects.create_user(form.cleaned_data['studentNum'],
-                                            form.cleaned_data['studentNum'] + '@student.uwa.edu.au',
+            user = User.objects.create_user(form.cleaned_data['username'],
+                                            form.cleaned_data['username'] + '@student.uwa.edu.au',
                                             form.cleaned_data['password'])
             user.save()
+            group = Group.objects.get(name='LBStudent')
+            group.user_set.add(user)
+            group.save()
             return redirect('login')
     else:
         form = SignupForm()
     return render(request, 'signup.html', {'signupForm':form})
+
+@transaction.atomic
+def supervisorSignupView(request):
+    '''
+    View for handling supervisor registraion
+    Uses the same template as signupView, but with a different form
+    '''
+    if request.method == 'POST':
+        form = SupervisorSignupForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user(form.cleaned_data['username'],
+                                            form.cleaned_data['username'],
+                                            form.cleaned_data['password'])
+            user.save()
+            group = Group.objects.get(name='LBSupervisor')
+            group.user_set.add(user)
+            group.save()
+            return redirect('login')
+    else:
+        form = SupervisorSignupForm()
+    return render(request, 'signup.html', {'signupForm':form})
+        
     
 
 @login_required
@@ -157,7 +191,6 @@ def logoutView(request):
 
 @login_required
 def profileView(request):
-
     # Staff member can view analytics in profile or in index
     if request.user.is_staff:
         print('Staff User')

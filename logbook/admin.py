@@ -29,7 +29,7 @@ class LogEntryAdmin(admin.ModelAdmin):
 @admin.register(Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
     # Will need to add the Org's Calista code when we add that to model
-    list_display = ['name',]
+    list_display = ['name','code']
 
 @admin.register(Supervisor)
 class SupervisorAdmin(admin.ModelAdmin):

@@ -10,8 +10,7 @@ class LBUser(models.Model):
 
 class Organisation(models.Model):
     name = models.CharField(max_length=200)
-    # more fields here once we get that email with the csv of organisations
-    # UPDATE logbook.admin so org has calista code field in it
+    code = models.CharField(max_length=8, blank=True, default=None)
     def __str__(self):
         return str(self.name)
 
