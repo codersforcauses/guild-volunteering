@@ -19,7 +19,7 @@
                         <li><a href="./add">Add Entry</a></li>
 	      		<li><a href="#edit_entry">Edit Entry</a></li>
 	      		<li><a href="#submit_entries">Submit Entry/s</a></li>
-	      		<li><a href="#delete_entries">Delete Entry/s</a></li>
+                <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Entry/s</a></li>
                     </ul>
                 </li>
                 <li>
@@ -46,13 +46,12 @@
 		<h1 class="page-header">Manage Entries</h1>
 	    {% endif %}
 	    <div class="table-responsive">
-                <form action="." method="post">
+                <form action="." method="post" id="modelForm">
                     {% csrf_token %}
-                    Action:
-                    <select name="selectedAction">
-                    <option value="delete">Delete</option>
+                    <select name="selectedAction" hidden="true" id="actions">
+                        <option value="none"></option>
+                        <option value="delete">Delete</option>
                     </select>
-                    <input type="submit" Value="Go">
                     <table class="table table-striped">
                         <thead>
                         <tr>

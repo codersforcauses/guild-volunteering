@@ -28,7 +28,7 @@
 			<li style="border-top: 1px solid grey;"><a href="./add">Add Book</a></li>
 	      		<li><a href="#edit_book">Edit Book</a></li>
 	      		<li><a href="#submit_books">Submit Book/s</a></li>
-	      		<li><a href="#delete_books">Delete Book/s</a></li>
+                <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Book/s</a></li>
 		    </ul>
 		</li>
             </ul>
@@ -39,13 +39,12 @@
 	<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
           <h1 class="page-header">Manage Your Log Books</h1>
           <div class="table-responsive">
-            <form action="." method="post">
+            <form action="." method="post" id="modelForm">
                 {% csrf_token %}
-                Action:
-                <select name="selectedAction">
+                <select name="selectedAction" hidden="true" id="actions">
+                    <option value="none"></option>
                     <option value="delete">Delete</option>
                 </select>
-                <input type="submit" Value="Go"> 
                 <table class="table table-striped">
                   <thead>
                     <tr>
@@ -81,3 +80,7 @@
 	</div>
 
     {% endblock %}
+
+    <style>
+    .click:hover{ cursor:pointer; }
+    </style>
