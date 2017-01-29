@@ -17,8 +17,6 @@ from .admin import *
 
 import string
 
-
-# For testing until merged with proper supervisor code
 def is_supervisor(user):
     return user.groups.filter(name='LBSupervisor').exists()
 
