@@ -38,32 +38,44 @@
 	<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
           <h1 class="page-header">Manage Your Log Books</h1>
           <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-		  <th>#</th>
-                  <th>Name</th>
-                  <th>Organisation</th>
-                  <th>Description</th>
-                  <th>Created</th>
-                  <th>Last Updated</th>
-                </tr>
-              </thead>
-              <tbody>
-		{% if logbooks %}
-		    {% for logbook in logbooks %}
-		    	<tr class = "">
-		    	    <td><input type="checkbox" name="logbook-{{logbook.id}}" value="{{ logbook.id }}"></td>
-                    	    <td><a href="./{{user.username}}/{{logbook.name_slug}}">{{ logbook.name }}</a></td>
-			    <td>{{ logbook.organisation }}</td>
-                    	    <td>{{ logentry.description }}</td>
-                    	    <td>{{ logbook.created_at }}</td>
-                    	    <td>{{ logbook.updated_at }}</td>
-			</tr>
-		    {% endfor %}
-		{% endif %}
-              </tbody>
-            </table>
+            <form action="." method="post">
+                {% csrf_token %}
+                Action:
+                <select name="selectedAction">
+                    <option value="delete">Delete</option>
+                </select>
+                <input type="submit" Value="Go"> 
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      {% for header in headers %}
+                      <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
+                      {% endfor %}
+                      <!-- <th>Name</th>
+                      <th>Organisation</th>
+                      <th>Description</th>
+                      <th>Created</th>
+                      <th>Last Updated</th> --!>
+                    </tr>
+                  </thead>
+                  <tbody>
+            {% if logbooks %}
+                {% for logbook in logbooks %}
+                    <tr class = "">
+                        <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
+                            <td><a href="./{{user.username}}/{{logbook.name_slug}}">{{ logbook.name }}</a></td>
+                            <!-- TODO make this use the headers instead of hardcoded --!>
+                            <td>{{ logbook.organisation }}</td>
+                            <td>{{ logbook.description }}</td>
+                            <td>{{ logbook.created_at }}</td>
+                            <td>{{ logbook.updated_at }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+                  </tbody>
+                </table>
+            </form>
           </div>
 	</div>
 

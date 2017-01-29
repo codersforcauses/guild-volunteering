@@ -46,32 +46,46 @@
 		<h1 class="page-header">Manage Entries</h1>
 	    {% endif %}
 	    <div class="table-responsive">
-            	<table class="table table-striped">
-             	    <thead>
-                	<tr>
-		  	    <th>#</th>
-                  	    <th>Category</th>
-                  	    <th>Supervisor</th>
-                  	    <th>Start Time</th>
-                  	    <th>End Time</th>
-                  	    <th>Status</th>
-                	</tr>
-              	    </thead>
-              	    <tbody>	
-			{% if entries %}
-		    	    {% for logentry in entries %}
-				<tr class = "">
-		    	    	    <td><input type="checkbox" name="logentry" value="{{ logentry.id }}"></td>
-		    	    	    <td>{{ logentry.category }}</td>
-                    	    	    <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
-                    	    	    <td>{{ logentry.start }}</td>
-                    	    	    <td>{{ logentry.end }}</td>
-                    	    	    <td>{{ logentry.status }}</td>
-				</tr>
-		   	    {% endfor %}
-			{% endif %}
-		    </tbody>
-		</table>
+                <form action="." method="post">
+                    {% csrf_token %}
+                    Action:
+                    <select name="selectedAction">
+                    <option value="delete">Delete</option>
+                    </select>
+                    <input type="submit" Value="Go">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                        <th>#</th>
+                          {% for header in headers %}
+                          <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
+                          {% endfor %}
+                            <!--<th>Category</th>
+                            <th>Supervisor</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Status</th> --!>
+                        </tr>
+                        </thead>
+                        <tbody>	
+                        {% if entries %}
+                            {% for logentry in entries %}
+                                <tr class = "">
+                                <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
+                                <td>{{ logentry.category }}</td>
+                                <td>{{ logentry.description }}</td>
+                                <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
+                                <td>{{ logentry.start }}</td>
+                                <td>{{ logentry.end }}</td>
+                                <td>{{ logentry.created_at }}</td>
+                                <td>{{ logentry.updated_at }}</td>
+                                <td>{{ logentry.status }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>
+            </form>
 	    </div>
 	</div>
     {% endblock %}

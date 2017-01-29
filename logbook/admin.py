@@ -20,7 +20,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(LogBook)
 class LogBookAdmin(admin.ModelAdmin):
-    list_display = ['user','name','description','created_at','updated_at',]
+    list_display = ['user','name','organisation','description','created_at','updated_at',]
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
