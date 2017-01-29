@@ -194,3 +194,39 @@ def profileView(request):
         print('Staff User')
 
     return render(request, 'profile.html', {})
+
+@login_required
+def addLogbookView(request):
+    if request.method == 'POST':
+        form = LogBookForm(request.POST)
+        if form.is_valid():
+            logbook = LogBook.objects.create(name=form.cleaned_data['bookName'], description=form.cleaned_data['bookDescription'], user=LBUser.objects.get(user=request.user))
+            logbook.save()
+            return redirect('index')
+    else:
+        form = LogBookForm()
+    return render(request, 'form.html', {'title':'Create Logbook', 'form':form})
+
+@login_required
+def addLogEntryView(request, username, logbook_name_slug):
+    # check that user is accessing their own book
+    if username != request.user.username:
+         return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        print('was post')
+        form = LogEntryForm(request.POST)
+        if form.is_valid():
+            print('was valid')
+            logentry = LogEntry.objects.create(category=form.cleaned_data['category'], 
+                                               description=form.cleaned_data['description'],
+                                               supervisor=form.cleaned_data['supervisor'],
+                                               start=form.cleaned_data['start'],
+                                               end=form.cleaned_data['end'],
+                                               book=LogBook.objects.get(name_slug=logbook_name_slug))
+            logentry.save()
+            print('redirecting')
+            return redirect('../')
+    else:
+        form = LogEntryForm()
+    return render(request, 'form.html', {'title':'Create Log Entry', 'form':form})

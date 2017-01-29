@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.indexView, name = 'index'),
+    url(r'^add/$', views.addLogbookView, name='addLogbook'),
     url(r'^signup/$', views.signupView, name = 'signup'),
     url(r'^superSignup/$', views.supervisorSignupView, name = 'superSignup'),
     url(r'^login/$', views.loginView, name = 'login'),
@@ -10,4 +11,6 @@ urlpatterns = [
     url(r'^profile/$', views.profileView, name = 'profile'),
     url(r'^(?P<username>[0-9]{8})/(?P<logbook_name_slug>[\w\-]+)/$',
         views.logentryView, name = 'logentry'),
+    url(r'^(?P<username>[0-9]{8})/(?P<logbook_name_slug>[\w\-]+)/add/$',
+        views.addLogEntryView, name='addLogEntry'),
     ]
