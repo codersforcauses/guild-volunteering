@@ -6,34 +6,32 @@
 
     {% block sideblock %}
 
-	<script type="text/javascript">
-	    var current = document.getElementById('overview');
-	    current.style.display = 'none';
-	    function showStuff(id) {
-		document.getElementById(id).style.display = '';
-		current.style.display = 'none';
-		current = document.getElementById(id);
-		}
-    	</script>	
-
-	<div class="col-sm-4 col-md-2 sidebar">
-	  
-	  <h3>Overview</h3>
-          <ul class="nav nav-sidebar">
-              <li class="active"><a href=".">Manage Log Books</a><span class="sr-only">(current)</span></li>
-              <li><a href="/logbook/#statistics" onclick = showStuff('statistics')>Statistics</a></li>
-              <li><a href="/logbook/#export" onclick = showStuff('export')>Export Log Books</a></li>
-          </ul>
-	
-	  <h3>Log Books</h3>
-          <ul class="nav nav-sidebar">
-	        {% if logbooks %}
-		    {% for logbook in logbooks %}
-	        	<li><a href="/logbook/{{ logbook.id }}">{{ logbook.name }}</a></li>
-		    {% endfor %}
-		{% endif %}
-		<li><a href="#addbook">Add Log Book</a></li>
-          </ul>
+	<div class="col-sm-4 col-md-2 sidebar" id="sidebar">
+            <ul class="nav" id="menu" style="display: inline-block;">
+                <li>
+		    <a href="#" data-target="#item1" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Overview</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
+                    <ul class="nav nav-stacked collapse left-submenu" id="item1">
+                    	<li class="active"><a href="#">Manage Log Books</a><span class="sr-only">(current)</span></li>
+              		<li><a href="#statistics">Statistics</a></li>
+              		<li><a href="#export">Export Log Books</a></li>
+		    </ul>
+		</li>
+            
+		<li>
+	    	    <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Log Books</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
+             	    <ul class="nav nav-stacked collapse left-submenu" id="item2">
+	        	{% if logbooks %}
+		    	    {% for logbook in logbooks %}
+	        		<li><a href="./{{user.username}}/{{logbook.name_slug}}">{{ logbook.name }}</a></li>
+		    	    {% endfor %}
+			{% endif %}
+			<li style="border-top: 1px solid grey;"><a href="#add_book">Add Book</a></li>
+	      		<li><a href="#edit_book">Edit Book</a></li>
+	      		<li><a href="#submit_books">Submit Book/s</a></li>
+	      		<li><a href="#delete_books">Delete Book/s</a></li>
+		    </ul>
+		</li>
+            </ul>
         </div>
     {% endblock %}
 
