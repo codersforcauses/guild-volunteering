@@ -27,7 +27,7 @@
 			{% endif %}
 			<li style="border-top: 1px solid grey;"><a href="./add">Add Book</a></li>
 	      		<li><a href="#edit_book">Edit Book</a></li>
-	      		<li><a href="#submit_books">Submit Book/s</a></li>
+	      		<li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Book/s</a></li>
                 <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Book/s</a></li>
 		    </ul>
 		</li>
@@ -43,6 +43,7 @@
                 {% csrf_token %}
                 <select name="selectedAction" hidden="true" id="actions">
                     <option value="none"></option>
+		    <option value="submit">Submit</option>
                     <option value="delete">Delete</option>
                 </select>
                 <table class="table table-striped">

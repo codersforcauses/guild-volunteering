@@ -18,7 +18,7 @@
                     <ul class="nav nav-stacked collapse left-submenu" id="item1">
                         <li><a href="./add">Add Entry</a></li>
 	      		<li><a href="#edit_entry">Edit Entry</a></li>
-	      		<li><a href="#submit_entries">Submit Entry/s</a></li>
+	      	<li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Entry/s</a></li>
                 <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Entry/s</a></li>
                     </ul>
                 </li>
@@ -50,6 +50,7 @@
                     {% csrf_token %}
                     <select name="selectedAction" hidden="true" id="actions">
                         <option value="none"></option>
+			<option value="submit">Submit</option>
                         <option value="delete">Delete</option>
                     </select>
                     <table class="table table-striped">

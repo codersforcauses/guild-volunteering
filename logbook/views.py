@@ -65,6 +65,17 @@ def modelActions(request, model, permissionCheck):
             if permissionCheck(request.user, m, 'delete'):
                 m.delete()
 
+    if action == 'submit':
+        for i in modelIDs:
+            try:
+                m = model.objects.get(id=i)
+            except model.DoesNotExist:
+                pass
+            if permissionCheck(request.user, m, 'submit'):
+                if m.status == 'Unapproved':
+                    m.status = 'Pending'
+                    m.save()
+
 def logbookPermissionCheck(user, logbook, action):
     user = LBUser.objects.get(user=user)
     return user == logbook.user
