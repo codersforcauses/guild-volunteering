@@ -50,11 +50,11 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
                     {% if user.is_authenticated %}
-                    <li><a style="color:#eaecef;" href="/logbook/profile/">{{ user.username }}</a></li>
-                    <li><a style="color:#eaecef;" href="/logbook/logout/">Logout</a></li>
+                    <li><a style="color:#eaecef;" href="{% url 'logbook:profile' %}">{{ user.username }}</a></li>
+                    <li><a style="color:#eaecef;" href="{% url 'logbook:logout' %}">Logout</a></li>
                     {% else %}
-                    <li><a style="color:#eaecef;" href="/logbook/login/">Login</a></li>
-                    <li><a style="color:#eaecef;" href="/logbook/signup">Sign Up!</a></li>
+                    <li><a style="color:#eaecef;" href="{% url 'logbook:login' %}">Login</a></li>
+                    <li><a style="color:#eaecef;" href="{% url 'logbook:signup' %}">Sign Up!</a></li>
                     {% endif %}
                 </ul>
                 <form class="navbar-form navbar-right">

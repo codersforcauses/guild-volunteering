@@ -27,7 +27,7 @@
             <ul class="nav nav-stacked collapse" id="item2">
                 {% if logbooks %}
                 {% for logbook in logbooks %}
-                <li><a href="/logbook/{{ user.username }}/{{ logbook.name_slug }}">{{ logbook.name }}</a></li>
+                <li><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></li>
                 {% endfor %}
                 {% endif %}
             </ul>

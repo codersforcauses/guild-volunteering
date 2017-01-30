@@ -10,8 +10,8 @@
     <h3>Overview</h3>
     <ul class="nav nav-sidebar">
         <li class="active"><a href=".">Manage Log Books</a><span class="sr-only">(current)</span></li>
-        <li><a href="/logbook/#statistics">Statistics</a></li>
-        <li><a href="/logbook/#export">Export Log Books</a></li>
+        <li><a href="{% url 'logbook:index' %}#statistics">Statistics</a></li>
+        <li><a href="{% url 'logbook:index' %}#export">Export Log Books</a></li>
     </ul>
 </div>
 {% endblock %}
@@ -33,7 +33,7 @@
                 {% for logbook in logbooks %}
                 <tr>
                     <td>{{ logbook.name }}</td>
-                    <td><a href="./{{ logbook.user.user.username }}/{{ logbook.name_slug }}">{{ logbook.user.user.username }} - {{ logbook.user.user.first_name }} {{ logbook.user.user.last_name }}</a></td>
+                    <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.user.user.username }} - {{ logbook.user.user.first_name }} {{ logbook.user.user.last_name }}</a></td>
                     <td>{{ logbook.description }}</td>
                 </tr>
                 {% endfor %}

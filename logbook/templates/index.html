@@ -1,5 +1,5 @@
 <html lang="en">
-    
+
 {% extends 'base.html' %}
 
 {% load static %}
@@ -12,20 +12,20 @@
     <h1 class="page-header" style="text-align: center;">Welcome to the Guild Volunteering System</h1>
     <div class="row placeholders">
         <div class="col-xs-4 col-xs-offset-6 col-sm-2 col-sm-offset-3  placeholder">
-            <a href="./books/"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="60%" height="60%" alt="Manage Your Log Books">
+            <a href="{% url 'logbook:list' %}"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="60%" height="60%" alt="Manage Your Log Books">
                 <h4>Manage Log Books</h4>
             </a>
             <span class="text-muted">Add entries to your log books and get them approved by your supervisor.</span>
         </div>
         <div class="col-xs-4 col-xs-offset-0 col-sm-2 col-sm-offset-0 placeholder">
-            <a href="./profile/">
+            <a href="{% url 'logbook:profile' %}">
                 <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="60%" height="60%" alt="Manage Your Log Books">
                 <h4>View Your Profile</h4>
             </a>
             <span class="text-muted">Change your account details, view stats, and see what badges you've earnt.</span>
         </div>
         <div class="col-xs-4 col-xs-offset-0 col-sm-2 col-sm-offset-0 placeholder">
-            <a href="./faq/"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="60%" height="60%" alt="Manage Your Log Books">
+            <a href="{% url 'logbook:faq' %}"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="60%" height="60%" alt="Manage Your Log Books">
                 <h4>FAQ</h4>
             </a>
             <span class="text-muted">View a guide on using this site, and any frequently asked questions that may help you.</span>
