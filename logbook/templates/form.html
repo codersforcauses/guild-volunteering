@@ -2,35 +2,30 @@
 
 {% extends 'base.html' %}
 
-    {% block titleblock %}
-    {{ title }}
-    {% endblock %}
+{% block titleblock %} {{ title }} {% endblock %}
 
-    {% block sideblock %}
-	<div class="col-sm-4 col-md-2 sidebar" id="sidebar">
-            <ul class="nav" id="menu" style="display: inline-block;">
-                <li>
-                    <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Log Books</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
-		    <ul class="nav nav-stacked collapse" id="item2">
-                        {% if logbooks %}
-		    	    {% for logbook in logbooks %}
-	        		<li><a href="/logbook/{{ user.username }}/{{ logbook.name_slug }}">{{ logbook.name }}</a></li>
-		    	    {% endfor %}
-			{% endif %}
-                    </ul>
-                </li>
-		<li><a href="/logbook/">Back</a></li>
+{% block sideblock %}
+<div class="col-sm-4 col-md-2 sidebar" id="sidebar">
+    <ul class="nav" id="menu" style="display: inline-block;">
+        <li>
+            <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Log Books</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
+            <ul class="nav nav-stacked collapse" id="item2">
+                {% if logbooks %} {% for logbook in logbooks %}
+                <li><a href="/logbook/{{ user.username }}/{{ logbook.name_slug }}">{{ logbook.name }}</a></li>
+                {% endfor %} {% endif %}
             </ul>
-        </div>
-    {% endblock %}
+        </li>
+        <li><a href="/logbook/">Back</a></li>
+    </ul>
+</div>
+{% endblock %}
 
-    {% block bodyblock %}
-        <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
-            <h1 class="page-header">{{title}}</h1>
-            <form action="." method="post">
-                {% csrf_token %}
-                {{ form.as_p}}
-                <button class="btn" type="submit" value="Submit" >Create</button>
-            </form>
-        </div>
-    {% endblock %}
+{% block bodyblock %}
+<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
+    <h1 class="page-header">{{title}}</h1>
+    <form action="." method="post">
+        {% csrf_token %} {{ form.as_p}}
+        <button class="btn" type="submit" value="Submit">Create</button>
+    </form>
+</div>
+{% endblock %}

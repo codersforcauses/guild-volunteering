@@ -2,32 +2,27 @@
 
 {% extends 'base.html' %}
 
-	    {% block titleblock %}
-		GVS - {{ user.username }}
-	    {% endblock %}
+{% block titleblock %}GVS - {{ user.username }}{% endblock %}
 
-    {% block sideblock %}
+{% block sideblock %}
+<div class="col-sm-4 col-md-2 sidebar">
 
-	<div class="col-sm-4 col-md-2 sidebar">
-	  
-	  <h3>Account Overview</h3>
-          <ul class="nav nav-sidebar">
-              <li class="active"><a href="/logbook/">Manage Log Books</a></li>
-              <li><a href="#badges">Badges</a></li>
-          </ul>
-	
-	  <h3>Settings</h3>
-          <ul class="nav nav-sidebar">
-		<li><a href="#account_details">Alter Account Details</a></li>
-		<li><a href="#password_reset">Reset Password</a></li>
-          </ul>
-        </div>
-    {% endblock %}
+    <h3>Account Overview</h3>
+    <ul class="nav nav-sidebar">
+        <li class="active"><a href="/logbook/">Manage Log Books</a></li>
+        <li><a href="#badges">Badges</a></li>
+    </ul>
 
-    {% block bodyblock %}
-	
-	<div id="" class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
-	
-	</div>
-	
-    {% endblock %}
+    <h3>Settings</h3>
+    <ul class="nav nav-sidebar">
+        <li><a href="#account_details">Alter Account Details</a></li>
+        <li><a href="#password_reset">Reset Password</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block bodyblock %}
+<div id="" class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
+
+</div>
+{% endblock %}

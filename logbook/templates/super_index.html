@@ -2,45 +2,45 @@
 
 {% extends 'base.html' %}
 
-    {% block titleblock %}Guild Volunteering System{% endblock %}
+{% block titleblock %}Guild Volunteering System{% endblock %}
 
-    {% block sideblock %}
-	<div class="col-sm-4 col-md-2 sidebar">
-	  
-	  <h3>Overview</h3>
-          <ul class="nav nav-sidebar">
-              <li class="active"><a href=".">Manage Log Books</a><span class="sr-only">(current)</span></li>
-              <li><a href="/logbook/#statistics">Statistics</a></li>
-              <li><a href="/logbook/#export">Export Log Books</a></li>
-          </ul>
-        </div>
-    {% endblock %}
+{% block sideblock %}
+<div class="col-sm-4 col-md-2 sidebar">
 
-    {% block bodyblock %}
-	<div class="col-sm-8 col-sm-offset-2 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Manage Your Students</h1>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
+    <h3>Overview</h3>
+    <ul class="nav nav-sidebar">
+        <li class="active"><a href=".">Manage Log Books</a><span class="sr-only">(current)</span></li>
+        <li><a href="/logbook/#statistics">Statistics</a></li>
+        <li><a href="/logbook/#export">Export Log Books</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block bodyblock %}
+<div class="col-sm-8 col-sm-offset-2 col-md-10 col-md-offset-2 main">
+    <h1 class="page-header">Manage Your Students</h1>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
                 <tr>
-		  <th>Book Name</th>
-                  <th>User</th>
-                  <th>Description</th>
+                    <th>Book Name</th>
+                    <th>User</th>
+                    <th>Description</th>
                 </tr>
-              </thead>
-              <tbody>
-		{% if logbooks %}
-		  {% for logbook in logbooks %}
-		  <tr>
-		      <td>{{ logbook.name }}</td>
-		      <td><a href="./{{ logbook.user.user.username }}/{{ logbook.name_slug }}">{{ logbook.user.user.username }} - {{ logbook.user.user.first_name }} {{ logbook.user.user.last_name }}</a></td>
-		      <td>{{ logbook.description }}</td>
-		  </tr>
-		  {% endfor %}
-		{% endif %}
-              </tbody>
-            </table>
-          </div>
-	</div>
+            </thead>
+            <tbody>
+                {% if logbooks %}
+                {% for logbook in logbooks %}
+                <tr>
+                    <td>{{ logbook.name }}</td>
+                    <td><a href="./{{ logbook.user.user.username }}/{{ logbook.name_slug }}">{{ logbook.user.user.username }} - {{ logbook.user.user.first_name }} {{ logbook.user.user.last_name }}</a></td>
+                    <td>{{ logbook.description }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-    {% endblock %}
+{% endblock %}
