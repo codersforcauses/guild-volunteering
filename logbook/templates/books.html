@@ -1,0 +1,88 @@
+<html lang="en">
+
+{% extends 'base.html' %}
+
+{% block titleblock %}Guild Volunteering System{% endblock %}
+
+{% block sideblock %}
+<div class="col-sm-4 col-md-2 sidebar" id="sidebar">
+    <ul class="nav" id="menu" style="display: inline-block;">
+        <li>
+            <a href="#" data-target="#item1" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Overview</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
+            <ul class="nav nav-stacked collapse left-submenu" id="item1">
+                <li class="active"><a href="#">Manage Log Books</a><span class="sr-only">(current)</span></li>
+                <li><a href="#statistics">Statistics</a></li>
+                <li><a href="#export">Export Log Books</a></li>
+            </ul>
+        </li>
+
+        <li>
+            <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Log Books</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
+            <ul class="nav nav-stacked collapse left-submenu" id="item2">
+                {% if logbooks %}
+                {% for logbook in logbooks %}
+                <li><a href="./{{user.username}}/{{logbook.name_slug}}">{{ logbook.name }}</a></li>
+                {% endfor %}
+                {% endif %}
+                <li style="border-top: 1px solid grey;"><a href="./add">Add Book</a></li>
+                <li><a href="#edit_book">Edit Book</a></li>
+                <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Book/s</a></li>
+                <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Book/s</a></li>
+            </ul>
+        </li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block bodyblock %}
+<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
+    <h1 class="page-header">Manage Your Log Books</h1>
+    <div class="table-responsive">
+        <form action="." method="post" id="modelForm">
+            {% csrf_token %}
+            <select name="selectedAction" hidden="true" id="actions">
+                    <option value="none"></option>
+                    <option value="submit">Submit</option>
+                    <option value="delete">Delete</option>
+                </select>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        {% for header in headers %}
+                        <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
+                        {% endfor %} {% comment %}
+                        <th>Name</th>
+                        <th>Organisation</th>
+                        <th>Description</th>
+                        <th>Created</th>
+                        <th>Last Updated</th>
+                        {% endcomment %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if logbooks %}
+                    {% for logbook in logbooks %}
+                    <tr class="">
+                        <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
+                        <td><a href="./{{user.username}}/{{logbook.name_slug}}">{{ logbook.name }}</a></td>
+                        {# TODO make this use the headers instead of hardcoded #}
+                        <td>{{ logbook.organisation }}</td>
+                        <td>{{ logbook.description }}</td>
+                        <td>{{ logbook.created_at }}</td>
+                        <td>{{ logbook.updated_at }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<style>
+    .click:hover {
+        cursor: pointer;
+    }
+</style>
