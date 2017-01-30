@@ -10,7 +10,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseNotFound, HttpResponseForbidden
+
+from django.urls import reverse
 
 from .forms import *
 from .admin import *
@@ -76,7 +78,7 @@ def modelActions(request, model, permissionCheck):
                     if m.status == 'Unapproved':
                         m.status = 'Pending'
                         m.save()
-                # Then it is a logbook (surely a 'safer' way to do this?) 
+                # Then it is a logbook (surely a 'safer' way to do this?)
                 except:
                     logentries = LogEntry.objects.filter(book=m.id)
                     for log in logentries:
@@ -95,7 +97,7 @@ def logentryPermissionCheck(user, logentry, action):
 def indexView(request):
     # If we use a decorator, it doesn't redirect at all.
     if not request.user.is_authenticated():
-        return redirect('login')
+        return redirect('logbook:login')
     else:
         if is_supervisor(request.user):
             entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').distinct()
@@ -116,20 +118,22 @@ def indexView(request):
             return render(request, 'index.html', {'logbooks':logbooks, 'headers':headers})
 
 @login_required
-def logentryView(request, username, logbook_name_slug):
+def logentryView(request, pk):
+    logbook = LogBook.objects.get(id=pk)
+    if logbook == None:
+        return HttpResponseNotFound
+
     # check that user is accessing their own book
-    if username != request.user.username:
+    if logbook.user != request.user.lbuser:
          return HttpResponseForbidden()
 
     if request.method == 'POST':
         modelActions(request, LogEntry, logentryPermissionCheck)
 
     logentries = {}
-    logbook = {}
     logbooks = {}
     try:
         logbooks = LogBook.objects.filter(user__user=request.user)
-        logbook = logbooks.get(name_slug=logbook_name_slug)
         logentries = LogEntry.objects.filter(book=logbook)
     except LogEntry.DoesNotExist:
         pass
@@ -153,7 +157,7 @@ def loginView(request):
             user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
             if user is not None:
                 login(request, user)
-                return redirect('index')
+                return redirect('logbook:index')
     else:
         form = LoginForm()
     return render(request, 'login.html', {'loginForm':form})
@@ -173,7 +177,7 @@ def signupView(request):
             group = Group.objects.get(name='LBStudent')
             group.user_set.add(user)
             group.save()
-            return redirect('login')
+            return redirect('logbook:login')
     else:
         form = SignupForm()
     return render(request, 'signup.html', {'signupForm':form})
@@ -194,17 +198,17 @@ def supervisorSignupView(request):
             group = Group.objects.get(name='LBSupervisor')
             group.user_set.add(user)
             group.save()
-            return redirect('login')
+            return redirect('logbook:login')
     else:
         form = SupervisorSignupForm()
     return render(request, 'signup.html', {'signupForm':form})
-        
-    
+
+
 
 @login_required
 def logoutView(request):
     logout(request)
-    return redirect('login')
+    return redirect('logbook:login')
 
 @login_required
 def profileView(request):
@@ -221,15 +225,19 @@ def addLogbookView(request):
         if form.is_valid():
             logbook = LogBook.objects.create(name=form.cleaned_data['bookName'], description=form.cleaned_data['bookDescription'], user=LBUser.objects.get(user=request.user))
             logbook.save()
-            return redirect('index')
+            return redirect('logbook:index')
     else:
         form = LogBookForm()
     return render(request, 'form.html', {'title':'Create Logbook', 'form':form})
 
 @login_required
-def addLogEntryView(request, username, logbook_name_slug):
+def addLogEntryView(request, pk):
+    logbook = LogBook.objects.get(id=pk)
+    if logbook == None:
+        return HttpResponseNotFound
+
     # check that user is accessing their own book
-    if username != request.user.username:
+    if logbook.user != request.user.lbuser:
          return HttpResponseForbidden()
 
     if request.method == 'POST':
@@ -237,15 +245,15 @@ def addLogEntryView(request, username, logbook_name_slug):
         form = LogEntryForm(request.POST)
         if form.is_valid():
             print('was valid')
-            logentry = LogEntry.objects.create(category=form.cleaned_data['category'], 
+            logentry = LogEntry.objects.create(category=form.cleaned_data['category'],
                                                description=form.cleaned_data['description'],
                                                supervisor=form.cleaned_data['supervisor'],
                                                start=form.cleaned_data['start'],
                                                end=form.cleaned_data['end'],
-                                               book=LogBook.objects.get(name_slug=logbook_name_slug))
+                                               book=logbook)
             logentry.save()
             print('redirecting')
-            return redirect('../')
+            return redirect(reverse('logbook:view', args=[logbook.id]))
     else:
         form = LogEntryForm()
     return render(request, 'form.html', {'title':'Create Log Entry', 'form':form})

@@ -12,7 +12,7 @@
     <h2 class="form-signin-heading">Please Sign In</h2> {{ loginForm.as_p }}
     <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">Sign in</button>
     <p>
-        Don't have an account? <a href="/logbook/signup/">Register</a>
+        Don't have an account? <a href="{% url 'logbook:signup' %}">Register</a>
     </p>
 </form>
 {% endblock %}

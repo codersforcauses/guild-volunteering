@@ -11,7 +11,7 @@
             <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Log Books</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
             <ul class="nav nav-stacked collapse" id="item2">
                 {% if logbooks %} {% for logbook in logbooks %}
-                <li><a href="/logbook/{{ user.username }}/{{ logbook.name_slug }}">{{ logbook.name }}</a></li>
+                <li><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></li>
                 {% endfor %} {% endif %}
             </ul>
         </li>

@@ -21,10 +21,10 @@
             <ul class="nav nav-stacked collapse left-submenu" id="item2">
                 {% if logbooks %}
                 {% for logbook in logbooks %}
-                <li><a href="./{{user.username}}/{{logbook.name_slug}}">{{ logbook.name }}</a></li>
+                <li><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></li>
                 {% endfor %}
                 {% endif %}
-                <li style="border-top: 1px solid grey;"><a href="./add">Add Book</a></li>
+                <li style="border-top: 1px solid grey;"><a href="{% url 'logbook:create' %}">Add Book</a></li>
                 <li><a href="#edit_book">Edit Book</a></li>
                 <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Book/s</a></li>
                 <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Book/s</a></li>
@@ -65,7 +65,7 @@
                     {% for logbook in logbooks %}
                     <tr class="">
                         <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
-                        <td><a href="./{{user.username}}/{{logbook.name_slug}}">{{ logbook.name }}</a></td>
+                        <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
                         {# TODO make this use the headers instead of hardcoded #}
                         <td>{{ logbook.organisation }}</td>
                         <td>{{ logbook.description }}</td>
