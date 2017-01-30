@@ -93,6 +93,14 @@ def logentryPermissionCheck(user, logentry, action):
     return user == logentry.book.user
 
 def indexView(request):
+
+    return render(request, 'index.html', {})
+
+def faqView(request):
+
+    return render(request, 'faq.html', {})
+
+def booksView(request):
     # If we use a decorator, it doesn't redirect at all.
     if not request.user.is_authenticated():
         return redirect('login')
@@ -101,7 +109,7 @@ def indexView(request):
             entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').distinct()
             #use books to get the student numbers
             logbooks = LogBook.objects.filter(id__in = entries)
-            return render(request, 'super_index.html', {'logbooks':logbooks})
+            return render(request, 'supervisor.html', {'logbooks':logbooks})
         else:
             if request.method == 'POST':
                 modelActions(request, LogBook, logbookPermissionCheck)
@@ -113,7 +121,7 @@ def indexView(request):
             headers = makeHeaders(unformattedHeaderNames, currentOrder)
             logbooks = LogBook.objects.filter(user__user=request.user)
             logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
-            return render(request, 'index.html', {'logbooks':logbooks, 'headers':headers})
+            return render(request, 'books.html', {'logbooks':logbooks, 'headers':headers})
 
 @login_required
 def logentryView(request, username, logbook_name_slug):
