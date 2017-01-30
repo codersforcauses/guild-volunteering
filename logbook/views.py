@@ -94,36 +94,37 @@ def logentryPermissionCheck(user, logentry, action):
     user = LBUser.objects.get(user=user)
     return user == logentry.book.user
 
+
 def indexView(request):
-
-    return render(request, 'index.html', {})
-
-def faqView(request):
-
-    return render(request, 'faq.html', {})
-
-def booksView(request):
     # If we use a decorator, it doesn't redirect at all.
     if not request.user.is_authenticated():
         return redirect('logbook:login')
     else:
-        if is_supervisor(request.user):
-            entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').distinct()
-            #use books to get the student numbers
-            logbooks = LogBook.objects.filter(id__in = entries)
-            return render(request, 'supervisor.html', {'logbooks':logbooks})
-        else:
-            if request.method == 'POST':
-                modelActions(request, LogBook, logbookPermissionCheck)
-            # display page
-            currentOrder = request.GET.get('order', [])
-            if currentOrder:
-                currentOrder = currentOrder.split('.')
-            unformattedHeaderNames = LogBookAdmin.list_display[1:] # leave out the sutdent
-            headers = makeHeaders(unformattedHeaderNames, currentOrder)
-            logbooks = LogBook.objects.filter(user__user=request.user)
-            logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
-            return render(request, 'books.html', {'logbooks':logbooks, 'headers':headers})
+        return render(request, 'index.html', {})
+
+def faqView(request):
+    
+    return render(request, 'faq.html', {})
+
+@login_required
+def booksView(request):
+    if is_supervisor(request.user):
+        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').distinct()
+        #use books to get the student numbers
+        logbooks = LogBook.objects.filter(id__in = entries)
+        return render(request, 'supervisor.html', {'logbooks':logbooks})
+    else:
+        if request.method == 'POST':
+            modelActions(request, LogBook, logbookPermissionCheck)
+        # display page
+        currentOrder = request.GET.get('order', [])
+        if currentOrder:
+            currentOrder = currentOrder.split('.')
+        unformattedHeaderNames = LogBookAdmin.list_display[1:] # leave out the sutdent
+        headers = makeHeaders(unformattedHeaderNames, currentOrder)
+        logbooks = LogBook.objects.filter(user__user=request.user)
+        logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
+        return render(request, 'books.html', {'logbooks':logbooks, 'headers':headers})
 
 @login_required
 def logentryView(request, pk):
