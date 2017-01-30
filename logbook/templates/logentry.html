@@ -16,7 +16,7 @@
         <li>
             <a href="#" data-target="#item1" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Manage Entries</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
             <ul class="nav nav-stacked collapse left-submenu" id="item1">
-                <li><a href="./add">Add Entry</a></li>
+                <li><a href="{% url 'logbook:add_entry' %}">Add Entry</a></li>
                 <li><a href="#edit_entry">Edit Entry</a></li>
                 <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Entry/s</a></li>
                 <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Entry/s</a></li>
@@ -32,7 +32,7 @@
                 {% endif %}
             </ul>
         </li>
-        <li><a href="/logbook/">Back</a></li>
+        <li><a href="{% url 'logbook:list' %}">Back</a></li>
     </ul>
 </div>
 {% endblock %}
