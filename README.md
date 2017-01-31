@@ -23,3 +23,7 @@ ALLOWED_HOSTS = ['127.0.0.1']
 Additional database settings and engines can be found [here](https://docs.djangoproject.com/en/1.10/ref/settings/#std:setting-DATABASES)
 
 For development the line `DEBUG = True` can be added to the file.
+
+## Testing
+To run the tests use
+```python manage.py test logbook/tests```
