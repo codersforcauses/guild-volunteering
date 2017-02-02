@@ -2,69 +2,46 @@
 
 {% extends 'base.html' %}
 
-    {% block titleblock %}Guild Volunteering System{% endblock %}
+{% load static %}
 
-    {% block sideblock %}
-	<div class="col-sm-4 col-md-2 sidebar" id="sidebar">
-            <ul class="nav" id="menu" style="display: inline-block;">
-                <li>
-		    <a href="#" data-target="#item1" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Overview</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
-                    <ul class="nav nav-stacked collapse left-submenu" id="item1">
-                    	<li class="active"><a href="#">Manage Log Books</a><span class="sr-only">(current)</span></li>
-              		<li><a href="#statistics">Statistics</a></li>
-              		<li><a href="#export">Export Log Books</a></li>
-		    </ul>
-		</li>
-            
-		<li>
-	    	    <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Log Books</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
-             	    <ul class="nav nav-stacked collapse left-submenu" id="item2">
-	        	{% if logbooks %}
-		    	    {% for logbook in logbooks %}
-	        		<li><a href="./{{user.username}}/{{logbook.name_slug}}">{{ logbook.name }}</a></li>
-		    	    {% endfor %}
-			{% endif %}
-			<li style="border-top: 1px solid grey;"><a href="#add_book">Add Book</a></li>
-	      		<li><a href="#edit_book">Edit Book</a></li>
-	      		<li><a href="#submit_books">Submit Book/s</a></li>
-	      		<li><a href="#delete_books">Delete Book/s</a></li>
-		    </ul>
-		</li>
-            </ul>
+{% block titleblock %}Welcome{% endblock %}
+
+<style>
+.center-block {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.element {
+  .center-block();
+}
+</style>
+
+{% block bodyblock %}
+
+<div style="display: inline-block; vertical-align: middle; float: none; padding-top: 6%" class="col-sm-6 col-sm-offset-3 center-text">
+    <h1 class="page-header" style="text-align: center;">Welcome to the Guild Volunteering System</h1>
+    <div class="row placeholders">
+        <div class="col-xs-4 col-xs-offset-0 col-sm-3 col-sm-offset-1  placeholder">
+            <a href="{% url 'logbook:list' %}"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4>Manage Log Books</h4>
+            </a>
+            <span class="text-muted">Add entries to your log books and get them approved by your supervisor.</span>
         </div>
-    {% endblock %}
-
-    {% block bodyblock %}
-	<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Manage Your Log Books</h1>
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-		  <th>#</th>
-                  <th>Name</th>
-                  <th>Organisation</th>
-                  <th>Description</th>
-                  <th>Created</th>
-                  <th>Last Updated</th>
-                </tr>
-              </thead>
-              <tbody>
-		{% if logbooks %}
-		    {% for logbook in logbooks %}
-		    	<tr class = "">
-		    	    <td><input type="checkbox" name="logbook-{{logbook.id}}" value="{{ logbook.id }}"></td>
-                    	    <td><a href="./{{user.username}}/{{logbook.name_slug}}">{{ logbook.name }}</a></td>
-			    <td>{{ logbook.organisation }}</td>
-                    	    <td>{{ logentry.description }}</td>
-                    	    <td>{{ logbook.created_at }}</td>
-                    	    <td>{{ logbook.updated_at }}</td>
-			</tr>
-		    {% endfor %}
-		{% endif %}
-              </tbody>
-            </table>
-          </div>
-	</div>
-
-    {% endblock %}
+        <div class="col-xs-4 col-xs-offset-0 col-sm-3 col-sm-offset-0 placeholder">
+            <a href="{% url 'logbook:profile' %}">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4>View Your Profile</h4>
+            </a>
+            <span class="text-muted">Change your account details, view stats, and see what badges you've earnt.</span>
+        </div>
+        <div class="col-xs-4 col-xs-offset-0 col-sm-3 col-sm-offset-0 placeholder">
+            <a href="{% url 'logbook:faq' %}"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4>FAQ</h4>
+            </a>
+            <span class="text-muted">View a guide on using this site, and any frequently asked questions that may help you.</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -10,8 +10,7 @@ class LBUser(models.Model):
 
 class Organisation(models.Model):
     name = models.CharField(max_length=200)
-    # more fields here once we get that email with the csv of organisations
-    # UPDATE logbook.admin so org has calista code field in it
+    code = models.CharField(max_length=8, blank=True, default=None)
     def __str__(self):
         return str(self.name)
 
@@ -24,11 +23,16 @@ class Supervisor(models.Model):
     def __str__(self):
         return str(self.email)
 
+class Category(models.Model):
+    name = models.CharField(max_length=200)
+    def __str__(self):
+        return str(self.name)
+
 class LogBook(models.Model):
     user = models.ForeignKey(LBUser, on_delete=models.PROTECT)
     organisation = models.ForeignKey(Organisation, on_delete=models.SET_NULL, null=True, default=None )
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, default=None)
     name = models.CharField(max_length=200)
-    name_slug = models.SlugField(blank=True,default=None)
     description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -41,15 +45,8 @@ class LogBook(models.Model):
         return str(self.user) + " - " + self.name
     readonly_fields = ('created_at','updated_at',)
 
-#Category of the log entry
-class Category(models.Model):
-    name = models.CharField(max_length=200)
-    def __str__(self):
-        return str(self.name)
-
 class LogEntry(models.Model):
     book = models.ForeignKey(LogBook, on_delete=models.PROTECT)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
     description = models.CharField(max_length=200)
     supervisor = models.ForeignKey(Supervisor, on_delete=models.SET_NULL, null=True)
     start = models.DateTimeField('task start')

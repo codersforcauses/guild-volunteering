@@ -1,19 +1,18 @@
 <html lang="en">
-  
-{% extends 'base.html' %}
-    {% block titleblock %}GVS - Login{% endblock %}
-  
-    {% block bodyblock %}
-	
-	<link href="http://getbootstrap.com/examples/signin/signin.css" rel="stylesheet">	
 
-        <form class="form-signin" role="form" method="post" action=".">
-            {% csrf_token %}
-            <h2 class="form-signin-heading">Please Sign In</h2>
-            {{ loginForm.as_p }}
-            <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit" >Sign in</button>
-	    <p>
-	    	Don't have an account? <a href="/logbook/signup/">Register</a>
-	    </p>
-        </form>
-    {% endblock %}
+{% extends 'base.html' %}
+
+{% block titleblock %}Login{% endblock %}
+
+{% block bodyblock %}
+<link href="http://getbootstrap.com/examples/signin/signin.css" rel="stylesheet">
+
+<form class="form-signin" role="form" method="post" action=".">
+    {% csrf_token %}
+    <h2 class="form-signin-heading">Please Sign In</h2> {{ loginForm.as_p }}
+    <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">Sign in</button>
+    <p>
+        Don't have an account? <a href="{% url 'logbook:signup' %}">Register</a>
+    </p>
+</form>
+{% endblock %}
