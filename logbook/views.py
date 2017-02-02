@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 # Database
 from .forms import *
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Count, Sum
 
 # User authentication
 from django.contrib.auth import authenticate, login, logout
@@ -18,6 +18,7 @@ from .forms import *
 from .admin import *
 
 import string
+import datetime
 
 def is_supervisor(user):
     return user.groups.filter(name='LBSupervisor').exists()
@@ -85,6 +86,21 @@ def modelActions(request, model, permissionCheck):
                         if log.status == 'Unapproved':
                             log.status = 'Pending'
                             log.save()
+    if action == 'edit':
+        for i in modelIDs:
+            try:
+                m = model.objects.get(id=i)
+            except model.DoesNotExist:
+                pass
+            if permissionCheck(request.user, m, 'edit'):
+                try:
+                    print('yes')
+                    logentry = LogEntry.objects.get(id=m.id)
+                    print(logentry.book.id,logentry.id)
+                    return redirect('edit_entry',args=(logentry.book.id, logentry.id))
+                except:
+                    print('rip')
+                    
 
 def logbookPermissionCheck(user, logbook, action):
     user = LBUser.objects.get(user=user)
@@ -119,10 +135,13 @@ def hasAllApproved(logbook):
 @login_required
 def booksView(request):
     if is_supervisor(request.user):
-        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').distinct()
+        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book__user__user__username','book__user__user__first_name','book__user__user__last_name').annotate(entries_pending=Count('id'))
         #use books to get the student numbers
-        logbooks = LogBook.objects.filter(id__in = entries)
-        return render(request, 'supervisor.html', {'logbooks':logbooks})
+        #logbooks = LogBook.objects.filter(id__in = entries)
+        ApprovalCount = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').annotate(Count('id'))
+        print(ApprovalCount)
+        
+        return render(request, 'supervisor.html', {'logbooks':entries,})
     else:
         if request.method == 'POST':
             modelActions(request, LogBook, logbookPermissionCheck)
@@ -287,3 +306,27 @@ def addLogEntryView(request, pk):
     else:
         form = LogEntryForm()
     return render(request, 'form.html', {'title':'Create Log Entry', 'form':form,'book':logbook})
+
+@login_required
+def editLogEntryView(request, pk, log_id):
+    logbook = LogBook.objects.get(id=pk)
+    logentry = LogEntry.objects.get(id = log_id)
+    if logentry == None:
+        return HttpResponseNotFound
+
+    if logbook.user != request.user.lbuser:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        editForm = LogEntryForm(request.POST)
+        if editForm.valid():
+            LogEntry.objects.get(id=log_id).update(description=form.cleaned_data['description'],
+                                               supervisor=form.cleaned_data['supervisor'],
+                                               start=form.cleaned_data['start'],
+                                               end=form.cleaned_data['end'],
+                                               updated_at=datetime.datetime.now())
+
+    else:
+        editForm = LogEntryForm()
+
+    return render(request, 'form.html', {'title':'Edit Log Entry', 'form':editForm,'book':logbook})
