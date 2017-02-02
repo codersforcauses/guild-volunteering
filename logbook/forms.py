@@ -52,8 +52,8 @@ class LoginForm(forms.Form):
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
 
 class LogBookForm(forms.Form):
-    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all())
-    bookCategory = forms.ModelChoiceField(queryset = Category.objects.all())
+    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation')
+    bookCategory = forms.ModelChoiceField(queryset = Category.objects.all(), label='Category')
     bookName = forms.CharField(label='Logbook name')
     bookDescription = forms.CharField(label='Logbook description')
 
