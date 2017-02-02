@@ -19,8 +19,8 @@
             <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Options</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
             <ul class="nav nav-stacked collapse left-submenu" id="item2">
                 <li><a href="{% url 'logbook:create' %}">Add Log Book</a></li>
-                <li><a href="#edit_book">Edit Log Book</a></li>
-                <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Log Book/s</a></li>
+                <li><a href="">Edit Log Book</a></li>
+                <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Log Book/s For Approval</a></li>
                 <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Log Book/s</a></li>
             </ul>
         </li>
@@ -40,6 +40,7 @@
                     <option value="submit">Submit</option>
                     <option value="delete">Delete</option>
                 </select>
+            <h2 class="sub-heading">Manage Your Log Books</h2>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -58,6 +59,37 @@
                     {% if logbooks %}
                     {% for logbook in logbooks %}
                     <tr class="">
+                        <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
+                        <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
+                        {# TODO make this use the headers instead of hardcoded #}
+                        <td>{{ logbook.organisation }}</td>
+			<td>{{ logbook.category }}
+                        <td>{{ logbook.description }}</td>
+			<td>{{ logbook.updated_at }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+            <h2 class="sub-heading">Log Books Ready To Be Handed In</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        {% for header in headers %}
+                        <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
+                        {% endfor %} {% comment %}
+                        <th>Name</th>
+                        <th>Organisation</th>
+                        <th>Description</th>
+                        <th>Last Updated</th>
+                        {% endcomment %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if approvedbooks %}
+                    {% for logbook in approvedbooks %}
+                    <tr class="success">
                         <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
                         <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
                         {# TODO make this use the headers instead of hardcoded #}

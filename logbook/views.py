@@ -106,6 +106,16 @@ def faqView(request):
     
     return render(request, 'faq.html', {})
 
+def hasAllApproved(logbook):
+    entries = LogEntry.objects.filter(book = logbook.id)
+    if len(entries) == 0:
+        return False
+    for entry in entries:
+        if entry.status == 'Unapproved' or entry.status == 'Pending':
+            return False
+    return True
+    
+
 @login_required
 def booksView(request):
     if is_supervisor(request.user):
@@ -124,7 +134,15 @@ def booksView(request):
         headers = makeHeaders(unformattedHeaderNames, currentOrder)
         logbooks = LogBook.objects.filter(user__user=request.user)
         logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
-        return render(request, 'books.html', {'logbooks':logbooks, 'headers':headers})
+        logbooks = list(logbooks)
+        approvedLogbooks = list()
+        print(approvedLogbooks)
+        for book in logbooks:
+            if hasAllApproved(book):
+                approvedLogbooks.append(book)
+                logbooks.remove(book)
+        
+        return render(request, 'books.html', {'logbooks':logbooks,'approvedbooks':approvedLogbooks, 'headers':headers})
 
 @login_required
 def logentryView(request, pk):
