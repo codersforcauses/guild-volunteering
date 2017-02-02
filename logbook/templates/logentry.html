@@ -74,12 +74,10 @@
                     {% for logentry in entries %}
                     <tr class = "">
                         <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
-                        <td>{{ logentry.category }}</td>
                         <td>{{ logentry.description }}</td>
                         <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
                         <td>{{ logentry.start }}</td>
                         <td>{{ logentry.end }}</td>
-                        <td>{{ logentry.created_at }}</td>
                         <td>{{ logentry.updated_at }}</td>
                         <td>{{ logentry.status }}</td>
                     </tr>
