@@ -238,7 +238,7 @@ def addLogbookView(request):
                                              category=form.cleaned_data['bookCategory'],
                                              user=LBUser.objects.get(user=request.user))
             logbook.save()
-            return redirect('logbook:index')
+            return redirect('logbook:list')
     else:
         form = LogBookForm()
     return render(request, 'form.html', {'title':'Create Logbook', 'form':form})
