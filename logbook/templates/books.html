@@ -50,7 +50,6 @@
                         <th>Name</th>
                         <th>Organisation</th>
                         <th>Description</th>
-                        <th>Created</th>
                         <th>Last Updated</th>
                         {% endcomment %}
                     </tr>
@@ -63,9 +62,9 @@
                         <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
                         {# TODO make this use the headers instead of hardcoded #}
                         <td>{{ logbook.organisation }}</td>
+			<td>{{ logbook.category }}
                         <td>{{ logbook.description }}</td>
-                        <td>{{ logbook.created_at }}</td>
-                        <td>{{ logbook.updated_at }}</td>
+			<td>{{ logbook.updated_at }}</td>
                     </tr>
                     {% endfor %}
                     {% endif %}

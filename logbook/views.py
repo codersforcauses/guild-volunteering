@@ -232,9 +232,13 @@ def addLogbookView(request):
     if request.method == 'POST':
         form = LogBookForm(request.POST)
         if form.is_valid():
-            logbook = LogBook.objects.create(name=form.cleaned_data['bookName'], description=form.cleaned_data['bookDescription'], user=LBUser.objects.get(user=request.user))
+            logbook = LogBook.objects.create(name=form.cleaned_data['bookName'],
+                                             description=form.cleaned_data['bookDescription'],
+                                             organisation=form.cleaned_data['bookOrganisation'],
+                                             category=form.cleaned_data['bookCategory'],
+                                             user=LBUser.objects.get(user=request.user))
             logbook.save()
-            return redirect('logbook:index')
+            return redirect('logbook:list')
     else:
         form = LogBookForm()
     return render(request, 'form.html', {'title':'Create Logbook', 'form':form})
@@ -254,8 +258,7 @@ def addLogEntryView(request, pk):
         form = LogEntryForm(request.POST)
         if form.is_valid():
             print('was valid')
-            logentry = LogEntry.objects.create(category=form.cleaned_data['category'],
-                                               description=form.cleaned_data['description'],
+            logentry = LogEntry.objects.create(description=form.cleaned_data['description'],
                                                supervisor=form.cleaned_data['supervisor'],
                                                start=form.cleaned_data['start'],
                                                end=form.cleaned_data['end'],

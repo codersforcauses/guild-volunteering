@@ -52,11 +52,12 @@ class LoginForm(forms.Form):
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
 
 class LogBookForm(forms.Form):
+    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation')
+    bookCategory = forms.ModelChoiceField(queryset = Category.objects.all(), label='Category')
     bookName = forms.CharField(label='Logbook name')
     bookDescription = forms.CharField(label='Logbook description')
 
 class LogEntryForm(forms.Form):
-    category = forms.ModelChoiceField(queryset = Category.objects.all())
     description = forms.CharField()
     # Allow user to select supervisor from a list of supervisors 
     supervisor = forms.ModelChoiceField(queryset=Supervisor.objects.all())
