@@ -72,7 +72,7 @@
                 <tbody>
                     {% if entries %}
                     {% for logentry in entries %}
-                    <tr class = "{% if logentry.status == 'Approved' %}success{% elif logentry.status == 'Pending' %}warning{% elif logentry.status == 'Unapproved' %}warning{%endif%}">
+                    <tr class = "{% if logentry.status == 'Approved' %}success{% elif logentry.status == 'Pending' %}warning{% elif logentry.status == 'Unapproved' %}danger{%endif%}">
                         <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
                         <td>{{ logentry.description }}</td>
                         <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
