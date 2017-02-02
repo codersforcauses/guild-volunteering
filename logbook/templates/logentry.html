@@ -1,41 +1,91 @@
 <html lang="en">
 
 {% extends 'base.html' %}
-    {% block titleblock %}GVS - LogEntries{% endblock %}
 
-    {% block bodyblock %}
+{% block titleblock %}
+{% if book %}
+    {{ book.name }}
+{% else %}
+    LogEntries
+{% endif %}
+{% endblock %}
 
-	<div class="table-responsive">
+{% block sideblock %}
+<div class="col-sm-4 col-md-2 sidebar" id="sidebar">
+    <ul class="nav" id="menu" style="display: inline-block;">
+        <li>
+            <a href="#" data-target="#item1" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Manage Entries</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
+            <ul class="nav nav-stacked collapse left-submenu" id="item1">
+                <li><a href="{% url 'logbook:add_entry' book.id %}">Add Entry</a></li>
+                <li><a href="#edit_entry">Edit Entry</a></li>
+                <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Entry/s</a></li>
+                <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Entry/s</a></li>
+            </ul>
+        </li>
+        <li>
+            <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Log Books</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
+            <ul class="nav nav-stacked collapse" id="item2">
+                {% if logbooks %}
+                {% for logbook in logbooks %}
+                <li><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></li>
+                {% endfor %}
+                {% endif %}
+            </ul>
+        </li>
+        <li><a href="{% url 'logbook:list' %}">Back to Logbooks</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block bodyblock %}
+<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
+    {% if book %}
+    <h1 class="page-header">Log Entries For: {{ book.name }}</h1>
+    <h3 class="sub-heading">{{ book.description }}</h3>
+    {% else %}
+    <h1 class="page-header">Manage Entries</h1>
+    {% endif %}
+    <div class="table-responsive">
+        <form action="." method="post" id="modelForm">
+            {% csrf_token %}
+            <select name="selectedAction" hidden="true" id="actions">
+                        <option value="none"></option>
+                        <option value="submit">Submit</option>
+                        <option value="delete">Delete</option>
+                    </select>
             <table class="table table-striped">
-              <thead>
-                <tr>
-		  <th>#</th>
-                  <th>Category</th>
-                  <th>Description</th>
-                  <th>Supervisor</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-                  <th>Created</th>
-                  <th>Last Updated</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>		
-
-		{% if logentries %}
-		    {% for logentry in logentries %}
-			<tr class = "">
-		    	    <td><input type="checkbox" name="logentry" value="{{ logentry.id }}"></td>
-		    	    <td>{{ logentry.category }}</td>
-                    	    <td>{{ logentry.description }}</td>
-                    	    <td>{{ logentry.supervisor }}</td>
-                    	    <td>{{ logentry.start }}</td>
-                    	    <td>{{ logentry.end }}</td>
-                    	    <td>{{ logentry.created_at }}</td>
-                    	    <td>{{ logentry.updated_at }}</td>
-                    	    <td>{{ logentry.status }}</td>
-			</tr>
-		   {% endfor %}
-		{% endif %}
-		</tbody>
-	{% endblock %}
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        {% for header in headers %}
+                        <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
+                        {% endfor %}
+                        {% comment %}
+                        <th>Category</th>
+                            <th>Supervisor</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Status</th>
+                        {% endcomment %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if entries %}
+                    {% for logentry in entries %}
+                    <tr class = "">
+                        <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
+                        <td>{{ logentry.description }}</td>
+                        <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
+                        <td>{{ logentry.start }}</td>
+                        <td>{{ logentry.end }}</td>
+                        <td>{{ logentry.updated_at }}</td>
+                        <td>{{ logentry.status }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+{% endblock %}

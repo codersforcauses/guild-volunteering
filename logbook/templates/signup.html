@@ -1,15 +1,15 @@
 <html lang="en">
 
 {% extends 'base.html' %}
-    {% block titleblock %}GVS - Sign Up!{% endblock %}
 
-    {% block bodyblock %}
-        <link href="http://getbootstrap.com/examples/signin/signin.css" rel="stylesheet">
+{% block titleblock %}Register!{% endblock %}
 
-        <form class="form-signin" role="form" method="post" action=".">
-            {% csrf_token %}
-            <h2 class="form-signin-heading">Create Account</h2>
-            {{ signupForm.as_p }}
-            <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit" >Create</button>
-        </form>
-      {% endblock %}
+{% block bodyblock %}
+<link href="http://getbootstrap.com/examples/signin/signin.css" rel="stylesheet">
+
+<form class="form-signin" role="form" method="post" action=".">
+    {% csrf_token %}
+    <h2 class="form-signin-heading">Create Account</h2> {{ signupForm.as_p }}
+    <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">Create</button>
+</form>
+{% endblock %}

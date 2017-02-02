@@ -20,11 +20,11 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(LogBook)
 class LogBookAdmin(admin.ModelAdmin):
-    list_display = ['user','name','description','created_at','updated_at',]
+    list_display = ['user','name','organisation','category','description','created_at','updated_at',]
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-    list_display = ['book','category','description','supervisor','start','end',
+    list_display = ['book','description','supervisor','start','end',
                     'created_at','updated_at','status',]
 @admin.register(Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
