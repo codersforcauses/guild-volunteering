@@ -23,19 +23,49 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Book Name</th>
-                    <th>User</th>
-                    <th>Description</th>
+                    <th>Volunteer</th>
+                    <th>Entries Needing Approval</th>
                 </tr>
             </thead>
             <tbody>
                 {% if logbooks %}
                 {% for logbook in logbooks %}
                 <tr>
-                    <td>{{ logbook.name }}</td>
-                    <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.user.user.username }} - {{ logbook.user.user.first_name }} {{ logbook.user.user.last_name }}</a></td>
-                    <td>{{ logbook.description }}</td>
+                    <a href="." data-target="#item1" data-toggle="collapse"><td>{{ logbook.book__user__user__first_name }} {{ logbook.book__user__user__last_name }} - {{ logbook.book__user__user__username }}</td></a>
+                    <td>{{ logbook.entries_pending }}</td>
                 </tr>
+                <table class="table table-striped collapse" id="#item1">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            {% for header in headers %}
+                            <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
+                            {% endfor %}
+                            {% comment %}
+                            <th>Category</th>
+                                <th>Supervisor</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Status</th>
+                            {% endcomment %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if entries %}
+                        {% for logentry in entries %}
+                        <tr class = "">
+                            <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
+                            <td>{{ logentry.description }}</td>
+                            <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
+                            <td>{{ logentry.start }}</td>
+                            <td>{{ logentry.end }}</td>
+                            <td>{{ logentry.updated_at }}</td>
+                            <td>{{ logentry.status }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
                 {% endfor %}
                 {% endif %}
             </tbody>

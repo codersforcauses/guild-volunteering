@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 # Database
 from .forms import *
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Count, Sum
 
 # User authentication
 from django.contrib.auth import authenticate, login, logout
@@ -106,13 +106,30 @@ def faqView(request):
     
     return render(request, 'faq.html', {})
 
+def hasAllApproved(logbook):
+    entries = LogEntry.objects.filter(book = logbook.id)
+    if len(entries) == 0:
+        return False
+    for entry in entries:
+        if entry.status == 'Unapproved' or entry.status == 'Pending':
+            return False
+    return True
+    
+
 @login_required
 def booksView(request):
     if is_supervisor(request.user):
-        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').distinct()
+        log = LogEntry.objects.all()[1]
+        print(log.duration())
+        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book__user__user__username','book__user__user__first_name','book__user__user__last_name').annotate(entries_pending=Count('id'))
+        print(entries[0]['entries_pending'])
+        print(entries)
         #use books to get the student numbers
-        logbooks = LogBook.objects.filter(id__in = entries)
-        return render(request, 'supervisor.html', {'logbooks':logbooks})
+        #logbooks = LogBook.objects.filter(id__in = entries)
+        #ApprovalCount = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').annotate(Count('id'))
+        #print(ApprovalCount)
+        
+        return render(request, 'supervisor.html', {'logbooks':entries,})
     else:
         if request.method == 'POST':
             modelActions(request, LogBook, logbookPermissionCheck)
@@ -124,7 +141,15 @@ def booksView(request):
         headers = makeHeaders(unformattedHeaderNames, currentOrder)
         logbooks = LogBook.objects.filter(user__user=request.user)
         logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
-        return render(request, 'books.html', {'logbooks':logbooks, 'headers':headers})
+        logbooks = list(logbooks)
+        approvedLogbooks = list()
+        print(approvedLogbooks)
+        for book in logbooks:
+            if hasAllApproved(book):
+                approvedLogbooks.append(book)
+                logbooks.remove(book)
+        
+        return render(request, 'books.html', {'logbooks':logbooks,'approvedbooks':approvedLogbooks, 'headers':headers})
 
 @login_required
 def logentryView(request, pk):
