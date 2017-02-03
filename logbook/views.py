@@ -88,9 +88,18 @@ def modelActions(request, model, permissionCheck):
 
 def logbookPermissionCheck(user, logbook, action):
     user = LBUser.objects.get(user=user)
+    if action == 'delete':
+        # Don't delete the book if it contains approved entries
+        entries = LogEntry.objects.filter(book=logbook, status=LogEntry.APPROVED)
+        if len(entries) > 0:
+            return False
     return user == logbook.user
 
 def logentryPermissionCheck(user, logentry, action):
+    if action == 'delete':
+        # don't delete an approved entry
+        if logentry.status == LogEntry.APPROVED:
+            return False
     user = LBUser.objects.get(user=user)
     return user == logentry.book.user
 
