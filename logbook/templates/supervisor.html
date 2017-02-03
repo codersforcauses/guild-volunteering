@@ -9,9 +9,8 @@
 
     <h3>Overview</h3>
     <ul class="nav nav-sidebar">
-        <li class="active"><a href=".">Manage Log Books</a><span class="sr-only">(current)</span></li>
+        <li class="active"><a href=".">Approve Volunteer Hours</a><span class="sr-only">(current)</span></li>
         <li><a href="{% url 'logbook:list' %}#statistics">Statistics</a></li>
-        <li><a href="{% url 'logbook:list' %}#export">Export Log Books</a></li>
     </ul>
 </div>
 {% endblock %}
@@ -19,21 +18,12 @@
 {% block bodyblock %}
 <div class="col-sm-8 col-sm-offset-2 col-md-10 col-md-offset-2 main">
     <h1 class="page-header">Manage Your Students</h1>
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Volunteer</th>
-                    <th>Entries Needing Approval</th>
-                </tr>
-            </thead>
-            <tbody>
+    <div class="">
+        <ul>
+            <li>
                 {% if logbooks %}
                 {% for logbook in logbooks %}
-                <tr>
-                    <a href="." data-target="#item1" data-toggle="collapse"><td>{{ logbook.book__user__user__first_name }} {{ logbook.book__user__user__last_name }} - {{ logbook.book__user__user__username }}</td></a>
-                    <td>{{ logbook.entries_pending }}</td>
-                </tr>
+                    <a href="#" data-target="#item1" data-toggle="collapse"><span class="collapse in hidden-xs">{{ logbook.book__user__user__first_name }} {{ logbook.book__user__user__last_name }} - {{ logbook.book__user__user__username }} - {{ logbook.entries_pending }}</a>
                 <table class="table table-striped collapse" id="#item1">
                     <thead>
                         <tr>
@@ -56,11 +46,8 @@
                         <tr class = "">
                             <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
                             <td>{{ logentry.description }}</td>
-                            <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
                             <td>{{ logentry.start }}</td>
                             <td>{{ logentry.end }}</td>
-                            <td>{{ logentry.updated_at }}</td>
-                            <td>{{ logentry.status }}</td>
                         </tr>
                         {% endfor %}
                         {% endif %}
@@ -68,8 +55,8 @@
                 </table>
                 {% endfor %}
                 {% endif %}
-            </tbody>
-        </table>
+            </li>
+        </ul>
     </div>
 </div>
 

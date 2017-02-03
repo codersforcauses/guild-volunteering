@@ -124,8 +124,8 @@ def booksView(request):
         #logbooks = LogBook.objects.filter(id__in = entries)
         ApprovalCount = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').annotate(Count('id'))
         print(ApprovalCount)
-        
-        return render(request, 'supervisor.html', {'logbooks':entries,})
+        logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
+        return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
     else:
         if request.method == 'POST':
             modelActions(request, LogBook, logbookPermissionCheck)
