@@ -1,6 +1,25 @@
 <html lang="en">
 
 {% extends 'base.html' %}
+{% block styleblock %}
+	ul {
+		list-style-type: none;
+	}
+	
+	.question{
+		font-weight: bold;
+		font-size: 1.5em;
+		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	}
+	.answer{
+		padding-bottom: 20px;
+	}
+	#faqblock{
+		margin-top: 40px;
+		width: 60%;
+	}
+{% endblock %}
+
 
 {% block titleblock %}FAQ{% endblock %}
 
@@ -16,12 +35,19 @@
 {% endblock %}
 
 {% block bodyblock %}
-<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
+<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main" id = "faqblock">
+	<ul>
+		<li><h2>Student</h2></li>
+		<li class = "question"> How do I create an account?</li>
+		<li class = "answer">To create an account, first,select the "Sign Up!" option from the navigation bar in the top left corner of your screen. Then, enter your student number and desired password into the forms provided, and click the "Create" button.<OPTIONAL> Before logging in for the first time an email will be sent asking you to validate your account. Open your student email and follow the link in the email from <<ValidationEmailAddress>>.</Optional></li>
+		<li class = "question">What is a logbook?</li>
+		<li class = "answer">Logbooks are a handy way of sorting your volunteer hours and saving you time while logging them. Every organization you volunteer for should have a seperate logbook</li>
+		<li class = "question">How do I log my hours to be approved by my supervisor?</li>
+		<li class = "answer">To log your hours, you first need to create an account and login. Once you have logged in, you should be presented with three options, Manage your logbooks, </li>
+		<li class = "question">What should I do if my supervisor isn't on the system yet?</li>
+		<li class = "answer">If your supervisor is not yet on the system, but plans to use it in the future, you can log your hours as normal, and your supervisor will be able to approve them once they have an account. If your supervisor does not plan to use the system, then you will have to log your hours physically.</li>
+		<li><h2>Supervisor</h2></li>
+	</ul>
 </div>
 {% endblock %}
 
-<style>
-    .click:hover {
-        cursor: pointer;
-    }
-</style>
