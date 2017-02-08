@@ -18,11 +18,19 @@ class EmailField(forms.CharField):
 class UsernameField(forms.CharField):
     widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Student Number/Username'})
 
+class FirstNameField(forms.CharField):
+    widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'First Name'})
+
+class LastNameField(forms.CharField):
+    widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Last Name'})
+
 class PasswordField(forms.CharField):
     widget = forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'})
 
 class SignupFormBase(forms.Form):
     username = forms.CharField() # have to declare here otherwise order of form elements will be weird
+    first_name = forms.CharField()
+    last_name = forms.CharField()
     password = PasswordField(label='')
     passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password Again'}))
     def clean(self):
@@ -43,6 +51,8 @@ class SignupFormBase(forms.Form):
 
 class SignupForm(SignupFormBase):
     username = StundetNumField(label='')
+    first_name = FirstNameField(label='')
+    last_name = LastNameField(label='')
 
 class SupervisorSignupForm(SignupFormBase):
     username = EmailField(label='')
