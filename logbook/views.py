@@ -96,11 +96,11 @@ def logentryPermissionCheck(user, logentry, action):
 
 
 def indexView(request):
-    # If we use a decorator, it doesn't redirect at all.
     if not request.user.is_authenticated():
         return redirect('logbook:login')
     else:
-        return render(request, 'index.html', {})
+        is_super = is_supervisor(request.user)
+        return render(request, 'index.html', {'is_super':is_super})
 
 def faqView(request):
     

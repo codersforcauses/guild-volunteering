@@ -24,10 +24,18 @@
     <h1 class="page-header" style="text-align: center;">Welcome to the Guild Volunteering System</h1>
     <div class="row placeholders">
         <div class="col-xs-4 col-xs-offset-0 col-sm-3 col-sm-offset-1  placeholder">
-            <a href="{% url 'logbook:list' %}"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                <h4>Manage Log Books</h4>
+            <a href="{% url 'logbook:list' %}"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Logs">
+                {% if is_super %}
+                <h4>Approve Volunteer Hours</h4>
+                {% else %}
+                <h4>Manage Your Log Books</h4>
+                {% endif %}
             </a>
+            {% if is_super %}
+            <span class="text-muted">Approve or unapprove volunteer's logged hours you have supervised.</span>
+            {% else %}
             <span class="text-muted">Add entries to your log books and get them approved by your supervisor.</span>
+            {% endif %}
         </div>
         <div class="col-xs-4 col-xs-offset-0 col-sm-3 col-sm-offset-0 placeholder">
             <a href="{% url 'logbook:profile' %}">
