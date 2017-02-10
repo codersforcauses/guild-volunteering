@@ -46,7 +46,7 @@ class LogBook(models.Model):
     readonly_fields = ('created_at','updated_at',)
 
 class LogEntry(models.Model):
-    book = models.ForeignKey(LogBook, on_delete=models.PROTECT)
+    book = models.ForeignKey(LogBook, on_delete=models.CASCADE)
     description = models.CharField(max_length=200)
     supervisor = models.ForeignKey(Supervisor, on_delete=models.SET_NULL, null=True)
     start = models.DateTimeField('task start')
