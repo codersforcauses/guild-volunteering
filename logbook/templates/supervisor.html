@@ -18,45 +18,46 @@
 {% block bodyblock %}
 <div class="col-sm-8 col-sm-offset-2 col-md-10 col-md-offset-2 main">
     <h1 class="page-header">Manage Your Students</h1>
-    <div class="">
-        <ul>
-            <li>
-                {% if logbooks %}
-                {% for logbook in logbooks %}
-                    <a href="#" data-target="#item1" data-toggle="collapse"><span class="collapse in hidden-xs">{{ logbook.book__user__user__first_name }} {{ logbook.book__user__user__last_name }} - {{ logbook.book__user__user__username }} - {{ logbook.entries_pending }}</a>
-                <table class="table table-striped collapse" id="#item1">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            {% for header in headers %}
-                            <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
-                            {% endfor %}
-                            {% comment %}
-                            <th>Category</th>
-                                <th>Supervisor</th>
-                                <th>Start Time</th>
-                                <th>End Time</th>
-                                <th>Status</th>
-                            {% endcomment %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if entries %}
-                        {% for logentry in entries %}
-                        <tr class = "">
-                            <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
-                            <td>{{ logentry.description }}</td>
-                            <td>{{ logentry.start }}</td>
-                            <td>{{ logentry.end }}</td>
-                        </tr>
-                        {% endfor %}
-                        {% endif %}
-                    </tbody>
-                </table>
-                {% endfor %}
-                {% endif %}
-            </li>
-        </ul>
+    <div class="panel-group" id="accordion">
+        {% if logbooks %}
+        {% for logbook in logbooks %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>
+                        <a href="#{{ logbook.book__id }}" data-toggle="collapse" data-parent="#accordion"><span class="collapse in hidden-xs"><h4>{{ logbook.book__user__user__first_name }} {{ logbook.book__user__user__last_name }} - {{ logbook.book__user__user__username }} <span class = "badge">{{ logbook.entries_pending }}</span> </h4></a>
+                </div>
+
+                <div id="{{ logbook.book__id }}" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Description</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if entries %}
+                                {% for logentry in entries %}
+                                <tr class = "">
+                                    <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
+                                    <td>{{ logentry.description }}</td>
+                                    <td>{{ logentry.start }}</td>
+                                    <td>{{ logentry.end }}</td>
+                                    <td><button class="btn btn-success">Approve</button></td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        <button class="btn btn-success">Approve All</button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% endif %}
     </div>
 </div>
 

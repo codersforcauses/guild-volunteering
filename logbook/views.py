@@ -119,7 +119,7 @@ def hasAllApproved(logbook):
 @login_required
 def booksView(request):
     if is_supervisor(request.user):
-        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book__user__user__username','book__user__user__first_name','book__user__user__last_name').annotate(entries_pending=Count('id'))
+        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id').annotate(entries_pending=Count('id'))
         #use books to get the student numbers
         #logbooks = LogBook.objects.filter(id__in = entries)
         ApprovalCount = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').annotate(Count('id'))
