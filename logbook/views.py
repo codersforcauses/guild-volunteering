@@ -120,7 +120,8 @@ def booksView(request):
         currentOrder = request.GET.get('order', [])
         if currentOrder:
             currentOrder = currentOrder.split('.')
-        unformattedHeaderNames = LogBookAdmin.list_display[1:] # leave out the sutdent
+        headerNum = len(LogBookAdmin.list_display[:])-2 #removes the datetime fields from the table (not needed)
+        unformattedHeaderNames = LogBookAdmin.list_display[1:headerNum] # leave out the sutdent
         headers = makeHeaders(unformattedHeaderNames, currentOrder)
         logbooks = LogBook.objects.filter(user__user=request.user)
         logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
@@ -150,7 +151,8 @@ def logentryView(request, pk):
     currentOrder = request.GET.get('order', [])
     if currentOrder:
         currentOrder = currentOrder.split('.')
-    unformattedHeaderNames = LogEntryAdmin.list_display[1:] # leave out book name and creation/update times
+    unformattedHeaderNames = list(LogEntryAdmin.list_display[1:5])
+    unformattedHeaderNames.append(LogEntryAdmin.list_display[-1]) # leave out book name and creation/update times
     headers = makeHeaders(unformattedHeaderNames, currentOrder)
     logentries = orderModels(currentOrder, unformattedHeaderNames, logentries)
 

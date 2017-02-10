@@ -2,6 +2,8 @@
 
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block titleblock %}Guild Volunteering System{% endblock %}
 
 {% block sideblock %}
@@ -24,7 +26,11 @@
                 <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Log Book/s</a></li>
             </ul>
         </li>
-        <li><a href="{% url 'logbook:index' %}">Home</a></li>
+        <li>
+            <ul class="pager">
+                <li class="previous"><a href="{% url 'logbook:index' %}">&larr; Home</a></li>
+            </ul>
+        </li>
     </ul>
 </div>
 {% endblock %}
@@ -64,13 +70,19 @@
                         <td>{{ logbook.organisation }}</td>
 			<td>{{ logbook.category }}
                         <td>{{ logbook.description }}</td>
-			<td>{{ logbook.updated_at }}</td>
+                        <td class="visible-xs">
+                            <img width="40px" height="30px" src="{% static "images/edit-icon.png" %}" />
+                            <img width="30px" height="30px" src="{% static "images/delete-icon.png" %}" />
+                        </td>
                     </tr>
                     {% endfor %}
                     {% endif %}
                 </tbody>
             </table>
         </form>
+    </div>
+    <div class='btn-toolbar'>
+        <button type="button" class="btn btn-success visible-xs">Finalise Log Book/s</button>
     </div>
 </div>
 {% endblock %}
