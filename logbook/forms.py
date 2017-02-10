@@ -56,6 +56,8 @@ class SignupForm(SignupFormBase):
 
 class SupervisorSignupForm(SignupFormBase):
     username = EmailField(label='')
+    first_name = FirstNameField(widget=forms.HiddenInput(), initial=None)
+    last_name = LastNameField(widget=forms.HiddenInput(), initial=None)
             
 class LoginForm(forms.Form):
     username = UsernameField(label='')
