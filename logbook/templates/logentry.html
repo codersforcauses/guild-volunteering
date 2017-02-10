@@ -18,8 +18,8 @@
             <ul class="nav nav-stacked collapse left-submenu" id="item1">
                 <li><a href="{% url 'logbook:add_entry' book.id %}">Add Entry</a></li>
                 <li><a href="#edit_entry">Edit Entry</a></li>
-                <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Entry/s</a></li>
-                <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Entry/s</a></li>
+                <li><a onclick="doAction('submit')">Submit Entry/s</a></li>
+                <li><a onclick="doAction('delete')">Delete Entry/s</a></li>
             </ul>
         </li>
         <li>
@@ -89,3 +89,17 @@
     </div>
 </div>
 {% endblock %}
+
+{% block footerblock %}
+<script>
+form = document.getElementById('modelForm');
+actions = document.getElementById('actions');
+function doAction(action) {
+    if (confirm("Are you sure you want to "+action+" the selected entries/s\n")) {
+        actions.value = action;
+        form.submit()
+    }
+}
+</script>
+{% endblock%}
+

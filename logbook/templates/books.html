@@ -4,6 +4,15 @@
 
 {% block titleblock %}Guild Volunteering System{% endblock %}
 
+{% block headerblock %}
+<style>
+    .click:hover {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+
 {% block sideblock %}
 <div class="col-sm-4 col-md-2 sidebar" id="sidebar">
     <ul class="nav" id="menu" style="display: inline-block;">
@@ -20,8 +29,8 @@
             <ul class="nav nav-stacked collapse left-submenu" id="item2">
                 <li><a href="{% url 'logbook:create' %}">Add Log Book</a></li>
                 <li><a href="#edit_book">Edit Log Book</a></li>
-                <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Log Book/s</a></li>
-                <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Log Book/s</a></li>
+                <li><a onclick="doAction('submit')">Submit Log Book/s</a></li>
+                <li><a onclick="doAction('delete')">Delete Log Book/s</a></li>
             </ul>
         </li>
         <li><a href="{% url 'logbook:index' %}">Home</a></li>
@@ -75,8 +84,15 @@
 </div>
 {% endblock %}
 
-<style>
-    .click:hover {
-        cursor: pointer;
+{% block footerblock %}
+<script>
+form = document.getElementById('modelForm');
+actions = document.getElementById('actions');
+function doAction(action) {
+    if (confirm("Are you sure you want to "+action+" the selected book/s\n")) {
+        actions.value = action;
+        form.submit()
     }
-</style>
+}
+</script>
+{% endblock%}
