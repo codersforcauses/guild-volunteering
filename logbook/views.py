@@ -241,7 +241,7 @@ def addLogbookView(request):
             return redirect('logbook:list')
     else:
         form = LogBookForm()
-    return render(request, 'form.html', {'title':'Create Logbook', 'form':form})
+    return render(request, 'form.html', {'title':'Create Logbook', 'form':form, 'backUrl':reverse('logbook:list')})
 
 @login_required
 def addLogEntryView(request, pk):
@@ -268,4 +268,4 @@ def addLogEntryView(request, pk):
             return redirect(reverse('logbook:view', args=[logbook.id]))
     else:
         form = LogEntryForm()
-    return render(request, 'form.html', {'title':'Create Log Entry', 'form':form,'book':logbook})
+    return render(request, 'form.html', {'title':'Create Log Entry', 'form':form, 'backUrl':reverse('logbook:view', args=[logbook.id])})
