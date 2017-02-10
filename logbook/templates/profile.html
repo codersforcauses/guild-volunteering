@@ -18,9 +18,11 @@
                 <li><a href="#password_reset">Reset Password</a></li>
                 <li><a href="#delete_account">Delete Account</a></li>
             </li>
-            <li style="border-top: solid #1c1c1c 1px;">
-                <a href="{% url 'logbook:index' %}">Home</a>
-            </li>
+            <li>
+            <ul class="pager">
+                <li class="previous"><a href="{% url 'logbook:index' %}">&larr; Home</a></li>
+            </ul>
+        </li>
         </ul>
     </div>
 {% endblock %}
