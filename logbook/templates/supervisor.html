@@ -9,9 +9,8 @@
 
     <h3>Overview</h3>
     <ul class="nav nav-sidebar">
-        <li class="active"><a href=".">Manage Log Books</a><span class="sr-only">(current)</span></li>
+        <li class="active"><a href=".">Approve Volunteer Hours</a><span class="sr-only">(current)</span></li>
         <li><a href="{% url 'logbook:list' %}#statistics">Statistics</a></li>
-        <li><a href="{% url 'logbook:list' %}#export">Export Log Books</a></li>
     </ul>
 </div>
 {% endblock %}
@@ -19,27 +18,46 @@
 {% block bodyblock %}
 <div class="col-sm-8 col-sm-offset-2 col-md-10 col-md-offset-2 main">
     <h1 class="page-header">Manage Your Students</h1>
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Book Name</th>
-                    <th>User</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if logbooks %}
-                {% for logbook in logbooks %}
-                <tr>
-                    <td>{{ logbook.name }}</td>
-                    <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.user.user.username }} - {{ logbook.user.user.first_name }} {{ logbook.user.user.last_name }}</a></td>
-                    <td>{{ logbook.description }}</td>
-                </tr>
-                {% endfor %}
-                {% endif %}
-            </tbody>
-        </table>
+    <div class="panel-group" id="accordion">
+        {% if logbooks %}
+        {% for logbook in logbooks %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>
+                        <a href="#{{ logbook.book__id }}" data-toggle="collapse" data-parent="#accordion"><span class="collapse in hidden-xs"><h4>{{ logbook.book__user__user__first_name }} {{ logbook.book__user__user__last_name }} - {{ logbook.book__user__user__username }} <span class = "badge">{{ logbook.entries_pending }}</span> </h4></a>
+                </div>
+
+                <div id="{{ logbook.book__id }}" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Description</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if entries %}
+                                {% for logentry in entries %}
+                                <tr class = "">
+                                    <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
+                                    <td>{{ logentry.description }}</td>
+                                    <td>{{ logentry.start }}</td>
+                                    <td>{{ logentry.end }}</td>
+                                    <td><button class="btn btn-success">Approve</button></td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        <button class="btn btn-success">Approve All</button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% endif %}
     </div>
 </div>
 
