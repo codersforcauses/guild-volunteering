@@ -112,11 +112,11 @@ def logentryPermissionCheck(user, logentry, action):
 
 
 def indexView(request):
-    # If we use a decorator, it doesn't redirect at all.
     if not request.user.is_authenticated():
         return redirect('logbook:login')
     else:
-        return render(request, 'index.html', {})
+        is_super = is_supervisor(request.user)
+        return render(request, 'index.html', {'is_super':is_super})
 
 def faqView(request):
     
@@ -135,16 +135,27 @@ def hasAllApproved(logbook):
 @login_required
 def booksView(request):
     if is_supervisor(request.user):
-        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book__user__user__username','book__user__user__first_name','book__user__user__last_name').annotate(entries_pending=Count('id'))
+        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id').annotate(entries_pending=Count('id'))
         #use books to get the student numbers
         #logbooks = LogBook.objects.filter(id__in = entries)
         ApprovalCount = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').annotate(Count('id'))
         print(ApprovalCount)
-        
-        return render(request, 'supervisor.html', {'logbooks':entries,})
+        logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
+        return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
     else:
         if request.method == 'POST':
-            modelActions(request, LogBook, logbookPermissionCheck)
+            add_form = LogBookForm(request.POST)
+            if add_form.is_valid():
+                logbook = LogBook.objects.create(name=add_form.cleaned_data['bookName'],
+                                             description=add_form.cleaned_data['bookDescription'],
+                                             organisation=add_form.cleaned_data['bookOrganisation'],
+                                             category=add_form.cleaned_data['bookCategory'],
+                                             user=LBUser.objects.get(user=request.user))
+                logbook.save()
+                return redirect('logbook:list')
+            else:
+                modelActions(request, LogBook, logbookPermissionCheck)
+        add_form = LogBookForm()
         # display page
         currentOrder = request.GET.get('order', [])
         if currentOrder:
@@ -260,8 +271,18 @@ def profileView(request):
     # Staff member can view analytics in profile or in index
     if request.user.is_staff:
         print('Staff User')
-
-    return render(request, 'profile.html', {})
+    if request.method == 'POST':
+        editNamesForm = EditNamesForm(request.POST)
+        if editNamesForm.is_valid():
+            user = request.user
+            user.first_name = editNamesForm.cleaned_data['first_name']
+            user.last_name = editNamesForm.cleaned_data['last_name']
+            user.save()
+            return redirect('logbook:profile')
+    else:
+        editNamesForm = EditNamesForm(instance=request.user)
+        
+    return render(request, 'profile.html', {'names_form':editNamesForm})
 
 @login_required
 def addLogbookView(request):

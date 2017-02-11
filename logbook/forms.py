@@ -18,11 +18,19 @@ class EmailField(forms.CharField):
 class UsernameField(forms.CharField):
     widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Student Number/Username'})
 
+class FirstNameField(forms.CharField):
+    widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'First Name'})
+
+class LastNameField(forms.CharField):
+    widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Last Name'})
+
 class PasswordField(forms.CharField):
     widget = forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'})
 
 class SignupFormBase(forms.Form):
     username = forms.CharField() # have to declare here otherwise order of form elements will be weird
+    first_name = forms.CharField()
+    last_name = forms.CharField()
     password = PasswordField(label='')
     passwordVerify = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password Again'}))
     def clean(self):
@@ -43,19 +51,23 @@ class SignupFormBase(forms.Form):
 
 class SignupForm(SignupFormBase):
     username = StundetNumField(label='')
+    first_name = FirstNameField(label='')
+    last_name = LastNameField(label='')
 
 class SupervisorSignupForm(SignupFormBase):
     username = EmailField(label='')
+    first_name = FirstNameField(widget=forms.HiddenInput(), initial=None)
+    last_name = LastNameField(widget=forms.HiddenInput(), initial=None)
             
 class LoginForm(forms.Form):
     username = UsernameField(label='')
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
 
 class LogBookForm(forms.Form):
-    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation')
+    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation')                                              
     bookCategory = forms.ModelChoiceField(queryset = Category.objects.all(), label='Category')
-    bookName = forms.CharField(label='Logbook name')
-    bookDescription = forms.CharField(label='Logbook description')
+    bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
+    bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}))
 
 class LogEntryForm(forms.Form):
     description = forms.CharField()
@@ -63,3 +75,11 @@ class LogEntryForm(forms.Form):
     supervisor = forms.ModelChoiceField(queryset=Supervisor.objects.all())
     start = forms.DateTimeField()
     end = forms.DateTimeField()
+
+class EditNamesForm(forms.ModelForm):
+    first_name = FirstNameField()
+    last_name = FirstNameField()
+
+    class Meta:
+        model = User
+        fields = ['first_name','last_name',]
