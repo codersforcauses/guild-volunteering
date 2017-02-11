@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 # Database
 from .forms import *
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F, Count, Sum
 
 # User authentication
 from django.contrib.auth import authenticate, login, logout
@@ -96,23 +96,36 @@ def logentryPermissionCheck(user, logentry, action):
 
 
 def indexView(request):
-    # If we use a decorator, it doesn't redirect at all.
     if not request.user.is_authenticated():
         return redirect('logbook:login')
     else:
-        return render(request, 'index.html', {})
+        is_super = is_supervisor(request.user)
+        return render(request, 'index.html', {'is_super':is_super})
 
 def faqView(request):
     
     return render(request, 'faq.html', {})
 
+def hasAllApproved(logbook):
+    entries = LogEntry.objects.filter(book = logbook.id)
+    if len(entries) == 0:
+        return False
+    for entry in entries:
+        if entry.status == 'Unapproved' or entry.status == 'Pending':
+            return False
+    return True
+    
+
 @login_required
 def booksView(request):
     if is_supervisor(request.user):
-        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').distinct()
+        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id').annotate(entries_pending=Count('id'))
         #use books to get the student numbers
-        logbooks = LogBook.objects.filter(id__in = entries)
-        return render(request, 'supervisor.html', {'logbooks':logbooks})
+        #logbooks = LogBook.objects.filter(id__in = entries)
+        ApprovalCount = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').annotate(Count('id'))
+        print(ApprovalCount)
+        logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
+        return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
     else:
         if request.method == 'POST':
             modelActions(request, LogBook, logbookPermissionCheck)
@@ -120,12 +133,19 @@ def booksView(request):
         currentOrder = request.GET.get('order', [])
         if currentOrder:
             currentOrder = currentOrder.split('.')
-        headerNum = len(LogBookAdmin.list_display[:])-2 #removes the datetime fields from the table (not needed)
-        unformattedHeaderNames = LogBookAdmin.list_display[1:headerNum] # leave out the sutdent
+        unformattedHeaderNames = LogBookAdmin.list_display[1:] # leave out the sutdent
         headers = makeHeaders(unformattedHeaderNames, currentOrder)
         logbooks = LogBook.objects.filter(user__user=request.user)
         logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
-        return render(request, 'books.html', {'logbooks':logbooks, 'headers':headers})
+        logbooks = list(logbooks)
+        approvedLogbooks = list()
+        print(approvedLogbooks)
+        for book in logbooks:
+            if hasAllApproved(book):
+                approvedLogbooks.append(book)
+                logbooks.remove(book)
+        
+        return render(request, 'books.html', {'logbooks':logbooks,'approvedbooks':approvedLogbooks, 'headers':headers})
 
 @login_required
 def logentryView(request, pk):
@@ -151,8 +171,7 @@ def logentryView(request, pk):
     currentOrder = request.GET.get('order', [])
     if currentOrder:
         currentOrder = currentOrder.split('.')
-    unformattedHeaderNames = list(LogEntryAdmin.list_display[1:5])
-    unformattedHeaderNames.append(LogEntryAdmin.list_display[-1]) # leave out book name and creation/update times
+    unformattedHeaderNames = LogEntryAdmin.list_display[1:] # leave out book name and creation/update times
     headers = makeHeaders(unformattedHeaderNames, currentOrder)
     logentries = orderModels(currentOrder, unformattedHeaderNames, logentries)
 
@@ -184,8 +203,6 @@ def signupView(request):
             user = User.objects.create_user(form.cleaned_data['username'],
                                             form.cleaned_data['username'] + '@student.uwa.edu.au',
                                             form.cleaned_data['password'])
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
             user.save()
             group = Group.objects.get(name='LBStudent')
             group.user_set.add(user)
@@ -228,8 +245,18 @@ def profileView(request):
     # Staff member can view analytics in profile or in index
     if request.user.is_staff:
         print('Staff User')
-
-    return render(request, 'profile.html', {})
+    if request.method == 'POST':
+        editNamesForm = EditNamesForm(request.POST)
+        if editNamesForm.is_valid():
+            user = request.user
+            user.first_name = editNamesForm.cleaned_data['first_name']
+            user.last_name = editNamesForm.cleaned_data['last_name']
+            user.save()
+            return redirect('logbook:profile')
+    else:
+        editNamesForm = EditNamesForm(instance=request.user)
+        
+    return render(request, 'profile.html', {'names_form':editNamesForm})
 
 @login_required
 def addLogbookView(request):

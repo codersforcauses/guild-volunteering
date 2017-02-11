@@ -75,3 +75,11 @@ class LogEntryForm(forms.Form):
     supervisor = forms.ModelChoiceField(queryset=Supervisor.objects.all())
     start = forms.DateTimeField()
     end = forms.DateTimeField()
+
+class EditNamesForm(forms.ModelForm):
+    first_name = FirstNameField()
+    last_name = FirstNameField()
+
+    class Meta:
+        model = User
+        fields = ['first_name','last_name',]
