@@ -64,10 +64,10 @@ class LoginForm(forms.Form):
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
 
 class LogBookForm(forms.Form):
-    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation')
+    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation')                                              
     bookCategory = forms.ModelChoiceField(queryset = Category.objects.all(), label='Category')
-    bookName = forms.CharField(label='Logbook name')
-    bookDescription = forms.CharField(label='Logbook description')
+    bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
+    bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}))
 
 class LogEntryForm(forms.Form):
     description = forms.CharField()

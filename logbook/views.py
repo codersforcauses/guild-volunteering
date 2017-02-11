@@ -128,7 +128,18 @@ def booksView(request):
         return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
     else:
         if request.method == 'POST':
-            modelActions(request, LogBook, logbookPermissionCheck)
+            add_form = LogBookForm(request.POST)
+            if add_form.is_valid():
+                logbook = LogBook.objects.create(name=add_form.cleaned_data['bookName'],
+                                             description=add_form.cleaned_data['bookDescription'],
+                                             organisation=add_form.cleaned_data['bookOrganisation'],
+                                             category=add_form.cleaned_data['bookCategory'],
+                                             user=LBUser.objects.get(user=request.user))
+                logbook.save()
+                return redirect('logbook:list')
+            else:
+                modelActions(request, LogBook, logbookPermissionCheck)
+        add_form = LogBookForm()
         # display page
         currentOrder = request.GET.get('order', [])
         if currentOrder:
@@ -145,7 +156,7 @@ def booksView(request):
                 approvedLogbooks.append(book)
                 logbooks.remove(book)
         
-        return render(request, 'books.html', {'logbooks':logbooks,'approvedbooks':approvedLogbooks, 'headers':headers})
+        return render(request, 'books.html', {'logbooks':logbooks,'approvedbooks':approvedLogbooks, 'headers':headers, 'form':add_form})
 
 @login_required
 def logentryView(request, pk):
