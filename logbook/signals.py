@@ -8,4 +8,7 @@ from .models import LBUser
 def user_saved(sender, instance, created, raw, using, update_fields, **kwargs):
     if created:
         LBUser.objects.create(user=instance)
-    instance.lbuser.save();
+    try:
+        instance.lbuser.save()
+    except:
+        pass
