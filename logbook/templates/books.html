@@ -79,6 +79,37 @@
                     {% endif %}
                 </tbody>
             </table>
+            <h2 class="sub-heading">Log Books Ready To Be Finalised</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        {% for header in headers %}
+                        <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
+                        {% endfor %} {% comment %}
+                        <th>Name</th>
+                        <th>Organisation</th>
+                        <th>Description</th>
+                        <th>Last Updated</th>
+                        {% endcomment %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if approvedbooks %}
+                    {% for logbook in approvedbooks %}
+                    <tr class="success">
+                        <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
+                        <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
+                        {# TODO make this use the headers instead of hardcoded #}
+                        <td>{{ logbook.organisation }}</td>
+			<td>{{ logbook.category }}
+                        <td>{{ logbook.description }}</td>
+			<td>{{ logbook.updated_at }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
         </form>
     </div>
     <div class='btn-toolbar'>

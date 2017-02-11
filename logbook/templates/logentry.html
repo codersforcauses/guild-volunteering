@@ -19,7 +19,7 @@
             <h3 style="color:1c1c1e;">Manage Entries</h3>
             <ul class="nav nav-stacked left-submenu" id="item1">
                 <li><a href="{% url 'logbook:add_entry' book.id %}">Add Entry</a></li>
-                <li><a href="#edit_entry">Edit Entry</a></li>
+                <li><a onclick="document.getElementById('actions').value='edit';document.getElementById('modelForm').submit()">Edit Entry</a></li>
                 <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Entry/s</a></li>
                 <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Entry/s</a></li>
             </ul>
@@ -58,10 +58,11 @@
         <form action="." method="post" id="modelForm">
             {% csrf_token %}
             <select name="selectedAction" hidden="true" id="actions">
-                        <option value="none"></option>
-                        <option value="submit">Submit</option>
-                        <option value="delete">Delete</option>
-                    </select>
+                <option value="none"></option>
+                <option value="edit"></option>
+                <option value="submit">Submit</option>
+                <option value="delete">Delete</option>
+            </select>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -83,7 +84,7 @@
                     {% for logentry in entries %}
                     <tr class = "{% if logentry.status == 'Approved' %}success{% elif logentry.status == 'Pending' %}warning{% elif logentry.status == 'Unapproved' %}danger{%endif%}">
                         <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
-                        <td>{{ logentry.description }}</td>
+                        <td><a href="{% url 'logbook:edit_entry' logentry.book.id logentry.id %}">{{ logentry.description }}</a></td>
                         <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
                         <td>{{ logentry.start }}</td>
                         <td>{{ logentry.end }}</td>

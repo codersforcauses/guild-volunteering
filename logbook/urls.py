@@ -16,4 +16,6 @@ urlpatterns = [
         views.logentryView, name='view'),
     url(r'^b/(?P<pk>[0-9]+)/add/$',
         views.addLogEntryView, name='add_entry'),
+    url(r'^b/(?P<pk>[0-9]+)/(?P<log_id>[0-9]+)/edit/$',
+        views.editLogEntryView, name='edit_entry'),
     ]
