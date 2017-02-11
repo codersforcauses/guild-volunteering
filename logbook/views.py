@@ -18,6 +18,7 @@ from .forms import *
 from .admin import *
 
 import string
+import datetime
 
 def is_supervisor(user):
     return user.groups.filter(name='LBSupervisor').exists()
@@ -85,6 +86,21 @@ def modelActions(request, model, permissionCheck):
                         if log.status == 'Unapproved':
                             log.status = 'Pending'
                             log.save()
+    if action == 'edit':
+        for i in modelIDs:
+            try:
+                m = model.objects.get(id=i)
+            except model.DoesNotExist:
+                pass
+            if permissionCheck(request.user, m, 'edit'):
+                try:
+                    print('yes')
+                    logentry = LogEntry.objects.get(id=m.id)
+                    print(logentry.book.id,logentry.id)
+                    return redirect('edit_entry',args=(logentry.book.id, logentry.id))
+                except:
+                    print('rip')
+                    
 
 def logbookPermissionCheck(user, logbook, action):
     user = LBUser.objects.get(user=user)
@@ -128,7 +144,18 @@ def booksView(request):
         return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
     else:
         if request.method == 'POST':
-            modelActions(request, LogBook, logbookPermissionCheck)
+            add_form = LogBookForm(request.POST)
+            if add_form.is_valid():
+                logbook = LogBook.objects.create(name=add_form.cleaned_data['bookName'],
+                                             description=add_form.cleaned_data['bookDescription'],
+                                             organisation=add_form.cleaned_data['bookOrganisation'],
+                                             category=add_form.cleaned_data['bookCategory'],
+                                             user=LBUser.objects.get(user=request.user))
+                logbook.save()
+                return redirect('logbook:list')
+            else:
+                modelActions(request, LogBook, logbookPermissionCheck)
+        add_form = LogBookForm()
         # display page
         currentOrder = request.GET.get('order', [])
         if currentOrder:
@@ -137,15 +164,14 @@ def booksView(request):
         headers = makeHeaders(unformattedHeaderNames, currentOrder)
         logbooks = LogBook.objects.filter(user__user=request.user)
         logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
-        logbooks = list(logbooks)
+        logbooks_list = list(logbooks)
         approvedLogbooks = list()
-        print(approvedLogbooks)
         for book in logbooks:
             if hasAllApproved(book):
                 approvedLogbooks.append(book)
-                logbooks.remove(book)
-        
-        return render(request, 'books.html', {'logbooks':logbooks,'approvedbooks':approvedLogbooks, 'headers':headers})
+                logbooks_list.remove(book)
+        print(approvedLogbooks)
+        return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers})
 
 @login_required
 def logentryView(request, pk):
@@ -245,8 +271,18 @@ def profileView(request):
     # Staff member can view analytics in profile or in index
     if request.user.is_staff:
         print('Staff User')
-
-    return render(request, 'profile.html', {})
+    if request.method == 'POST':
+        editNamesForm = EditNamesForm(request.POST)
+        if editNamesForm.is_valid():
+            user = request.user
+            user.first_name = editNamesForm.cleaned_data['first_name']
+            user.last_name = editNamesForm.cleaned_data['last_name']
+            user.save()
+            return redirect('logbook:profile')
+    else:
+        editNamesForm = EditNamesForm(instance=request.user)
+        
+    return render(request, 'profile.html', {'names_form':editNamesForm})
 
 @login_required
 def addLogbookView(request):
@@ -290,3 +326,27 @@ def addLogEntryView(request, pk):
     else:
         form = LogEntryForm()
     return render(request, 'form.html', {'title':'Create Log Entry', 'form':form,'book':logbook})
+
+@login_required
+def editLogEntryView(request, pk, log_id):
+    logbook = LogBook.objects.get(id=pk)
+    logentry = LogEntry.objects.get(id = log_id)
+    if logentry == None:
+        return HttpResponseNotFound
+
+    if logbook.user != request.user.lbuser:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        editForm = LogEntryForm(request.POST)
+        if editForm.valid():
+            LogEntry.objects.get(id=log_id).update(description=form.cleaned_data['description'],
+                                               supervisor=form.cleaned_data['supervisor'],
+                                               start=form.cleaned_data['start'],
+                                               end=form.cleaned_data['end'],
+                                               updated_at=datetime.datetime.now())
+
+    else:
+        editForm = LogEntryForm()
+
+    return render(request, 'form.html', {'title':'Edit Log Entry', 'form':editForm,'book':logbook})

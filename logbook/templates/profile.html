@@ -15,12 +15,13 @@
                 <h3 style="color:1c1c1e;">Account</h3>
                 <li><a href="#badges">Badges</a></li>
                 <li><a href="#account_details">Alter Account Details</a></li>
-                <li><a href="#password_reset">Reset Password</a></li>
                 <li><a href="#delete_account">Delete Account</a></li>
             </li>
-            <li style="border-top: solid #1c1c1c 1px;">
-                <a href="{% url 'logbook:index' %}">Home</a>
-            </li>
+            <li>
+            <ul class="pager">
+                <li class="previous"><a href="{% url 'logbook:index' %}">&larr; Home</a></li>
+            </ul>
+        </li>
         </ul>
     </div>
 {% endblock %}
@@ -29,85 +30,89 @@
 
 <div id="content" class="col-xs-12 col-xs-offset-0 col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2">
     <div id="#account-content">
-        <h2 class="page-header">Account</h2>
-        <h4 class="sub-heading">Badges</h4>
-        <div class="container">
-            <div class="row text-center block-left">
-                <div class="col-xs-3 col-sm-1 col-md-1">
-                    <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                    <h4 class="">0/1</h4>
-                    <span class="text-muted hidden-xs">Log Entries Added</span>
-                </div>
-                <div class="col-xs-3 col-sm-1 col-md-1">
-                    <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                    <h4 class="">0/1</h4>
-                    <span class="text-muted hidden-xs">Log Entries Added</span>
-                </div>
-                <div class="col-xs-3 col-sm-1">
-                    <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                    <h4 class="">0/1</h4>
-                    <span class="text-muted hidden-xs">Log Entries Added</span>
-                </div>
-                <div class="col-xs-3 col-sm-1">
-                    <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                    <h4 class="">0/1</h4>
-                    <span class="text-muted hidden-xs">Log Entries Added</span>
-                </div>
-                <div class="col-xs-3 col-sm-1">
-                    <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                    <h4 class="">0/1</h4>
-                    <span class="text-muted hidden-xs">Log Entries Added</span>
-                </div>
-                <div class="col-xs-3 col-sm-1">
-                    <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                    <h4 class="">0/1</h4>
-                    <span class="text-muted hidden-xs">Log Entries Added</span>
-                </div>
-                <div class="col-xs-3 col-sm-1">
-                    <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                    <h4 class="">0/1</h4>
-                    <span class="text-muted hidden-xs">Log Entries Added</span>
-                </div>
-                <div class="col-xs-3 col-sm-1">
-                    <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                    <h4 class="">0/1</h4>
-                    <span class="text-muted hidden-xs">Log Entries Added</span>
-                </div>
-                <div class="col-xs-3 col-sm-1">
-                    <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                    <h4 class="">0/1</h4>
-                    <span class="text-muted hidden-xs">Log Entries Added</span>
-                </div>
-                <div class="col-xs-3 col-sm-1">
-                    <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
-                    <h4 class="">0/1</h4>
-                    <span class="text-muted hidden-xs">Log Entries Added</span>
-                </div>
 
-
-                <table class="table table-striped">
-                    <tbody>
-                    {% if badges %}
-                        {% for badge in badges %}
-                        <tr class = "">
-                        </tr>
-                        {% endfor %}
-                    {% endif %}
-                    </tbody>
-                </table>
+        <h3 class="page-header">Badges</h3>
+        <div class="row text-center block-left" style="padding-top: 10">
+            <div class="col-xs-3 col-sm-1 col-md-1">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4 class="">0/1</h4>
+                <span class="text-muted hidden-xs">Log Entries Added</span>
             </div>
+            <div class="col-xs-3 col-sm-1 col-md-1">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4 class="">0/1</h4>
+                <span class="text-muted hidden-xs">Log Entries Added</span>
+            </div>
+            <div class="col-xs-3 col-sm-1">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4 class="">0/1</h4>
+                <span class="text-muted hidden-xs">Log Entries Added</span>
+            </div>
+            <div class="col-xs-3 col-sm-1">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4 class="">0/1</h4>
+                <span class="text-muted hidden-xs">Log Entries Added</span>
+            </div>
+            <div class="col-xs-3 col-sm-1">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4 class="">0/1</h4>
+                <span class="text-muted hidden-xs">Log Entries Added</span>
+            </div>
+            <div class="col-xs-3 col-sm-1">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4 class="">0/1</h4>
+                <span class="text-muted hidden-xs">Log Entries Added</span>
+            </div>
+            <div class="col-xs-3 col-sm-1">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4 class="">0/1</h4>
+                <span class="text-muted hidden-xs">Log Entries Added</span>
+            </div>
+            <div class="col-xs-3 col-sm-1">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4 class="">0/1</h4>
+                <span class="text-muted hidden-xs">Log Entries Added</span>
+            </div>
+            <div class="col-xs-3 col-sm-1">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4 class="">0/1</h4>
+                <span class="text-muted hidden-xs">Log Entries Added</span>
+            </div>
+            <div class="col-xs-3 col-sm-1">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <h4 class="">0/1</h4>
+                <span class="text-muted hidden-xs">Log Entries Added</span>
+            </div>
+
+
+            <table class="table table-striped">
+                <tbody>
+                {% if badges %}
+                    {% for badge in badges %}
+                    <tr class = "">
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>
         </div>
         
         <div id="#account_details">
-            <h4 class="page-header">Account Details</h4>
-        </div>
-
-        <div id="#password_reset">
-            <h4 class="page-header">Reset Password</h4>
+            <h3 class="page-header">Account Details</h3>
+            <div class="row" style="padding-top: 10">
+                <div class="col-xs-6 col-sm-2 col-md-2">
+                    <form action="." method="post">
+                        {% csrf_token %} 
+                        {{ names_form.as_p}}
+                        <button class="btn" type="submit" value="Submit">Save</button>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <div id="#delete_account">
-            <h4 class="page-header">Delete Account</h4>
+            <h3 class="page-header">Delete Account</h3>
+            <button class="btn btn-danger">Delete Account</button>
         </div>
     </div>
 </div>
