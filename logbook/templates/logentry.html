@@ -16,8 +16,8 @@
 <div class="col-sm-2 col-md-2 sidebar" id="sidebar">
     <ul class="nav" id="menu" style="display: inline-block;">
         <li>
-            <a href="#" data-target="#item1" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Manage Entries</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
-            <ul class="nav nav-stacked collapse left-submenu" id="item1">
+            <h3 style="color:1c1c1e;">Manage Entries</h3>
+            <ul class="nav nav-stacked left-submenu" id="item1">
                 <li><a href="{% url 'logbook:add_entry' book.id %}">Add Entry</a></li>
                 <li><a href="#edit_entry">Edit Entry</a></li>
                 <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Entry/s</a></li>
@@ -25,11 +25,13 @@
             </ul>
         </li>
         <li>
-            <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Log Books</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
-            <ul class="nav nav-stacked collapse" id="item2">
+            <h3 style="color:1c1c1e;">Log Books</h3>
+            <ul class="nav nav-stacked" id="item2">
                 {% if logbooks %}
                 {% for logbook in logbooks %}
-                <li><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></li>
+                    {% if logbook.name != book.name %}
+                    <li><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></li>
+                    {% endif %}
                 {% endfor %}
                 {% endif %}
             </ul>

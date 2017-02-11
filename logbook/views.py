@@ -148,13 +148,13 @@ def booksView(request):
         headers = makeHeaders(unformattedHeaderNames, currentOrder)
         logbooks = LogBook.objects.filter(user__user=request.user)
         logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
-        logbooks = list(logbooks)
+        books = list(logbooks)
         approvedLogbooks = list()
         print(approvedLogbooks)
         for book in logbooks:
             if hasAllApproved(book):
                 approvedLogbooks.append(book)
-                logbooks.remove(book)
+                books.remove(book)
         
         return render(request, 'books.html', {'logbooks':logbooks,'approvedbooks':approvedLogbooks, 'headers':headers, 'form':add_form})
 

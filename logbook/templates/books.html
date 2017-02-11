@@ -8,18 +8,18 @@
 
 {% block sideblock %}
 <div class="col-sm-4 col-md-2 sidebar" id="sidebar">
-    <ul class="nav" id="menu" style="display: inline-block;">
+    <ul class="nav" id="#accordion" style="display: inline-block;">
         <li>
-            <a href="#" data-target="#item1" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Overview</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
-            <ul class="nav nav-stacked collapse left-submenu" id="item1">
+            <h3 style="color:1c1c1e;">Overview</h3>
+            <ul class="nav nav-stacked left-submenu" id="item1">
                 <li class="active"><a href="#">Manage Log Books</a><span class="sr-only">(current)</span></li>
                 <li><a href="#statistics">Statistics</a></li>
             </ul>
         </li>
 
         <li>
-            <a href="#" data-target="#item2" data-toggle="collapse"><i class="fa fa-list"></i><span class="collapse in hidden-xs"><h3 style="color:1c1c1e;">Options</h3> <span class="caret" style="position: absolute; left:95%; top:55%; color:#1c1c1e"></span></span></a>
-            <ul class="nav nav-stacked collapse left-submenu" id="item2">
+            <h3 style="color:1c1c1e;">Options</h3>
+            <ul class="nav nav-stacked left-submenu" id="item2">
                 <li><a data-toggle="modal" href="#addModal">Add Log Book</a></li>
                 <li><a href="#edit_book">Edit Log Book</a></li>
                 <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Log Book/s</a></li>
