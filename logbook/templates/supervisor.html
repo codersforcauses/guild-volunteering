@@ -41,13 +41,15 @@
                             <tbody>
                                 {% if entries %}
                                 {% for logentry in entries %}
-                                <tr class = "">
-                                    <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
-                                    <td>{{ logentry.description }}</td>
-                                    <td>{{ logentry.start }}</td>
-                                    <td>{{ logentry.end }}</td>
-                                    <td><button class="btn btn-success">Approve</button></td>
-                                </tr>
+                                    {% if logentry.book.id == logbook.book__id %}
+                                    <tr class = "">
+                                        <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
+                                        <td>{{ logentry.description }}</td>
+                                        <td>{{ logentry.start }}</td>
+                                        <td>{{ logentry.end }}</td>
+                                        <td><button class="btn btn-success">Approve</button></td>
+                                    </tr>
+                                    {% endif %}
                                 {% endfor %}
                                 {% endif %}
                             </tbody>
