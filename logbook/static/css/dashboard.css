@@ -10,9 +10,16 @@ body {
 /*
  * Global add-ons
  */
+.page-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
 .sub-header {
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
+}
+.question {
+    padding-bottom: 10px;
 }
 
 /*
