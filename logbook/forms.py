@@ -1,9 +1,11 @@
 from django import forms
 from django.core.validators import RegexValidator, EmailValidator
 from django.contrib.auth.models import User
+from django.contrib.admin import widgets  
 from .models import *
 
 import re
+from datetimewidget.widgets import DateTimeWidget
 
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
@@ -70,11 +72,16 @@ class LogBookForm(forms.Form):
     bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}))
 
 class LogEntryForm(forms.Form):
-    description = forms.CharField()
+    description = forms.CharField(label='',help_text="What did your volunteering entail.", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Description'}))
     # Allow user to select supervisor from a list of supervisors 
-    supervisor = forms.ModelChoiceField(queryset=Supervisor.objects.all())
-    start = forms.DateTimeField()
-    end = forms.DateTimeField()
+    supervisor = forms.ModelChoiceField(queryset=Supervisor.objects.all(),label='Supervisor')
+    dateTimeOptions = {
+        'format': 'dd/mm/yyyy HH:ii P',
+        'autoclose': True,
+        'showMeridian' : True,
+        }
+    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')
+    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')
 
 class EditNamesForm(forms.ModelForm):
     first_name = FirstNameField()

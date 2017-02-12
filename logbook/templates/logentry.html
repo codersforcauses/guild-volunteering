@@ -12,6 +12,8 @@
 {% endif %}
 {% endblock %}
 
+{{ form.media }}
+
 {% block sideblock %}
 <div class="col-sm-2 col-md-2 sidebar" id="sidebar">
     <ul class="nav" id="menu" style="display: inline-block;">
@@ -63,20 +65,20 @@
                 <option value="submit">Submit</option>
                 <option value="delete">Delete</option>
             </select>
-            <table class="table table-striped">
+            <table class="table table-striped" style="table-layout: fixed; word-wrap: break-word;">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th class="col-xs-1">#</th>
+                        {% comment %}
                         {% for header in headers %}
                         <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
                         {% endfor %}
-                        {% comment %}
-                        <th>Category</th>
-                            <th>Supervisor</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Status</th>
                         {% endcomment %}
+                        <th class="col-xs-1">Category</th>
+                        <th class="col-xs-2">Supervisor</th>
+                        <th class="col-xs-3">Start Time</th>
+                        <th class="col-xs-3">End Time</th>
+                        <th class="col-xs-2 hidden-xs">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,9 +88,9 @@
                         <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
                         <td><a href="{% url 'logbook:edit_entry' logentry.book.id logentry.id %}">{{ logentry.description }}</a></td>
                         <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
-                        <td>{{ logentry.start }}</td>
-                        <td>{{ logentry.end }}</td>
-                        <td>{{ logentry.status }}</td>
+                        <td>{{ logentry.start|date:"d-m-y P" }}</td>
+                        <td>{{ logentry.end|date:"d-m-y P"}}</td>
+                        <td class="hidden-xs">{{ logentry.status }}</td>
                         <td class="visible-xs">
                             <img width="40px" height="30px" src="{% static "images/edit-icon.png" %}" />
                             <img width="30px" height="30px" src="{% static "images/delete-icon.png" %}" />
@@ -101,7 +103,7 @@
         </form>
     </div>
     <div class='btn-toolbar'>
-        <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addEntryModal">Add Log Book</button>
+        <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addEntryModal">Add Log Entry</button>
     </div>
 </div>
 <div class = "modal fade" id = "addEntryModal" tabindex = "-1" role = "dialog" 
@@ -118,8 +120,8 @@
             <div class = "modal-body">
                 <div class="row" style="padding-top: 10">
                     <div class="col-xs-8 col-sm-6 col-md-6 col-lg-6">
-                            {% csrf_token %} 
-                            {{ addentry_form.as_p}}
+                        {% csrf_token %} 
+                        {{ addentry_form.as_p }}
                     </div>
                 </div>
             </div>
@@ -132,11 +134,10 @@
           </div>
     </div>
 </div>
-
 {% endblock %}
 
-<script>
-   $(function () { $('#addEntryModal').modal({
-      keyboard: true
-   })});
+<script type="text/javascript">
+    $('#addEntryModal').modal({
+    keyboard: true
+    })
 </script>
