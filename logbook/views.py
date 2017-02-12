@@ -184,8 +184,20 @@ def logentryView(request, pk):
          return HttpResponseForbidden()
 
     if request.method == 'POST':
-        modelActions(request, LogEntry, logentryPermissionCheck)
-
+        addEntryForm = LogEntryForm(request.POST)
+        if addEntryForm.is_valid():
+            logentry = LogEntry.objects.create(description=addEntryForm.cleaned_data['description'],
+                                               supervisor=addEntryForm.cleaned_data['supervisor'],
+                                               start=addEntryForm.cleaned_data['start'],
+                                               end=addEntryForm.cleaned_data['end'],
+                                               book=logbook)
+            logentry.save()
+            return redirect(reverse('logbook:view', args=[logbook.id]))
+        else:
+            modelActions(request, LogEntry, logentryPermissionCheck)
+            
+    addEntryForm = LogEntryForm()
+    
     logentries = {}
     logbooks = {}
     try:
@@ -204,7 +216,7 @@ def logentryView(request, pk):
     return render(request, 'logentry.html', {'entries':logentries,
                                              'logbooks':logbooks,
                                              'book':logbook,
-                                             'headers':headers})
+                                             'headers':headers,'addentry_form':addEntryForm})
 
 def loginView(request):
     if request.method == 'POST':
@@ -271,18 +283,24 @@ def profileView(request):
     # Staff member can view analytics in profile or in index
     if request.user.is_staff:
         print('Staff User')
+    user = request.user
     if request.method == 'POST':
         editNamesForm = EditNamesForm(request.POST)
+        deleteForm = DeleteUserForm(request.POST, instance=user)
         if editNamesForm.is_valid():
-            user = request.user
             user.first_name = editNamesForm.cleaned_data['first_name']
             user.last_name = editNamesForm.cleaned_data['last_name']
             user.save()
             return redirect('logbook:profile')
+        elif deleteForm.is_valid:
+            active = deleteForm.save()
+            #Logout User
+            return redirect('logbook:login')
     else:
-        editNamesForm = EditNamesForm(instance=request.user)
+        editNamesForm = EditNamesForm(instance=user)
+        deleteForm = DeleteUserForm(instance=user)
         
-    return render(request, 'profile.html', {'names_form':editNamesForm})
+    return render(request, 'profile.html', {'names_form':editNamesForm,'delete_form':deleteForm})
 
 @login_required
 def addLogbookView(request):
