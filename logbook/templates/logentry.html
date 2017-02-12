@@ -74,11 +74,11 @@
                         <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
                         {% endfor %}
                         {% endcomment %}
-                        <th class="col-xs-1">Category</th>
+                        <th class="col-xs-2">Category</th>
                         <th class="col-xs-2">Supervisor</th>
                         <th class="col-xs-3">Start Time</th>
                         <th class="col-xs-3">End Time</th>
-                        <th class="col-xs-2 hidden-xs">Status</th>
+                        <th class="col-xs-1 hidden-xs">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -87,9 +87,10 @@
                     <tr class = "{% if logentry.status == 'Approved' %}success{% elif logentry.status == 'Pending' %}warning{% elif logentry.status == 'Unapproved' %}danger{%endif%}">
                         <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
                         <td><a href="{% url 'logbook:edit_entry' logentry.book.id logentry.id %}">{{ logentry.description }}</a></td>
-                        <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
-                        <td>{{ logentry.start|date:"d-m-y P" }}</td>
-                        <td>{{ logentry.end|date:"d-m-y P"}}</td>
+                        <td class="hidden-xs"><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
+                        <td class="visible-xs"><a href="mailto:{{ logentry.supervisor }}"><img src="" alt="super" width="40px" height="40px"></a></td>
+                        <td>{{ logentry.start|date:"P" }}</td>
+                        <td>{{ logentry.end|date:"P"}}</td>
                         <td class="hidden-xs">{{ logentry.status }}</td>
                         <td class="visible-xs">
                             <img width="40px" height="30px" src="{% static "images/edit-icon.png" %}" />
