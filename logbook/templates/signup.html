@@ -2,14 +2,17 @@
 
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block titleblock %}Register!{% endblock %}
 
 {% block bodyblock %}
-<link href="http://getbootstrap.com/examples/signin/signin.css" rel="stylesheet">
-
-<form class="form-signin" role="form" method="post" action=".">
-    {% csrf_token %}
-    <h2 class="form-signin-heading">Create Account</h2> {{ signupForm.as_p }}
-    <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">Create</button>
-</form>
+<link href="{% static "css/signin.css" %}" rel="stylesheet">
+<div class="col-sm-3 col-sm-offset-4 col-lg-3 col-lg-offset-4">
+    <form class="form-signin" role="form" method="post" action=".">
+        {% csrf_token %}
+        <h2 class="form-signin-heading">Create Account</h2> {{ signupForm.as_p }}
+        <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">Create</button>
+    </form>
+</div>
 {% endblock %}

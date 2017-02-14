@@ -14,6 +14,13 @@ class TestUser(TestCase):
         group.user_set.add(cls.user)
         group.save()
 
+    def setUp(self):
+        self.userTemplate = {'username':'12345678',
+                            'password':'password',
+                            'first_name':'fname',
+                            'last_name':'lname',
+                            'passwordVerify':'password'}
+
     def pages_reachable(self):
         response = self.client.get(reverse('logbook:signup'))
         self.assertEqual(response.status_code, 200)
@@ -21,19 +28,25 @@ class TestUser(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_signup_with_valid_input(self):
-        response = self.client.post(reverse('logbook:signup'), {'username':'12345678', 'password':'password', 'passwordVerify':'password'})
+        response = self.client.post(reverse('logbook:signup'), self.userTemplate)
         self.assertRedirects(response, reverse('logbook:login'))
 
     def test_signup_with_bad_student_number(self):
-        response = self.client.post(reverse('logbook:signup'), {'username':'notAStudentNumber', 'password':'password', 'passwordVerify':'password'})
+        ut = self.userTemplate
+        ut['username'] = 'notAStudentNumber'
+        response = self.client.post(reverse('logbook:signup'), ut)
         self.assertFormError(response, 'signupForm', 'username', 'Enter a valid student number')
 
     def test_signup_with_mismatched_passwords(self):
-        response = self.client.post(reverse('logbook:signup'), {'username':'12345678', 'password':'password1', 'passwordVerify':'password2'})
+        ut = self.userTemplate
+        ut['password'] = 'password1'
+        response = self.client.post(reverse('logbook:signup'), ut)
         self.assertFormError(response, 'signupForm', None, 'Passwords do not match')
 
     def test_signup_with_existing_user(self):
-        response = self.client.post(reverse('logbook:signup'), {'username':'11111111', 'password':'password', 'passwordVerify':'password'})
+        ut = self.userTemplate
+        ut['username'] = '11111111'
+        response = self.client.post(reverse('logbook:signup'), ut)
         self.assertFormError(response, 'signupForm', None, 'User already exists')
 
     def test_login_valid(self):
