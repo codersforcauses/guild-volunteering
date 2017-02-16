@@ -120,7 +120,7 @@
             <form action="." method="post">
             <div class = "modal-body">
                 <div class="row" style="padding-top: 10">
-                    <div class="col-xs-8 col-sm-6 col-md-6 col-lg-6">
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                         {% csrf_token %} 
                         {{ addentry_form.as_p }}
                     </div>
@@ -141,4 +141,5 @@
     $('#addEntryModal').modal({
     keyboard: true
     })
+    $("[title]").tooltip();
 </script>
