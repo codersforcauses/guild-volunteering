@@ -15,7 +15,7 @@
 {{ form.media }}
 
 {% block sideblock %}
-<div class="col-sm-2 col-md-2 sidebar" id="sidebar">
+<div class="col-sm-2 col-md-2 col-lg-2 sidebar" id="sidebar">
     <ul class="nav" id="menu" style="display: inline-block;">
         <li>
             <h3 style="color:1c1c1e;">Manage Entries</h3>
@@ -48,7 +48,7 @@
 {% endblock %}
 
 {% block bodyblock %}
-<div class="col-xs-12 col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 main">
+<div class="col-xs-12 col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 col-lg-10 col-lg-offset-2 main">
     {% if book %}
     
     <h1 class="page-header"><a href="{% url 'logbook:list' %}" class="hidden-sm hidden-md hidden-lg">&larr;</a> {{ book.name }}</h1>

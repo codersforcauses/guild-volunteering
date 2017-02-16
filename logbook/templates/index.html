@@ -20,10 +20,10 @@
 
 {% block bodyblock %}
 
-<div style="display: inline-block; vertical-align: middle; float: none; padding-top: 6%" class="col-xs-12 col-sm-6 col-sm-offset-3">
+<div style="display: inline-block; vertical-align: middle; float: none; padding-top: 6%" class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
     <h1 class="page-header" style="text-align: center;">Welcome to the Guild Volunteering System</h1>
     <div class="row placeholders">
-        <div class="col-xs-4 col-xs-offset-0 col-sm-3 col-sm-offset-2 col-md-2 col-md-offset-3">
+        <div class="col-xs-3 col-xs-offset-1 col-sm-3 col-sm-offset-1 col-md-3 col-md-offset-1">
             <a href="{% url 'logbook:list' %}"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Logs">
                 {% if is_super %}
                 <h4>Approve Volunteer Hours</h4>
@@ -37,14 +37,14 @@
             <span class="text-muted hidden-xs">Add entries to your log books and get them approved by your supervisor.</span>
             {% endif %}
         </div>
-        <div class="col-xs-4 col-xs-offset-0 col-sm-3 col-sm-offset-0 col-md-2">
+        <div class="col-xs-3 col-xs-offset-0 col-sm-3 col-sm-offset-0 col-md-3">
             <a href="{% url 'logbook:profile' %}">
                 <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
                 <h4>View Your Profile</h4>
             </a>
             <span class="text-muted hidden-xs">Change your account details, view stats, and see what badges you've earnt.</span>
         </div>
-        <div class="col-xs-4 col-xs-offset-0 col-sm-3 col-sm-offset-0 col-md-2">
+        <div class="col-xs-3 col-xs-offset-0 col-sm-3 col-sm-offset-0 col-md-3">
             <a href="{% url 'logbook:faq' %}"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
                 <h4>FAQ</h4>
             </a>
