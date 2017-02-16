@@ -89,6 +89,7 @@
                 </tbody>
             </table>
             <hr>
+            {% if approvedbooks %}
             <h2 class="sub-heading">Log Books Ready To Be Finalised</h2>
             <table class="table table-striped">
                 <thead>
@@ -105,7 +106,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% if approvedbooks %}
                     {% for logbook in approvedbooks %}
                     <tr class="success">
                         <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
@@ -116,9 +116,9 @@
                         <td>{{ logbook.description }}</td>
                     </tr>
                     {% endfor %}
-                    {% endif %}
                 </tbody>
             </table>
+            {% endif %}
         </form>
     </div>
     <div class='btn-toolbar'>
