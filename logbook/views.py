@@ -241,6 +241,9 @@ def signupView(request):
             user = User.objects.create_user(form.cleaned_data['username'],
                                             form.cleaned_data['username'] + '@student.uwa.edu.au',
                                             form.cleaned_data['password'])
+
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
             user.save()
             group = Group.objects.get(name='LBStudent')
             group.user_set.add(user)
