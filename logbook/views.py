@@ -104,9 +104,18 @@ def modelActions(request, model, permissionCheck):
 
 def logbookPermissionCheck(user, logbook, action):
     user = LBUser.objects.get(user=user)
+    if action == 'delete':
+        # Don't delete the book if it contains approved entries
+        entries = LogEntry.objects.filter(book=logbook, status=LogEntry.APPROVED)
+        if len(entries) > 0:
+            return False
     return user == logbook.user
 
 def logentryPermissionCheck(user, logentry, action):
+    if action == 'delete':
+        # don't delete an approved entry
+        if logentry.status == LogEntry.APPROVED:
+            return False
     user = LBUser.objects.get(user=user)
     return user == logentry.book.user
 
@@ -319,7 +328,7 @@ def addLogbookView(request):
             return redirect('logbook:list')
     else:
         form = LogBookForm()
-    return render(request, 'form.html', {'title':'Create Logbook', 'form':form})
+    return render(request, 'form.html', {'title':'Create Logbook', 'form':form, 'backUrl':reverse('logbook:list')})
 
 @login_required
 def addLogEntryView(request, pk):
@@ -346,7 +355,7 @@ def addLogEntryView(request, pk):
             return redirect(reverse('logbook:view', args=[logbook.id]))
     else:
         form = LogEntryForm()
-    return render(request, 'form.html', {'title':'Create Log Entry', 'form':form,'book':logbook})
+    return render(request, 'form.html', {'title':'Create Log Entry', 'form':form, 'backUrl':reverse('logbook:view', args=[logbook.id])})
 
 @login_required
 def editLogEntryView(request, pk, log_id):
@@ -370,4 +379,4 @@ def editLogEntryView(request, pk, log_id):
     else:
         editForm = LogEntryForm()
 
-    return render(request, 'form.html', {'title':'Edit Log Entry', 'form':editForm,'book':logbook})
+    return render(request, 'form.html', {'title':'Edit Log Entry', 'form':editForm,'book':logbook, 'backUrl':reverse('logbook:view', args=[logbook.id])})

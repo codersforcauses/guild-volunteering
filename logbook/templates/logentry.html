@@ -21,9 +21,9 @@
             <h3 style="color:1c1c1e;">Manage Entries</h3>
             <ul class="nav nav-stacked left-submenu" id="item1">
                 <li><a data-toggle="modal" href="#addEntryModal">Add Entry</a></li>
-                <li><a onclick="document.getElementById('actions').value='edit';document.getElementById('modelForm').submit()">Edit Entry</a></li>
-                <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Entry/s</a></li>
-                <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Entry/s</a></li>
+                <li><a onclick="doAction('edit')">Edit Entry/s</a></li>
+                <li><a onclick="doAction('submit')">Submit Entry/s</a></li>
+                <li><a onclick="doAction('delete')">Delete Entry/s</a></li>
             </ul>
         </li>
         <li>
@@ -137,9 +137,16 @@
 </div>
 {% endblock %}
 
+{% block footerblock %}
 <script type="text/javascript">
-    $('#addEntryModal').modal({
-    keyboard: true
-    })
-    $("[title]").tooltip();
+    form = document.getElementById('modelForm');
+    actions = document.getElementById('actions');
+    function doAction(action) {
+        if (confirm("Are you sure you want to "+action+" the selected entries/s\n")) {
+            actions.value = action;
+            form.submit()
+        }
+    }
+  $("[title]").tooltip();
 </script>
+{% endblock%}

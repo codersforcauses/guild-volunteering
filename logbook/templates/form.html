@@ -7,7 +7,7 @@
 {% block sideblock %}
 <div class="col-sm-4 col-md-2 sidebar" id="sidebar">
     <ul class="nav" id="menu" style="display: inline-block;">
-        <li><a href="{% url 'logbook:view' book.id %}">Back</a></li>
+        <li><a href="{{backUrl}}">Back</a></li>
     </ul>
 </div>
 {% endblock %}
