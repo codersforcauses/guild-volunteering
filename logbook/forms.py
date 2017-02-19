@@ -1,9 +1,11 @@
 from django import forms
 from django.core.validators import RegexValidator, EmailValidator
 from django.contrib.auth.models import User
+from django.contrib.admin import widgets  
 from .models import *
 
 import re
+from datetimewidget.widgets import DateTimeWidget
 
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
@@ -64,17 +66,22 @@ class LoginForm(forms.Form):
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
 
 class LogBookForm(forms.Form):
-    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation')                                              
-    bookCategory = forms.ModelChoiceField(queryset = Category.objects.all(), label='Category')
+    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation',help_text='<span data-toggle="tooltip" style="pading:20px" title="Please email Guild Volunteering if an organisation is not listed"><a>?</a></span>')                                              
+    bookCategory = forms.ModelChoiceField(queryset = Category.objects.all(), label='Category',help_text='Choose a category that <strong>best</strong> describes your work.')
     bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
     bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}))
 
 class LogEntryForm(forms.Form):
-    description = forms.CharField()
+    description = forms.CharField(label='',help_text="What did your volunteering entail.", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Description'}))
     # Allow user to select supervisor from a list of supervisors 
-    supervisor = forms.ModelChoiceField(queryset=Supervisor.objects.all())
-    start = forms.DateTimeField()
-    end = forms.DateTimeField()
+    supervisor = forms.ModelChoiceField(queryset=Supervisor.objects.all(),label='Supervisor')
+    dateTimeOptions = {
+        'format': 'dd/mm/yyyy HH:ii P',
+        'autoclose': True,
+        'showMeridian' : True,
+        }
+    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')
+    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')
 
 class EditNamesForm(forms.ModelForm):
     first_name = FirstNameField()
@@ -83,3 +90,19 @@ class EditNamesForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name','last_name',]
+
+class DeleteUserForm(forms.ModelForm):
+    is_active = forms.BooleanField(label='', initial=False)
+    
+    class Meta:
+        model = User
+        fields = ['is_active']
+
+    def __init__(self, *args, **kwargs):
+        super(DeleteUserForm, self).__init__(*args, **kwargs)
+        self.fields['is_active'].help_text = "Check this box if you are sure you want to suspend this account."
+
+    def clean_is_active(self):  
+        # Reverses true/false for your form prior to validation
+        is_active = not(self.cleaned_data["is_active"])
+        return is_active

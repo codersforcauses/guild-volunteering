@@ -1,18 +1,29 @@
 /*
  * Base structure
  */
+html {
+  position: relative;
+  min-height: 100%;
+}
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
   padding-top: 50px;
-  margin-bottom: 60px;
+  margin-bottom: 130px;
 }
 
 /*
  * Global add-ons
  */
+.page-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
 .sub-header {
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
+}
+.question {
+    padding-bottom: 10px;
 }
 
 /*
@@ -108,4 +119,14 @@ body {
 
 .footer p {
     color: #f5f5f5;
+}
+
+.tooltip {
+    display:none;
+    background:transparent url(https://dl.dropboxusercontent.com/u/25819920/tooltip/black_arrow.png);
+    font-size:12px;
+    height:70px;
+    width:160px;
+    padding:25px;
+    color:#fff;
 }

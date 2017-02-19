@@ -15,42 +15,30 @@
 		padding-bottom: 20px;
 	}
 	#faqblock{
-		margin-top: 40px;
-		width: 60%;
+		margin-top: 20px;
 	}
 {% endblock %}
 
 
 {% block titleblock %}FAQ{% endblock %}
 
-{% block sideblock %}
-<div class="col-sm-4 col-md-2 sidebar" id="sidebar">
-    <ul class="nav" id="menu" style="display: inline-block;">
-        <li>
-            <h3 style="color:1c1c1e;">FAQ</h3>
-        </li>
-
-    </ul>
-</div>
-{% endblock %}
-
 {% block bodyblock %}
-<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main" id = "faqblock">
-	<ul>
-		<li><h2>Student</h2></li>
-		<li class = "question"> How do I create an account?</li>
-		<li class = "answer">To create an account, first,select the "Sign Up!" option from the navigation bar in the top left corner of your screen. Then, enter your student number and desired password into the forms provided, and click the "Create" button.<OPTIONAL> Before logging in for the first time an email will be sent asking you to validate your account. Open your student email and follow the link in the email from <<ValidationEmailAddress>>.</Optional></li>
-		<li class = "question">What is a logbook?</li>
-		<li class = "answer">Logbooks are a handy way of sorting your volunteer hours and saving you time while logging them. Every organization you volunteer for should have a seperate logbook.</li>
-		<li class = "question">How do I log my hours to be approved by my supervisor?</li>
-		<li class = "answer">Placeholder</li>
-		<li class = "question">What should I do if my supervisor isn't on the system yet?</li>
-		<li class = "answer">If your supervisor is not yet on the system, but plans to use it in the future, you can log your hours as normal, and your supervisor will be able to approve them once they have an account. If your supervisor does not plan to use the system, then you will have to log your hours physically.</li>
-		<li class = "question">Help! I forgot my password!</li>
-		<li class = "answer">Placeholder</li>
-		<li><h2>Supervisor</h2></li>
-		<li class = "question">How do I log hours?</li>
-	</ul>
+<div class="col-xs-11 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-10 col-lg-offset-1" id = "faqblock">
+    <ul>
+        <li><h2 class = "page-header">Students</h2></li>
+        <li class = "question">How do I create an account?</li>
+        <li class = "answer">To create an account, first,select the "Sign Up!" option from the navigation bar in the top left corner of your screen. Then, enter your student number and desired password into the forms provided, and click the "Create" button.<OPTIONAL> Before logging in for the first time an email will be sent asking you to validate your account. Open your student email and follow the link in the email from <<ValidationEmailAddress>>.</Optional></li>
+        <li class = "question">What is a logbook?</li>
+        <li class = "answer">Logbooks are a handy way of sorting your volunteer hours and saving you time while logging them. Every organization you volunteer for should have a separate logbook.</li>
+        <li class = "question">How do I log my hours to be approved by my supervisor?</li>
+        <li class = "answer">Placeholder</li>
+        <li class = "question">What should I do if my supervisor isn't on the system yet?</li>
+        <li class = "answer">If your supervisor is not yet on the system but plans to use it in the future, you can log your hours as normal and will be able to approve them once they have an account. If your supervisor does not plan to use the system, then you will have to log your hours physically. Please speak to Guild Volunteering about acquiring a log book.</li>
+        <li class = "question">Help! I forgot my password!</li>
+        <li class = "answer">If you forget your password it can be reset by following the link on the login page or by clicking <a href="{% url 'logbook:signup' %}">here</a>.</li>
+        <li><h2 class = "page-header">Supervisors</h2></li>
+        <li class = "question">How do I log hours?</li>
+    </ul>
 </div>
 {% endblock %}
 

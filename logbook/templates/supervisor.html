@@ -2,6 +2,8 @@
 
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block titleblock %}Guild Volunteering System{% endblock %}
 
 {% block sideblock %}
@@ -55,6 +57,7 @@
                             </tbody>
                         </table>
                         <button class="btn btn-success">Approve All</button>
+                        <a href="mailto:{{logbook.book__user__user__username}}@student.uwa.edu.au"><img src="{% static "images/email.png" %}" alt="Email Student" width=30px height=30px /></a>
                     </div>
                 </div>
             </div>
