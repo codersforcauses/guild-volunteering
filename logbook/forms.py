@@ -69,7 +69,7 @@ class LogBookForm(forms.Form):
     bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation',help_text='<span data-toggle="tooltip" style="pading:20px" title="Please email Guild Volunteering if an organisation is not listed"><a>?</a></span>')                                              
     bookCategory = forms.ModelChoiceField(queryset = Category.objects.all(), label='Category',help_text='Choose a category that <strong>best</strong> describes your work.')
     bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
-    bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}))
+    bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}), required=False)
 
 class LogEntryForm(forms.Form):
     description = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name'}))
