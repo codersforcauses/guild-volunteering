@@ -12,13 +12,15 @@
 {% endif %}
 {% endblock %}
 
+{{ form.media }}
+
 {% block sideblock %}
-<div class="col-sm-2 col-md-2 sidebar" id="sidebar">
+<div class="col-sm-2 col-md-2 col-lg-2 sidebar" id="sidebar">
     <ul class="nav" id="menu" style="display: inline-block;">
         <li>
             <h3 style="color:1c1c1e;">Manage Entries</h3>
             <ul class="nav nav-stacked left-submenu" id="item1">
-                <li><a href="{% url 'logbook:add_entry' book.id %}">Add Entry</a></li>
+                <li><a data-toggle="modal" href="#addEntryModal">Add Entry</a></li>
                 <li><a onclick="document.getElementById('actions').value='edit';document.getElementById('modelForm').submit()">Edit Entry</a></li>
                 <li><a onclick="document.getElementById('actions').value='submit';document.getElementById('modelForm').submit()">Submit Entry/s</a></li>
                 <li><a onclick="document.getElementById('actions').value='delete';document.getElementById('modelForm').submit()">Delete Entry/s</a></li>
@@ -46,7 +48,7 @@
 {% endblock %}
 
 {% block bodyblock %}
-<div class="col-xs-12 col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 main">
+<div class="col-xs-12 col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 col-lg-10 col-lg-offset-2 main">
     {% if book %}
     
     <h1 class="page-header"><a href="{% url 'logbook:list' %}" class="hidden-sm hidden-md hidden-lg">&larr;</a> {{ book.name }}</h1>
@@ -63,20 +65,20 @@
                 <option value="submit">Submit</option>
                 <option value="delete">Delete</option>
             </select>
-            <table class="table table-striped">
+            <table class="table table-striped" style="table-layout: fixed; word-wrap: break-word;">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th class="col-xs-1">#</th>
+                        {% comment %}
                         {% for header in headers %}
                         <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
                         {% endfor %}
-                        {% comment %}
-                        <th>Category</th>
-                            <th>Supervisor</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Status</th>
                         {% endcomment %}
+                        <th class="col-xs-2">Category</th>
+                        <th class="col-xs-2">Supervisor</th>
+                        <th class="col-xs-3">Start Time</th>
+                        <th class="col-xs-3">End Time</th>
+                        <th class="col-xs-1 hidden-xs">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -85,10 +87,11 @@
                     <tr class = "{% if logentry.status == 'Approved' %}success{% elif logentry.status == 'Pending' %}warning{% elif logentry.status == 'Unapproved' %}danger{%endif%}">
                         <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
                         <td><a href="{% url 'logbook:edit_entry' logentry.book.id logentry.id %}">{{ logentry.description }}</a></td>
-                        <td><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
-                        <td>{{ logentry.start }}</td>
-                        <td>{{ logentry.end }}</td>
-                        <td>{{ logentry.status }}</td>
+                        <td class="hidden-xs"><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
+                        <td class="visible-xs"><a href="mailto:{{ logentry.supervisor }}"><img src="" alt="super" width="40px" height="40px"></a></td>
+                        <td>{{ logentry.start|date:"P" }}</td>
+                        <td>{{ logentry.end|date:"P"}}</td>
+                        <td class="hidden-xs">{{ logentry.status }}</td>
                         <td class="visible-xs">
                             <img width="40px" height="30px" src="{% static "images/edit-icon.png" %}" />
                             <img width="30px" height="30px" src="{% static "images/delete-icon.png" %}" />
@@ -100,5 +103,42 @@
             </table>
         </form>
     </div>
+    <div class='btn-toolbar'>
+        <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addEntryModal">Add Log Entry</button>
+    </div>
+</div>
+<div class = "modal fade" id = "addEntryModal" tabindex = "-1" role = "dialog" 
+   aria-labelledby = "myModalLabel" aria-hidden = "true">
+   
+    <div class = "modal-dialog">
+        <div class = "modal-content">
+
+            <div class = "modal-header">
+                <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
+                <h4 class = "modal-title" id = "myModalLabel">Add Log Book</h4>
+            </div>
+            <form action="." method="post">
+            <div class = "modal-body">
+                <div class="row" style="padding-top: 10">
+                    <div class="col-xs-8 col-sm-6 col-md-6 col-lg-6">
+                        {% csrf_token %} 
+                        {{ addentry_form.as_p }}
+                    </div>
+                </div>
+            </div>
+
+            <div class = "modal-footer text-left">
+                <button type = "button" class = "btn btn-default" data-dismiss = "modal">Close</button>
+                <button type = "submit" value="Submit" class = "btn btn-primary">Add</button>
+            </div>
+            </form>
+          </div>
+    </div>
 </div>
 {% endblock %}
+
+<script type="text/javascript">
+    $('#addEntryModal').modal({
+    keyboard: true
+    })
+</script>
