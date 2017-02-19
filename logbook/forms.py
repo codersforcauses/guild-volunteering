@@ -72,7 +72,7 @@ class LogBookForm(forms.Form):
     bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}))
 
 class LogEntryForm(forms.Form):
-    description = forms.CharField(label='',help_text="What did your volunteering entail.", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Description'}))
+    description = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name'}))
 
     def __init__(self, *args, **kwargs):
         org_id = kwargs.pop('org_id')

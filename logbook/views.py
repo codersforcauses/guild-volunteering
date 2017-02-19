@@ -148,7 +148,6 @@ def booksView(request):
         #use books to get the student numbers
         #logbooks = LogBook.objects.filter(id__in = entries)
         ApprovalCount = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').annotate(Count('id'))
-        print(ApprovalCount)
         logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
         return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
     else:
@@ -179,7 +178,7 @@ def booksView(request):
             if hasAllApproved(book):
                 approvedLogbooks.append(book)
                 logbooks_list.remove(book)
-        print(approvedLogbooks)
+                
         return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers,'form':add_form})
 
 @login_required

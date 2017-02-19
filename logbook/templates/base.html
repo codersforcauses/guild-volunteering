@@ -14,7 +14,16 @@
     <title>{% block titleblock %}{% endblock %}</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="{% static "bootstrap/css/bootstrap.css" %}" rel="stylesheet"> 
+    
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <!-- BootStrap CSS LOCAL -->
+    <script>
+        $(document).ready(function() {
+        var bodyColor = $('body').css('color');
+        if(bodyColor != 'rgb(51, 51, 51)') {
+        $("head").prepend('<link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.css" %}">');}});
+    </script>
     <!-- Custom styles -->
     <link href="{% static "css/dashboard.css" %}" rel="stylesheet">
     
@@ -22,7 +31,10 @@
     
     <!-- Javascript + dependencies -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="{% static "bootstrap/js/bootstrap.min.js"%}"></script>
+    <!-- Bootstrap JS CDN -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <!-- Bootstrap JS LOCAL -->
+    <script>if(typeof($.fn.modal) === 'undefined') {document.write('<script src="{% static "bootstrap/js/bootstrap.min.js"%}"><\/script>')}</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.js"></script>
     <script src="{% static "js/bootstrap-datetimepicker.js" %}"></script>
     

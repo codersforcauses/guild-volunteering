@@ -93,8 +93,7 @@
                         <td>{{ logentry.end|date:"P"}}</td>
                         <td class="hidden-xs">{{ logentry.status }}</td>
                         <td class="visible-xs">
-                            <img width="40px" height="30px" src="{% static "images/edit-icon.png" %}" />
-                            <img width="30px" height="30px" src="{% static "images/delete-icon.png" %}" />
+                            <a ><img width="40px" height="30px" src="{% static "images/edit-icon.png" %}" /></a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -105,6 +104,7 @@
     </div>
     <div class='btn-toolbar'>
         <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addEntryModal">Add Log Entry</button>
+        <button type="button" class="btn btn-danger visible-xs" data-toggle="modal" data-target="#deleteEntryModal">Delete Log Entry/s</button>
     </div>
 </div>
 <div class = "modal fade" id = "addEntryModal" tabindex = "-1" role = "dialog" 
@@ -147,8 +147,8 @@
             </div>
             <div class = "modal-body">
                 <div class="row" style="padding-top: 10">
-                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-                        <p>If you confirm this action, you will permanently delete the selected Log Entries.</p>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p>If you confirm this action you will <strong>permanently</strong> delete the selected Log Entries, with the exception of <strong class="success">Approved</strong> entries. If for some reason you require an approved entry deleted please contact <a href="mailto:volunteering@guild.uwa.edu.au">Guild Volunteering</a>.</p>
                     </div>
                 </div>
             </div>

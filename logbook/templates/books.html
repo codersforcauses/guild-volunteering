@@ -17,7 +17,7 @@
 
 {% block sideblock %}
 <div class="col-sm-2 col-md-2 sidebar" id="sidebar">
-    <ul class="nav" id="#accordion" style="display: inline-block;">
+    <ul class="nav" style="display: inline-block;">
         <li>
             <h3 style="color:1c1c1e;">Overview</h3>
             <ul class="nav nav-stacked left-submenu" id="item1">
@@ -29,10 +29,10 @@
         <li>
             <h3 style="color:1c1c1e;">Options</h3>
             <ul class="nav nav-stacked left-submenu" id="item2">
-                <li><a data-toggle="modal" href="#addModal">Add Log Book</a></li>
+                <li><a data-toggle="modal" href="#addBookModal">Add Log Book</a></li>
                 <li><a href="#edit_book">Edit Log Book</a></li>
                 <li><a onclick="doAction('submit')">Submit Log Book/s</a></li>
-                <li><a onclick="doAction('delete')">Delete Log Book/s</a></li>
+                <li><a data-toggle="modal" href="#deleteBookModal">Delete Log Book/s</a></li>
             </ul>
         </li>
         <li>
@@ -122,12 +122,13 @@
         </form>
     </div>
     <div class='btn-toolbar'>
-        <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addModal">Add Log Book</button>
+        <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addBookModal">Add Log Book</button>
+        <button type="button" class="btn btn-danger visible-xs" data-toggle="modal" data-target="#deleteBookModal">Delete Log Book/s</button>
         <button type="button" class="btn btn-success visible-xs">Finalise Log Book/s</button>
     </div>
 </div>
 
-<div class = "modal fade" id = "addModal" tabindex = "-1" role = "dialog" 
+<div class = "modal fade" id = "addBookModal" tabindex = "-1" role = "dialog" 
    aria-labelledby = "myModalLabel" aria-hidden = "true">
    
     <div class = "modal-dialog">
@@ -155,7 +156,7 @@
           </div>
     </div>
 </div>
-<div class = "modal fade" id = "deleteModal" tabindex = "-1" role = "dialog" 
+<div class = "modal fade" id = "deleteBookModal" tabindex = "-1" role = "dialog" 
    aria-labelledby = "myModalLabel" aria-hidden = "true">
    
     <div class = "modal-dialog">
@@ -168,16 +169,16 @@
             
             <div class = "modal-body">
                 <div class="row" style="padding: 10">
-                    <div class="col-xs-12 col-sm-12 col-md-12">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                         <p>Are you sure you want to delete this Log Book?</p>
-                        <p>Doing so will only remove all the <strong>unapproved</strong> entries, all others will remain behind.</p>
+                        <p>Doing so will remove all the books with only <strong>unapproved</strong> and <strong>pending</strong> entries, any books with approved entries will <strong>not</strong> be deleted.</p>
                     </div>
                 </div>
             </div>
 
             <div class = "modal-footer text-left">
-                <button type = "button" class = "btn btn-default" data-dismiss = "modal">No</button>
-                <button type = "submit" value="Submit" class = "btn btn-primary">Yes</button>
+                <button type = "button" class = "btn btn-default" data-dismiss = "modal">Cancel</button>
+                <button onClick="doAction('delete')" class = "btn btn-primary">Confirm</button>
             </div>
           </div>
     </div>
@@ -189,10 +190,8 @@
     form = document.getElementById('modelForm');
     actions = document.getElementById('actions');
     function doAction(action) {
-        if (confirm("Are you sure you want to "+action+" the selected book/s\n")) {
-            actions.value = action;
-            form.submit()
-        }
+        actions.value = action;
+        form.submit();
     }
 </script>
 {% endblock%}
