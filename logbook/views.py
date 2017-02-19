@@ -204,6 +204,7 @@ def logentryView(request, pk):
                                                book=logbook)
             logentry.save()
             return redirect(reverse('logbook:view', args=[logbook.id]))
+                
         else:
             modelActions(request, LogEntry, logentryPermissionCheck)
             
@@ -227,7 +228,8 @@ def logentryView(request, pk):
     return render(request, 'logentry.html', {'entries':logentries,
                                              'logbooks':logbooks,
                                              'book':logbook,
-                                             'headers':headers,'addentry_form':addEntryForm})
+                                             'headers':headers,
+                                             'addentry_form':addEntryForm,})
 
 def loginView(request):
     if request.method == 'POST':

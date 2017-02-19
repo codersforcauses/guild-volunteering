@@ -23,7 +23,7 @@
                 <li><a data-toggle="modal" href="#addEntryModal">Add Entry</a></li>
                 <li><a onclick="doAction('edit')">Edit Entry/s</a></li>
                 <li><a onclick="doAction('submit')">Submit Entry/s</a></li>
-                <li><a onclick="doAction('delete')">Delete Entry/s</a></li>
+                <li><a data-toggle="modal" href="#deleteEntryModal">Delete Entry/s</a></li>
             </ul>
         </li>
         <li>
@@ -115,7 +115,7 @@
 
             <div class = "modal-header">
                 <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
-                <h4 class = "modal-title" id = "myModalLabel">Add Log Book</h4>
+                <h4 class = "modal-title" id = "myModalLabel">Add Log Entry</h4>
             </div>
             <form action="." method="post">
             <div class = "modal-body">
@@ -135,6 +135,30 @@
           </div>
     </div>
 </div>
+<div class = "modal fade" id = "deleteEntryModal" tabindex = "-1" role = "dialog" 
+   aria-labelledby = "myModalLabel" aria-hidden = "true">
+   
+    <div class = "modal-dialog">
+        <div class = "modal-content">
+
+            <div class = "modal-header">
+                <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
+                <h4 class = "modal-title" id = "myModalLabel">Delete Log Entry/s</h4>
+            </div>
+            <div class = "modal-body">
+                <div class="row" style="padding-top: 10">
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                        <p>If you confirm this action, you will permanently delete the selected Log Entries.</p>
+                    </div>
+                </div>
+            </div>
+            <div class = "modal-footer text-left">
+                <button type = "button" class = "btn btn-default" data-dismiss = "modal">Cancel</button>
+                <button onClick="doAction('delete')" class = "btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block footerblock %}
@@ -142,10 +166,8 @@
     form = document.getElementById('modelForm');
     actions = document.getElementById('actions');
     function doAction(action) {
-        if (confirm("Are you sure you want to "+action+" the selected entries/s\n")) {
-            actions.value = action;
-            form.submit()
-        }
+        actions.value = action;
+        form.submit();
     }
   $("[title]").tooltip();
 </script>
