@@ -73,15 +73,22 @@ class LogBookForm(forms.Form):
 
 class LogEntryForm(forms.Form):
     description = forms.CharField(label='',help_text="What did your volunteering entail.", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Description'}))
-    # Allow user to select supervisor from a list of supervisors 
-    supervisor = forms.ModelChoiceField(queryset=Supervisor.objects.all(),label='Supervisor')
+
+    def __init__(self, *args, **kwargs):
+        org_id = kwargs.pop('org_id')
+        super(LogEntryForm,self).__init__(*args,**kwargs)
+        # Allow user to select supervisor from a list of supervisors 
+        self.fields['supervisor'].queryset = Supervisor.objects.filter(organisation = org_id)
+        
+    supervisor = forms.ModelChoiceField(queryset = [], label = 'Supervisor')
+    
     dateTimeOptions = {
         'format': 'dd/mm/yyyy HH:ii P',
         'autoclose': True,
         'showMeridian' : True,
         }
     start = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')
-    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')
+    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')        
 
 class EditNamesForm(forms.ModelForm):
     first_name = FirstNameField()

@@ -185,6 +185,7 @@ def booksView(request):
 @login_required
 def logentryView(request, pk):
     logbook = LogBook.objects.get(id=pk)
+    org = logbook.organisation
     if logbook == None:
         return HttpResponseNotFound
 
@@ -193,7 +194,8 @@ def logentryView(request, pk):
          return HttpResponseForbidden()
 
     if request.method == 'POST':
-        addEntryForm = LogEntryForm(request.POST)
+        
+        addEntryForm = LogEntryForm(request.POST, org_id = org.id)
         if addEntryForm.is_valid():
             logentry = LogEntry.objects.create(description=addEntryForm.cleaned_data['description'],
                                                supervisor=addEntryForm.cleaned_data['supervisor'],
@@ -202,10 +204,11 @@ def logentryView(request, pk):
                                                book=logbook)
             logentry.save()
             return redirect(reverse('logbook:view', args=[logbook.id]))
+                
         else:
             modelActions(request, LogEntry, logentryPermissionCheck)
             
-    addEntryForm = LogEntryForm()
+    addEntryForm = LogEntryForm(org_id = org.id)
     
     logentries = {}
     logbooks = {}
@@ -225,7 +228,8 @@ def logentryView(request, pk):
     return render(request, 'logentry.html', {'entries':logentries,
                                              'logbooks':logbooks,
                                              'book':logbook,
-                                             'headers':headers,'addentry_form':addEntryForm})
+                                             'headers':headers,
+                                             'addentry_form':addEntryForm,})
 
 def loginView(request):
     if request.method == 'POST':
