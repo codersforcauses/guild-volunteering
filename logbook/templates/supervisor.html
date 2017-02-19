@@ -46,8 +46,8 @@
                                     <tr class = "">
                                         <td class="hidden"><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
                                         <td>{{ logentry.description }}</td>
-                                        <td>{{ logentry.start }}</td>
-                                        <td>{{ logentry.end }}</td>
+                                        <td>{{ logentry.start|date:"d/m/y P" }}</td>
+                                        <td>{{ logentry.end|date:"d/m/y P" }}</td>
                                         <td><button class="btn btn-success">Approve</button></td>
                                     </tr>
                                     {% endif %}
@@ -55,6 +55,7 @@
                                 {% endif %}
                             </tbody>
                         </table>
+                        <h4>Total of {{ logbook.entries_pending_total_duration }} hours to be approved</h4>
                         <button class="btn btn-success">Approve All</button>
                         <a href="mailto:{{logbook.book__user__user__username}}@student.uwa.edu.au"><img src="{% static "images/email.png" %}" alt="Email Student" width=30px height=30px /></a>
                     </div>

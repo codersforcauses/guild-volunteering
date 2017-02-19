@@ -149,9 +149,6 @@ def booksView(request):
                   .annotate(entries_pending=Count('id'))\
                   .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'), output_field=fields.DurationField())))
         #use books to get the student numbers
-        #logbooks = LogBook.objects.filter(id__in = entries)
-        ApprovalCount = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').annotate(Count('id'))
-        print(ApprovalCount)
         logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
         return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
     else:
