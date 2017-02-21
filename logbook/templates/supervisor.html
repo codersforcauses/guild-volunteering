@@ -1,8 +1,7 @@
-<html lang="en">
-
 {% extends 'base.html' %}
 
 {% load static %}
+{% load filters %}
 
 {% block titleblock %}Guild Volunteering System{% endblock %}
 
@@ -55,7 +54,7 @@
                                 {% endif %}
                             </tbody>
                         </table>
-                        <h4>Total of {{ logbook.entries_pending_total_duration }} hours to be approved</h4>
+                        <h4>Total of {{ logbook.entries_pending_total_duration|timedelta }} to be approved</h4>
                         <button class="btn btn-success">Approve All</button>
                         <a href="mailto:{{logbook.book__user__user__username}}@student.uwa.edu.au"><img src="{% static "images/email.png" %}" alt="Email Student" width=30px height=30px /></a>
                     </div>
