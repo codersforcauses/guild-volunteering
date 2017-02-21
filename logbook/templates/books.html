@@ -55,7 +55,7 @@
                     <option value="submit">Submit</option>
                     <option value="delete">Delete</option>
                 </select>
-            <table class="table table-striped">
+            <table class="table table-striped table-responsive table-sm">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -80,8 +80,7 @@
 			<td>{{ logbook.category }}
                         <td>{{ logbook.description }}</td>
                         <td class="visible-xs">
-                            <img width="40px" height="30px" src="{% static "images/edit-icon.png" %}" />
-                            <img width="30px" height="30px" src="{% static "images/delete-icon.png" %}" />
+                            <button class="btn btn-lg"><span class="glyphicon glyphicon-pencil"></span></button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -122,9 +121,15 @@
         </form>
     </div>
     <div class='btn-toolbar'>
-        <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addBookModal">Add Log Book</button>
-        <button type="button" class="btn btn-danger visible-xs" data-toggle="modal" data-target="#deleteBookModal">Delete Log Book/s</button>
-        <button type="button" class="btn btn-success visible-xs">Finalise Log Book/s</button>
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addBookModal">Add Log Book</button>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-danger visible-xs" data-toggle="modal" data-target="#deleteBookModal">Delete Log Book/s</button>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-success visible-xs">Finalise Log Book/s</button>
+        </div>
     </div>
 </div>
 
