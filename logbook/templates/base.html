@@ -74,13 +74,15 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
                     <li class="hidden-xs"><a style="color:#eaecef;" href="{% url 'logbook:faq' %}">FAQ</a></li>
-                    <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:faq' %}"><span class="glyphicon glyphicon-question-sign"></span> FAQ</a></li>
+                    <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:faq' %}"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> FAQ</a></li>
                     {% if user.is_authenticated %}
                     <li class="hidden-xs"><a style="color:#eaecef;" href="{% url 'logbook:profile' %}">{{ user.username }}</a></li>
                     <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:profile' %}"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ user.username }}</a></li>
-                    <li><a style="color:#eaecef;" href="{% url 'logbook:logout' %}">Logout</a></li>
+                    <li class="hidden-xs"><a style="color:#eaecef;" href="{% url 'logbook:logout' %}">Logout</a></li>
+                    <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:logout' %}"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a></li>
                     {% else %}
-                    <li><a style="color:#eaecef;" href="{% url 'logbook:login' %}">Login</a></li>
+                    <li class="hidden-xs"><a style="color:#eaecef;" href="{% url 'logbook:login' %}">Login</a></li>
+                    <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:login' %}"><span class="glyphicon glyphicon-log-in" aria-hidden='true'></span> Login</a></li>
                     <li><a style="color:#eaecef;" href="{% url 'logbook:signup' %}">Sign Up!</a></li>
                     {% endif %}
                 </ul>
