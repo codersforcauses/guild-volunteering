@@ -43,7 +43,7 @@ class SupervisorAdmin(admin.ModelAdmin):
 
 @admin.site.register_view(r'logbook/export', visible='false', name="Export Logbooks")
 def exportView(request):
-    # TODO: find out what date format to use for export
+    DATE_FORMAT = '%d/%m/%Y'
     if request.method == 'POST':
         form = ExportForm(request.POST)
         if form.is_valid():
@@ -57,7 +57,7 @@ def exportView(request):
                 writer.writerow([user.user.username, user.user.first_name, user.user.last_name,
                     entry.start.year, entry.book.category,
                     entry.book.organisation.code, entry.book.organisation.name,
-                    '','', (entry.end - entry.start).seconds/3600])
+                    entry.start.strftime(DATE_FORMAT), entry.end.strftime(DATE_FORMAT), (entry.end - entry.start).seconds/3600])
             return response
 
     else:
