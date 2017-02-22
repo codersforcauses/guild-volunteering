@@ -83,12 +83,15 @@ class LogEntryForm(forms.Form):
     supervisor = forms.ModelChoiceField(queryset = [], label = 'Supervisor')
     
     dateTimeOptions = {
-        'format': 'dd/mm/yyyy HH:ii P',
+        'format': 'dd/mm/yyyy hh:ii:00',
+        'weekStart' : '1',
         'autoclose': True,
-        'showMeridian' : True,
+        'showMeridian': True,
+        'minuteStep' : '15',
+        'clearBtn' : True,
         }
-    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')
-    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')        
+    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3),label='',)
+    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3),label='',)        
 
 class EditNamesForm(forms.ModelForm):
     first_name = FirstNameField()
