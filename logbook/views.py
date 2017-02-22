@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 # Database
 from .forms import *
 from django.db import transaction
-from django.db.models import F, Count, Sum
+from django.db.models import ExpressionWrapper, F, Count, Sum, fields
 
 # User authentication
 from django.contrib.auth import authenticate, login, logout
@@ -100,7 +100,7 @@ def modelActions(request, model, permissionCheck):
                     return redirect('edit_entry',args=(logentry.book.id, logentry.id))
                 except:
                     print('rip')
-                    
+
 
 def logbookPermissionCheck(user, logbook, action):
     user = LBUser.objects.get(user=user)
@@ -128,7 +128,7 @@ def indexView(request):
         return render(request, 'index.html', {'is_super':is_super})
 
 def faqView(request):
-    
+
     return render(request, 'faq.html', {})
 
 def hasAllApproved(logbook):
@@ -139,15 +139,16 @@ def hasAllApproved(logbook):
         if entry.status == 'Unapproved' or entry.status == 'Pending':
             return False
     return True
-    
+
 
 @login_required
 def booksView(request):
     if is_supervisor(request.user):
-        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id').annotate(entries_pending=Count('id'))
+        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')\
+                  .values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id')\
+                  .annotate(entries_pending=Count('id'))\
+                  .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'), output_field=fields.DurationField())))
         #use books to get the student numbers
-        #logbooks = LogBook.objects.filter(id__in = entries)
-        ApprovalCount = LogEntry.objects.filter(supervisor__user = request.user, status='Pending').values('book').annotate(Count('id'))
         logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
         return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
     else:
@@ -193,7 +194,7 @@ def logentryView(request, pk):
          return HttpResponseForbidden()
 
     if request.method == 'POST':
-        
+
         addEntryForm = LogEntryForm(request.POST, org_id = org.id)
         if addEntryForm.is_valid():
             logentry = LogEntry.objects.create(description=addEntryForm.cleaned_data['description'],
@@ -203,12 +204,12 @@ def logentryView(request, pk):
                                                book=logbook)
             logentry.save()
             return redirect(reverse('logbook:view', args=[logbook.id]))
-                
+
         else:
             modelActions(request, LogEntry, logentryPermissionCheck)
-            
+
     addEntryForm = LogEntryForm(org_id = org.id)
-    
+
     logentries = {}
     logbooks = {}
     try:
@@ -314,7 +315,7 @@ def profileView(request):
     else:
         editNamesForm = EditNamesForm(instance=user)
         deleteForm = DeleteUserForm(instance=user)
-        
+
     return render(request, 'profile.html', {'names_form':editNamesForm,'delete_form':deleteForm})
 
 @login_required
