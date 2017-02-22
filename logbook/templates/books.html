@@ -51,11 +51,11 @@
         <form action="." method="post" id="modelForm">
             {% csrf_token %}
             <select name="selectedAction" hidden="true" id="actions">
-                    <option value="none"></option>
-                    <option value="submit">Submit</option>
-                    <option value="delete">Delete</option>
-                </select>
-            <table class="table table-striped table-responsive table-sm">
+                <option value="none"></option>
+                <option value="submit">Submit</option>
+                <option value="delete">Delete</option>
+            </select>
+            <table class="table table-striped table-sm">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -87,8 +87,9 @@
                     {% endif %}
                 </tbody>
             </table>
-            <hr>
+            
             {% if approvedbooks %}
+            <hr>
             <h2 class="sub-heading">Log Books Ready To Be Finalised</h2>
             <table class="table table-striped">
                 <thead>
