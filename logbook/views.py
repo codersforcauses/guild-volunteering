@@ -179,7 +179,7 @@ def booksView(request):
             if hasAllApproved(book):
                 approvedLogbooks.append(book)
                 logbooks_list.remove(book)
-        print(approvedLogbooks)
+                
         return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers,'form':add_form})
 
 @login_required
