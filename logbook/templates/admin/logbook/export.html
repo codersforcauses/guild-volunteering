@@ -1,0 +1,22 @@
+{% extends 'admin/base_site.html' %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo;
+    <a href="{% url 'admin:app_list' app_label='logbook' %}">Logbook</a>
+    &rsaquo;
+    Export
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit"></input>
+</form>
+
+{% endblock %}

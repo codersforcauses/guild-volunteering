@@ -1,5 +1,11 @@
+from django.shortcuts import render
+from django.contrib.auth.models import User
 from django.contrib import admin
+from .adminForms import *
 from .models import *
+
+from django.http import HttpResponse
+import csv
 
 @admin.register(LBUser)
 class LBUserAdmin(admin.ModelAdmin):
@@ -35,3 +41,28 @@ class OrganisationAdmin(admin.ModelAdmin):
 class SupervisorAdmin(admin.ModelAdmin):
     list_display = ['user','email','validated','organisation',]
 
+@admin.site.register_view(r'logbook/export', visible='false', name="Export Logbooks")
+def exportView(request):
+    # TODO: find out what date format to use for export
+    if request.method == 'POST':
+        form = ExportForm(request.POST)
+        if form.is_valid():
+            response = HttpResponse(content_type='text/csv')
+            user = form.cleaned_data['student']
+            response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(user.user.username)
+            writer = csv.writer(response)
+            writer.writerow(['StudentID','First Name','Surname','Calendar Year','Position Type','Host Organisation Code','Host Organisation Description','Start Date','End Date','Hours'])
+            entries = LogEntry.objects.filter(book__user=user, status='Approved')#.select_related('book__organisation__name','book__organisation__code','book__category')
+            for entry in entries:
+                writer.writerow([user.user.username, user.user.first_name, user.user.last_name,
+                    entry.start.year, entry.book.category,
+                    entry.book.organisation.code, entry.book.organisation.name,
+                    '','', (entry.end - entry.start).seconds/3600])
+            return response
+
+    else:
+        form = ExportForm()
+
+    context = dict(admin.site.each_context(request),
+        form=form)
+    return render(request, 'admin/logbook/export.html',context)

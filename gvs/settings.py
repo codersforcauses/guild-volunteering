@@ -29,7 +29,8 @@ SECRET_KEY = '5de1_txz%-chu&9of#e(ygn_f5%=c9#!-ym_j_sj-^v@j@qj!a'
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'django.contrib.admin.apps.SimpleAdminConfig',
+    'adminplus',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
