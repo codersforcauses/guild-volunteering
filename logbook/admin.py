@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib import admin
 from .adminForms import *
 from .models import *
+from django.db.models import F, Min, Max
 
 from django.http import HttpResponse
 import csv
@@ -52,12 +53,16 @@ def exportView(request):
             response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(user.user.username)
             writer = csv.writer(response)
             writer.writerow(['StudentID','First Name','Surname','Calendar Year','Position Type','Host Organisation Code','Host Organisation Description','Start Date','End Date','Hours'])
-            entries = LogEntry.objects.filter(book__user=user, status='Approved')#.select_related('book__organisation__name','book__organisation__code','book__category')
+            fields = ['book__user__user__username', 'book__user__user__first_name','book__user__user__last_name', 'year', 'book__category__name', 'book__organisation__code','book__organisation__name']
+            entries = LogEntry.objects.filter(book__user=user, status='Approved'
+                    ).extra(select={'year': "EXTRACT(year FROM start)"}
+                    ).values(*fields
+                    ).annotate(startDate=Min('start'), endDate=Max('end'))
+            print(entries)
             for entry in entries:
-                writer.writerow([user.user.username, user.user.first_name, user.user.last_name,
-                    entry.start.year, entry.book.category,
-                    entry.book.organisation.code, entry.book.organisation.name,
-                    entry.start.strftime(DATE_FORMAT), entry.end.strftime(DATE_FORMAT), (entry.end - entry.start).seconds/3600])
+                print(entry,'\n', entry['year'])
+                writer.writerow([entry[f] for f in fields]
+                        + [ entry['startDate'].strftime(DATE_FORMAT), entry['endDate'].strftime(DATE_FORMAT), round((entry['endDate']-entry['startDate']).seconds/3600)])
             return response
 
     else:
