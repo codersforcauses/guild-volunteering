@@ -206,7 +206,10 @@ def logentryView(request, pk):
             return redirect(reverse('logbook:view', args=[logbook.id]))
 
         else:
-            modelActions(request, LogEntry, logentryPermissionCheck)
+            try:
+                modelActions(request, LogEntry, logentryPermissionCheck)
+            except:
+                pass
 
     addEntryForm = LogEntryForm(org_id = org.id)
 

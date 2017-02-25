@@ -93,6 +93,17 @@ class LogEntryForm(forms.Form):
     start = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3),label='',)
     end = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3),label='',)        
 
+    def clean(self):
+        cleaned_data = super().clean()
+
+        start = cleaned_data.get('start')
+        end = cleaned_data.get('end')
+        timediff = end-start
+        if timediff.total_seconds() < 0:
+            raise forms.ValidationError('Invalid start or end time')
+        
+        return cleaned_data
+
 class EditNamesForm(forms.ModelForm):
     first_name = FirstNameField()
     last_name = FirstNameField()
