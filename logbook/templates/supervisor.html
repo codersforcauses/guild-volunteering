@@ -18,7 +18,10 @@
 
 {% block bodyblock %}
 <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 main">
-    <h1 class="page-header">Manage Your Students</h1>
+    <div class="visible-xs">
+        <a href="{% url 'logbook:index' %}" class="visible-xs" style="float:left"><span style="font-size: 40; position:relative;top:-10px;">&larr;</span></a> <h1 class="page-header" style="display: inline-block;">Manage Your Students</h1>
+    </div>
+    <h1 class="page-header hidden-xs">Manage Your Students</h1>
     <div class="panel-group" id="accordion">
         {% if logbooks %}
         <form method="post" id="modelForm">
