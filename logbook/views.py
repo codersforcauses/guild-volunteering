@@ -104,7 +104,7 @@ def modelActions(request, model, permissionCheck):
         for i in modelIDs:
             try:
                 m = model.objects.get(id=i)
-            except: model.DoesNotExist:
+            except model.DoesNotExist:
                 pass
             if permissionCheck(request.user, m, 'approve'):
                 if m.status == 'Pending':
@@ -114,7 +114,7 @@ def modelActions(request, model, permissionCheck):
         for i in modelIDs:
             try:
                 m = model.objects.get(id=i)
-            except: model.DoesNotExist:
+            except model.DoesNotExist:
                 pass
             if permissionCheck(request.user, m, 'decline'):
                 if m.status == 'Pending':
