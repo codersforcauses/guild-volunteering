@@ -175,13 +175,12 @@ def booksView(request):
     if is_supervisor(request.user):
         if request.method == 'POST':
             modelActions(request, LogEntry, approvePermissionCheck)
-        else:
-            entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')\
-                  .values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id')\
-                  .annotate(entries_pending=Count('id'))\
-                  .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'), output_field=fields.DurationField())))
-            #use books to get the student numbers
-            logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
+        entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')\
+              .values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id')\
+              .annotate(entries_pending=Count('id'))\
+              .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'), output_field=fields.DurationField())))
+        #use books to get the student numbers
+        logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
         return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
     else:
         if request.method == 'POST':
