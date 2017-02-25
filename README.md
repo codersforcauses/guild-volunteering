@@ -26,8 +26,8 @@ For development the line `DEBUG = True` can be added to the file.
 
 ## Requirements:
 Need to install:
-- django-datetimepicker
-- django-adminplus
+- [django-datetime-widget](https://github.com/asaglimbeni/django-datetime-widget)
+- [django-adminplus](https://github.com/jsocol/django-adminplus)
 
 ## Testing
 To run the tests use
