@@ -24,6 +24,11 @@ Additional database settings and engines can be found [here](https://docs.django
 
 For development the line `DEBUG = True` can be added to the file.
 
+## Requirements:
+Need to install:
+- django-datetimepicker
+- django-adminplus
+
 ## Testing
 To run the tests use
 ```python manage.py test logbook/tests```
