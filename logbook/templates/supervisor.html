@@ -19,11 +19,11 @@
 {% block bodyblock %}
 <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 main">
     <div class="visible-xs">
-        <a href="{% url 'logbook:index' %}" class="visible-xs" style="float:left"><span style="font-size: 40; position:relative;top:-10px;">&larr;</span></a> <h1 class="page-header" style="display: inline-block;">Manage Your Students</h1>
+        <a href="{% url 'logbook:index' %}" class="visible-xs" style="float:left"><span style="font-size: 40; position:relative;top:-10px;">&larr;</span></a> <h1 class="page-header">Approve Volunteer Hours</h1>
     </div>
-    <h1 class="page-header hidden-xs">Manage Your Students</h1>
+    <h1 class="page-header hidden-xs">Approve Volunteer Hours</h1>
+    {% if logbooks %}
     <div class="panel-group" id="accordion">
-        {% if logbooks %}
         <form method="post" id="modelForm">
             {% csrf_token %}
             <select name="selectedAction" hidden="true" id="actions">
@@ -58,8 +58,8 @@
                                         <td>{{ logentry.end|date:"d/m/y P" }}</td>
                                         <td>
                                             <div class='btn-toolbar'>
-                                                <button class="btn btn-success visible-xs"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
-                                                <button class="btn btn-danger visible-xs"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                                                <button class="btn btn-success visible-xs" onclick="doOne('check-{{logentry.id}}','approve')"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+                                                <button class="btn btn-danger visible-xs" onclick="doOne('check-{{logentry.id}}', 'decline')"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
                                                 <button class="btn btn-success hidden-xs" onclick="doOne('check-{{logentry.id}}','approve')">Approve</button>
                                                 <button class="btn btn-danger hidden-xs" onclick="doOne('check-{{logentry.id}}', 'decline')">Decline</button>
                                             </div>
@@ -72,14 +72,19 @@
                         </table>
                         <h4>Total of {{ logbook.entries_pending_total_duration|timedelta }} to be approved</h4>
                         <button class="btn btn-success" onclick="submitAll('table-{{logbook.book__id}}')">Approve All</button>
+                        <button class="btn btn-danger" onclick="declineAll('table-{{logbook.book__id}}')">Decline All</button>
                         <button class="btn btn-lg btn-inverse" onclick="location.href='mailto:{{logbook.book__user__user__username}}@student.uwa.edu.au'"><span class="glyphicon glyphicon-envelope"></span></button>
                     </div>
                 </div>
             </div>
         {% endfor %}
         </form>
-        {% endif %}
     </div>
+    {% else %}
+    <div style="padding-top: 10px;">
+        <p><h4>You do not have any hours to approve, please come back later and check.</h4></p>
+    </div>
+    {% endif %}
 </div>
 
 {% endblock %}
@@ -101,6 +106,15 @@
         }
         actions.value = 'approve';
         form.submit()
-    }   
+    }
+    function declineAll(tableid) {
+        table = document.getElementById(tableid);
+        checkboxes = table.querySelectorAll('[name=model_selected]');
+        for (var i=0; i<checkboxes.length; i++) {
+            checkboxes[i].checked = true;
+        }
+        actions.value = 'decline';
+        form.submit()
+    }
 </script>
 {% endblock%}
