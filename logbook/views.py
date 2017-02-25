@@ -10,13 +10,17 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 
+#Redirect
 from django.http import HttpResponseNotFound, HttpResponseForbidden
-
 from django.urls import reverse
 
+#Logbook Project
 from .forms import *
 from .admin import *
 
+#General
+from django.utils.crypto import get_random_string
+import hashlib
 import string
 import datetime
 
@@ -246,24 +250,34 @@ def loginView(request):
         form = LoginForm()
     return render(request, 'login.html', {'loginForm':form})
 
+def generate_activation_key(username):
+    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    secret_key = get_random_string(20, chars)
+    return hashlib.sha256((secret_key + username).encode('utf-8')).hexdigest()
+
 @transaction.atomic
 def signupView(request):
+    if request.user.is_authenticated():
+        return redirect('logbook:index')
     '''
     View for handling student registration
     '''
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
-            user = User.objects.create_user(form.cleaned_data['username'],
-                                            form.cleaned_data['username'] + '@student.uwa.edu.au',
-                                            form.cleaned_data['password'])
+            data = {}
+            data['username'] = form.cleaned_data['username']
+            data['email'] = form.cleaned_data['username'] + '@student.uwa.edu.au'
+            data['password1'] = form.cleaned_data['password']
+            data['activation_key'] = generate_activation_key(data['username'])
+            
+            data['email_path']="/ActivationEmail.txt"
+            data['email_subject']="Activate your Guild Volunteering account"
 
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
-            user.save()
-            group = Group.objects.get(name='LBStudent')
-            group.user_set.add(user)
-            group.save()
+            form.sendVerifyEmail(data)
+            form.save(data) #Save the user and his profile
+
+            request.session['registered']=True #For display purposes
             return redirect('logbook:login')
     else:
         form = SignupForm()

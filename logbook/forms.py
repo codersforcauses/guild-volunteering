@@ -1,11 +1,14 @@
 from django import forms
 from django.core.validators import RegexValidator, EmailValidator
 from django.contrib.auth.models import User
-from django.contrib.admin import widgets  
+from django.contrib.admin import widgets
+from django.template import Context,Template
+
 from .models import *
 
 import re
 from datetimewidget.widgets import DateTimeWidget
+from django.core.mail import send_mail
 
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
@@ -55,6 +58,36 @@ class SignupForm(SignupFormBase):
     username = StundetNumField(label='')
     first_name = FirstNameField(label='')
     last_name = LastNameField(label='')
+
+    def save(self, data):
+        user = User.objects.create_user(data['username'],
+                                        data['username'] + '@student.uwa.edu.au',
+                                        data['password1'])
+
+        user.first_name = data['first_name']
+        user.last_name = data['last_name']
+        user.is_active = False
+        user.save()
+        lbUser = LBUser()
+        lbUser.user = user
+        lbUser.activation_key = data['activation_key']
+        lbUser.key_expires = datetime.datetime.strftime(datetime.now()+ datetime.timedelta(days=7), "%Y-%m-%d %H:%M:%S")
+        lbUser.save()
+        group = Group.objects.get(name='LBStudent')
+        group.user_set.add(user)
+        group.save()
+        return user
+
+    def sendVerifyEmail(self, mailData):
+        link = "http://192.168.0.3:8000/activate/"+mailData['activation_key']
+        contxt = Context({'activation_link':link,'username':mailData['username']})
+        STATIC_PATH = 'A:/Libraries/Documents/guild-volunteering/logbook/static'
+        file = open(STATIC_PATH+mailData['email_path'],'r')
+        temp = Template(file.read())
+        file.close
+        message = temp.render(contxt)
+        print(message)
+        send_mail(mailData['email_subject'],message,'Guild Volunteering <sam.j.s.heath@gmail.com>',['sam.j.s.heath@gmail.com'], fail_silently=False)
 
 class SupervisorSignupForm(SignupFormBase):
     username = EmailField(label='')
