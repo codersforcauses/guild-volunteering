@@ -1,0 +1,14 @@
+<html lang="en">
+
+{% extends 'base.html' %}
+
+{% block titleblock %}Activated Account{% endblock %}
+
+{% block bodyblock %}
+<div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
+    <h1 class="page-header">Your account has been activated!</h1>
+    <p>
+        Click <a href="{% url 'logbook:login' %}">here</a> to login.
+    </p>
+</div>
+{% endblock %}

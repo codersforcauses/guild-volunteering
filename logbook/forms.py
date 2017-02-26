@@ -1,15 +1,18 @@
 from django import forms
 from django.core.validators import RegexValidator, EmailValidator
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.admin import widgets
 from django.template import Context,Template
+from django.core.mail import send_mail
 
 from .models import *
 
-import re
 from datetimewidget.widgets import DateTimeWidget
-from django.core.mail import send_mail
+import os
+import re
+import socket
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
 class StundetNumField(forms.CharField):
@@ -62,32 +65,32 @@ class SignupForm(SignupFormBase):
     def save(self, data):
         user = User.objects.create_user(data['username'],
                                         data['username'] + '@student.uwa.edu.au',
-                                        data['password1'])
+                                        data['password'])
 
         user.first_name = data['first_name']
         user.last_name = data['last_name']
         user.is_active = False
+        group = Group.objects.get(name='LBStudent')
+        group.user_set.add(user)
+        group.save()
         user.save()
         lbUser = LBUser()
         lbUser.user = user
         lbUser.activation_key = data['activation_key']
-        lbUser.key_expires = datetime.datetime.strftime(datetime.now()+ datetime.timedelta(days=7), "%Y-%m-%d %H:%M:%S")
+        lbUser.key_expires = datetime.datetime.strftime(datetime.datetime.now()+ datetime.timedelta(days=7), "%Y-%m-%d %H:%M:%S")
         lbUser.save()
-        group = Group.objects.get(name='LBStudent')
-        group.user_set.add(user)
-        group.save()
         return user
 
     def sendVerifyEmail(self, mailData):
-        link = "http://192.168.0.3:8000/activate/"+mailData['activation_key']
+        hostname = socket.gethostbyname(socket.gethostname())
+        link = "http://"+hostname+":8000/logbook/activate/"+mailData['activation_key']
         contxt = Context({'activation_link':link,'username':mailData['username']})
-        STATIC_PATH = 'A:/Libraries/Documents/guild-volunteering/logbook/static'
+        STATIC_PATH = os.path.join(BASE_DIR,'logbook\\static')
         file = open(STATIC_PATH+mailData['email_path'],'r')
         temp = Template(file.read())
         file.close
         message = temp.render(contxt)
-        print(message)
-        send_mail(mailData['email_subject'],message,'Guild Volunteering <sam.j.s.heath@gmail.com>',['sam.j.s.heath@gmail.com'], fail_silently=False)
+        send_mail(mailData['email_subject'],message,'Guild Volunteering <sam.j.s.heath@gmail.com>',[mailData['email']], fail_silently=False)
 
 class SupervisorSignupForm(SignupFormBase):
     username = EmailField(label='')

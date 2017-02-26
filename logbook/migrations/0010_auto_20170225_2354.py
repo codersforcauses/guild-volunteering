@@ -16,11 +16,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='lbuser',
             name='activation_key',
-            field=models.CharField(max_length=40),
+            field=models.CharField(max_length=64),
         ),
         migrations.AddField(
             model_name='lbuser',
             name='key_expires',
-            field=models.DateTimeField(datetime.datetime.now()),
+            field=models.DateTimeField(datetime.datetime.now()+datetime.timedelta(days=7)),
         ),
     ]

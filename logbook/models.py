@@ -6,8 +6,8 @@ import datetime
 
 class LBUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
-    activation_key = models.CharField(max_length=40)
-    key_expires = models.DateTimeField(default=datetime.datetime.now())
+    activation_key = models.CharField(max_length=64)
+    key_expires = models.DateTimeField(default=datetime.datetime.now()+datetime.timedelta(days=7))
     def __str__(self):
         return str(self.user)
 

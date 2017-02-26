@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^faq/$', views.faqView, name='faq'),
     url(r'^create/$', views.addLogbookView, name='create'),
     url(r'^signup/$', views.signupView, name='signup'),
+    url(r'^activate/(?P<key>.+)$', views.activation, name = 'activate'),
     url(r'^signup/supervisor/$', views.supervisorSignupView, name='super_signup'),
     url(r'^login/$', views.loginView, name='login'),
     url(r'^logout/$', views.logoutView, name='logout'),

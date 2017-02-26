@@ -13,6 +13,7 @@ from django.contrib.auth.models import User, Group
 #Redirect
 from django.http import HttpResponseNotFound, HttpResponseForbidden
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
 
 #Logbook Project
 from .forms import *
@@ -23,6 +24,7 @@ from django.utils.crypto import get_random_string
 import hashlib
 import string
 import datetime
+from django.utils import timezone
 
 def is_supervisor(user):
     return user.groups.filter(name='LBSupervisor').exists()
@@ -268,20 +270,40 @@ def signupView(request):
             data = {}
             data['username'] = form.cleaned_data['username']
             data['email'] = form.cleaned_data['username'] + '@student.uwa.edu.au'
-            data['password1'] = form.cleaned_data['password']
+            data['first_name'] = form.cleaned_data['first_name']
+            data['last_name'] = form.cleaned_data['last_name']
+            data['password'] = form.cleaned_data['password']
             data['activation_key'] = generate_activation_key(data['username'])
             
-            data['email_path']="/ActivationEmail.txt"
+            data['email_path']="\\ActivationEmail.txt"
             data['email_subject']="Activate your Guild Volunteering account"
 
             form.sendVerifyEmail(data)
-            form.save(data) #Save the user and his profile
+            form.save(data) #Save the user and lbuser
 
             request.session['registered']=True #For display purposes
             return redirect('logbook:login')
     else:
         form = SignupForm()
     return render(request, 'signup.html', {'signupForm':form})
+
+def activation(request, key):
+    activation_expired = False
+    already_active = False
+    lbuser = get_object_or_404(LBUser, activation_key=key)
+    if lbuser.user.is_active == False:
+        if timezone.now() > lbuser.key_expires:
+            activation_expired = True #Display: offer the user to send a new activation link
+            id_user = lbuser.user.id
+        else: #Activation successful
+            lbuser.user.is_active = True
+            lbuser.user.save()
+
+    #If user is already active, simply display error message
+    else:
+        already_active = True #Display : error message
+    return render(request, 'activation.html', locals())
+
 
 @transaction.atomic
 def supervisorSignupView(request):
