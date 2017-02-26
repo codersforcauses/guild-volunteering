@@ -275,7 +275,7 @@ def signupView(request):
             data['password'] = form.cleaned_data['password']
             data['activation_key'] = generate_activation_key(data['username'])
             
-            data['email_path']="\\ActivationEmail.txt"
+            data['email_path']="ActivationEmail.txt"
             data['email_subject']="Activate your Guild Volunteering account"
 
             form.sendVerifyEmail(data)

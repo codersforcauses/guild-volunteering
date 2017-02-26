@@ -12,7 +12,7 @@ import os
 import re
 import socket
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from django.conf import settings
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
 class StundetNumField(forms.CharField):
@@ -85,12 +85,11 @@ class SignupForm(SignupFormBase):
         hostname = socket.gethostbyname(socket.gethostname())
         link = "http://"+hostname+":8000/logbook/activate/"+mailData['activation_key']
         contxt = Context({'activation_link':link,'username':mailData['username']})
-        STATIC_PATH = os.path.join(BASE_DIR,'logbook\\static')
-        file = open(STATIC_PATH+mailData['email_path'],'r')
+        EMAIL_PATH = os.path.join(settings.BASE_DIR,'logbook','static', mailData['email_path'])
+        file = open(EMAIL_PATH,'r')
         temp = Template(file.read())
         file.close
         message = temp.render(contxt)
-        send_mail(mailData['email_subject'],message,'Guild Volunteering <sam.j.s.heath@gmail.com>',[mailData['email']], fail_silently=False)
 
 class SupervisorSignupForm(SignupFormBase):
     username = EmailField(label='')
