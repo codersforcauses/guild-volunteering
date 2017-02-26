@@ -6,13 +6,13 @@ from django.template import Context,Template
 from django.core.mail import send_mail
 
 from .models import *
+from django.conf import settings
 
 from datetimewidget.widgets import DateTimeWidget
 import os
 import re
 import socket
 
-from django.conf import settings
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
 class StundetNumField(forms.CharField):
@@ -90,6 +90,7 @@ class SignupForm(SignupFormBase):
         temp = Template(file.read())
         file.close
         message = temp.render(contxt)
+        send_mail(mailData['email_subject'],message,'Guild Volunteering <volunteering@guild.uwa.edu.au',[mailData['email']], fail_silently=False)
 
 class SupervisorSignupForm(SignupFormBase):
     username = EmailField(label='')
