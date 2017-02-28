@@ -1,14 +1,43 @@
+@font-face {
+	font-family: 'Proxima Nova Thin';
+	src: url('fonts/ProximaNovaThin.eot');
+	src: local('☺'), url('fonts/ProximaNovaThin.woff') format('woff'), url('fonts/ProximaNovaThin.ttf') format('truetype'), url('fonts/ProximaNovaThin.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'Proxima Nova Regular';
+	src: url('fonts/ProximaNovaRegular.eot');
+	src: local('☺'), url('fonts/ProximaNovaRegular.woff') format('woff'), url('fonts/ProximaNovaRegular.ttf') format('truetype'), url('fonts/ProximaNovaRegular.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'Proxima Nova Bold';
+	src: url('fonts/ProximaNovaBold.eot');
+	src: local('☺'), url('fonts/ProximaNovaBold.woff') format('woff'), url('fonts/ProximaNovaBold.ttf') format('truetype'), url('fonts/ProximaNovaBold.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
 /*
  * Base structure
  */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
-  padding-top: 50px;
-  margin-bottom: 130px;
+    font-family: "Proxima Nova Thin", "HelveticaNeue", "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    color: #666666;
+    padding-top: 50px;
+    margin-bottom: 262px;
+}
+
+.placeholders a {
+    color: #666666;
 }
 
 /*
@@ -109,18 +138,39 @@ body {
 }
 
 .footer {
+  padding: 20px;
   position: absolute;
   bottom: 0;
   width: 100%;
   z-index: 1001;
-  height: 80px;
+  height: 202px;
   background-color: #1c1c1c;
 }
 
 .footer p {
+    font-size: 14px;
     color: #f5f5f5;
 }
-
+.footer a {
+    color: #f5f5f5;
+    font-size: 12px;
+}
+.footer a:hover, a:focus {
+    text-decoration: none;
+    color: #75C19D;
+}
+.footer ul li {
+    font-size: 11px;
+    display: inline;
+    list-style-type: none;
+}
+.footer li:after {
+    font-size: 11px;
+    color: #f5f5f5;
+    content: "|";
+    padding-left: 5px;
+    padding-right: 5px;
+}
 .tooltip {
     display:none;
     background:transparent url(https://dl.dropboxusercontent.com/u/25819920/tooltip/black_arrow.png);
