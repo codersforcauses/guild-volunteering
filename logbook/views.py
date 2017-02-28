@@ -111,6 +111,9 @@ def logbookPermissionCheck(user, logbook, action):
             return False
     return user == logbook.user
 
+def getCreator():
+    return 'Created by Coders for Causes Members: Samuel Heath, Lachlan Walking and Zen Ly'
+
 def logentryPermissionCheck(user, logentry, action):
     if action == 'delete':
         # don't delete an approved entry
@@ -129,7 +132,7 @@ def indexView(request):
 
 def faqView(request):
 
-    return render(request, 'faq.html', {})
+    return render(request, 'faq.html', {'names':getCreator()})
 
 def hasAllApproved(logbook):
     entries = LogEntry.objects.filter(book = logbook.id)
@@ -206,10 +209,7 @@ def logentryView(request, pk):
             return redirect(reverse('logbook:view', args=[logbook.id]))
 
         else:
-            try:
-                modelActions(request, LogEntry, logentryPermissionCheck)
-            except:
-                pass
+            modelActions(request, LogEntry, logentryPermissionCheck)
 
     addEntryForm = LogEntryForm(org_id = org.id)
 

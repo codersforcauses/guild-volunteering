@@ -9,14 +9,14 @@
 {% block bodyblock %}
 <link href="{% static "css/signin.css" %}" rel="stylesheet">
 
-<div class="col-lg-3 col-lg-offset-4">
+<div class="col-lg-7 col-lg-offset-2" style="padding-top: 4%;">
     <form class="form-signin" role="form" method="post" action=".">
         {% csrf_token %}
         <h2 class="form-signin-heading">Please Sign In</h2> {{ loginForm.as_p }}
         <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">Sign in</button>
         <p>
-        <h4>Don't have an account? <a href="{% url 'logbook:signup' %}">Register</a></h4>
-        <h4>Forgot your password? <a href="{% url 'logbook:signup' %}">Reset Password</a></h4>
+            <h4>Don't have an account? <a href="{% url 'logbook:signup' %}">Register</a></h4>
+            <h4>Forgot your password? <a href="{% url 'logbook:signup' %}">Reset Password</a></h4>
         </p>
     </form>
 </div>

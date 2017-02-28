@@ -98,9 +98,10 @@ class LogEntryForm(forms.Form):
 
         start = cleaned_data.get('start')
         end = cleaned_data.get('end')
-        timediff = end-start
-        if timediff.total_seconds() < 0:
-            raise forms.ValidationError('Invalid start or end time')
+        if start != None or end != None:
+            timediff = end-start
+            if timediff.total_seconds() < 0:
+                raise forms.ValidationError('Invalid start or end time')
         
         return cleaned_data
 

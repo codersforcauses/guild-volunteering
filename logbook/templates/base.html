@@ -58,7 +58,7 @@
 
 <body>
 
-    <nav class="navbar navbar-inverse navbar-fixed-top" style="#1c1c1c">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -71,18 +71,18 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
-                    <li class="hidden-xs"><a style="color:#eaecef;" href="{% url 'logbook:faq' %}">FAQ</a></li>
-                    <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:faq' %}"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> FAQ</a></li>
+                    <li class="visible-xs"><a href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
+                    <li class="hidden-xs"><a href="{% url 'logbook:faq' %}">FAQ</a></li>
+                    <li class="visible-xs"><a href="{% url 'logbook:faq' %}"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> FAQ</a></li>
                     {% if user.is_authenticated %}
-                    <li class="hidden-xs"><a style="color:#eaecef;" href="{% url 'logbook:profile' %}">{{ user.username }}</a></li>
-                    <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:profile' %}"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ user.username }}</a></li>
-                    <li class="hidden-xs"><a style="color:#eaecef;" href="{% url 'logbook:logout' %}">Logout</a></li>
-                    <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:logout' %}"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a></li>
+                    <li class="hidden-xs"><a href="{% url 'logbook:profile' %}">{{ user.username }}</a></li>
+                    <li class="visible-xs"><a href="{% url 'logbook:profile' %}"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ user.username }}</a></li>
+                    <li class="hidden-xs"><a href="{% url 'logbook:logout' %}">Logout</a></li>
+                    <li class="visible-xs"><a href="{% url 'logbook:logout' %}"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a></li>
                     {% else %}
-                    <li class="hidden-xs"><a style="color:#eaecef;" href="{% url 'logbook:login' %}">Login</a></li>
-                    <li class="visible-xs"><a style="color:#eaecef;" href="{% url 'logbook:login' %}"><span class="glyphicon glyphicon-log-in" aria-hidden='true'></span> Login</a></li>
-                    <li><a style="color:#eaecef;" href="{% url 'logbook:signup' %}">Sign Up!</a></li>
+                    <li class="hidden-xs"><a href="{% url 'logbook:login' %}">Login</a></li>
+                    <li class="visible-xs"><a href="{% url 'logbook:login' %}"><span class="glyphicon glyphicon-log-in" aria-hidden='true'></span> Login</a></li>
+                    <li><a href="{% url 'logbook:signup' %}">Sign Up!</a></li>
                     {% endif %}
                 </ul>
                 <form class="navbar-form navbar-right">
@@ -107,10 +107,10 @@
     <footer class="footer hidden-xs">
         <div class="container">
             <div class="row">
-                <div class="col-sm-2 col-sm-offset-0 col-md-2 col-md-offset-0">
+                <div class="col-sm-2 col-md-2 col-lg-2" style="margin-bottom:15px; margin-top:15px;">
                     <a><img src="{% static "images/footer-logo-1.png" %}" /></a>
                 </div>
-                <div class="col-sm-10 col-md-10 text-right" style="padding-top: 30px;">
+                <div class="col-sm-10 col-md-10 col-lg-10 text-right" style="margin-top:60px;">
                     <div class="row align-right">
                         <ul>
                             <li>
@@ -120,21 +120,15 @@
                                 <a href="http://websiteindevelopment.biz/wordpress/volunteering/">HOME</a>
                             </li>
                             <li>
-                                <a class="newsletter pum-trigger" href="#" style="cursor: pointer;">NEWSLETTER</a>
-                            </li>
-                            <li>
                                 <a href="http://websiteindevelopment.biz/wordpress/volunteering/about/">ABOUT</a>
                             </li>
                             <li>
                                 <a href="http://websiteindevelopment.biz/wordpress/volunteering/volunteer-opportunities/">VOLUNTEER OPPORTUNITIES</a>
                             </li>
                             <li>
-                                <a href="http://websiteindevelopment.biz/wordpress/volunteering/partners/">PARTNERS</a>
-                            </li>
-                            <li>
                                 <a href="http://websiteindevelopment.biz/wordpress/volunteering/support/">SUPPORT</a>
                             </li>
-                            <li>
+                            <li style="">
                                 <a href="http://websiteindevelopment.biz/wordpress/volunteering/contact/">CONTACT</a>
                             </li>
                         </ul>
@@ -156,7 +150,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="col-sm-12 col-md-12 col-lg-12" style="padding-top: 20px;">
                     <div class="copyright-content"><p>COPYRIGHT © 2017 UWA STUDENT GUILD | ABN 39 156 317 391</p></div>
                 </div>
             </div>
