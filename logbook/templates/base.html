@@ -106,7 +106,60 @@
 
     <footer class="footer hidden-xs">
         <div class="container">
-            <p>THIS IS A FOOTER</p>
+            <div class="row">
+                <div class="col-sm-2 col-sm-offset-0 col-md-2 col-md-offset-0">
+                    <a><img src="{% static "images/footer-logo-1.png" %}" /></a>
+                </div>
+                <div class="col-sm-10 col-md-10 text-right" style="padding-top: 30px;">
+                    <div class="row align-right">
+                        <ul>
+                            <li>
+                                <a href="http://www.uwastudentguild.com/" target="_blank">UWA STUDENT GUILD</a>
+                            </li>
+                            <li>
+                                <a href="http://websiteindevelopment.biz/wordpress/volunteering/">HOME</a>
+                            </li>
+                            <li>
+                                <a class="newsletter pum-trigger" href="#" style="cursor: pointer;">NEWSLETTER</a>
+                            </li>
+                            <li>
+                                <a href="http://websiteindevelopment.biz/wordpress/volunteering/about/">ABOUT</a>
+                            </li>
+                            <li>
+                                <a href="http://websiteindevelopment.biz/wordpress/volunteering/volunteer-opportunities/">VOLUNTEER OPPORTUNITIES</a>
+                            </li>
+                            <li>
+                                <a href="http://websiteindevelopment.biz/wordpress/volunteering/partners/">PARTNERS</a>
+                            </li>
+                            <li>
+                                <a href="http://websiteindevelopment.biz/wordpress/volunteering/support/">SUPPORT</a>
+                            </li>
+                            <li>
+                                <a href="http://websiteindevelopment.biz/wordpress/volunteering/contact/">CONTACT</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="row align-right">
+                        <div class="col-sm-1 col-sm-offset-8">
+                            <a target="_blank" title="Facebook" href="http://www.facebook.com/GuildVolunteering"><img src="{% static "images/facebook-logo.png" %}" border="0" width="32" alt="Facebook" style="margin: 2px; opacity: 1;"></a>
+                        </div>
+                        <div class="col-sm-1">
+                            <a target="_blank" title="Twitter" href="http://twitter.com/GuildVolunteer"><img src="{% static "images/twitter-logo.png" %}" border="0" width="32" alt="Twitter" style="margin: 2px; opacity: 1;"></a>
+                        </div>
+                        <div class="col-sm-1">
+                            <a target="_blank" title="Instagram" href="http://www.instagram.com/guildvolunteeringuwa/"><img src="{% static "images/instagram-logo.png" %}" border="0" width="32" alt="Instagram" style="margin: 2px; opacity: 1;"></a>
+                        </div>
+                        <div class="col-sm-1">
+                            <a target="_blank" title="Email" href="mailto:volunteering@guild.uwa.edu.au"><img src="{% static "images/envelope-logo.png" %}" border="0" width="32" alt="Email" style="margin: 2px; opacity: 1;"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="copyright-content"><p>COPYRIGHT © 2017 UWA STUDENT GUILD | ABN 39 156 317 391</p></div>
+                </div>
+            </div>
         </div>
         {% block footerblock %}{% endblock %}
     </footer>
