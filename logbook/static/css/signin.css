@@ -6,7 +6,9 @@ body {
 
 .form-signin {
   padding-top: 4%;
-  max-width: 400px;
+  max-width: 500px;
+  width:100%;
+  min-width: 300px;
   margin: 0 auto;
 }
 .form-signin .form-signin-heading,
