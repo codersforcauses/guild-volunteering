@@ -12,7 +12,8 @@
 <div class="col-lg-3 col-lg-offset-4">
     <form class="form-signin" role="form" method="post" action=".">
         {% csrf_token %}
-        <h2 class="form-signin-heading">Please Sign In</h2> {{ loginForm.as_p }}
+        <h2 class="form-signin-heading">Please Sign In</h2> 
+        {{ loginForm.as_p }}
         <button class="btn btn-lg btn-primary btn-block" type="submit" value="Submit">Sign in</button>
         <p>
         <h4>Don't have an account? <a href="{% url 'logbook:signup' %}">Register</a></h4>

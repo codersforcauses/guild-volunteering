@@ -16,8 +16,10 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
+from logbook.views import loginView
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^logbook/accounts/', include('django.contrib.auth.urls')),
     url(r'^logbook/', include('logbook.urls')),
+    url(r'^logbook/accounts/', include('django.contrib.auth.urls')),
 ]
