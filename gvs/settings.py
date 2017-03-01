@@ -25,6 +25,9 @@ SECRET_KEY = '5de1_txz%-chu&9of#e(ygn_f5%=c9#!-ym_j_sj-^v@j@qj!a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
+# Registration
+DAYS_VALID = 2
+
 
 # Application definition
 

@@ -6,9 +6,28 @@
 
 {% block bodyblock %}
 <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 main">
+    {% if activation_expired %}
+    <h1 class="page-header">Your activation link has expired!</h1>
+    <p>
+        Click <a href="{% url 'logbook:new_activation_link' user_id %}">here</a> to resend your activation link.
+    </p>
+    {% elif isActive %}
+        {% if request.user.is_authenticated %}
+        <h1 class="page-header">You are already logged in!</h1>
+        <p>
+            Click <a href="{% url 'logbook:index' %}">here</a> to go home.
+        </p>
+        {% else %}
+        <h1 class="page-header">Your account is already activated!</h1>
+        <p>
+            Click <a href="{% url 'logbook:login' %}">here</a> to login.
+        </p>
+        {% endif %}
+    {% else %}
     <h1 class="page-header">Your account has been activated!</h1>
     <p>
         Click <a href="{% url 'logbook:login' %}">here</a> to login.
     </p>
+    {% endif %}
 </div>
 {% endblock %}

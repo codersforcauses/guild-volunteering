@@ -77,14 +77,14 @@ class SignupForm(SignupFormBase):
         lbUser = LBUser()
         lbUser.user = user
         lbUser.activation_key = data['activation_key']
-        lbUser.key_expires = datetime.datetime.strftime(datetime.datetime.now()+ datetime.timedelta(days=7), "%Y-%m-%d %H:%M:%S")
+        lbUser.key_expires = datetime.datetime.strftime(datetime.datetime.now()+ datetime.timedelta(days=settings.DAYS_VALID), "%Y-%m-%d %H:%M:%S")
         lbUser.save()
         return user
 
     def sendVerifyEmail(self, mailData):
         hostname = socket.gethostbyname(socket.gethostname())
         link = "http://"+hostname+":8000/logbook/activate/"+mailData['activation_key']
-        contxt = Context({'activation_link':link,'username':mailData['username']})
+        contxt = Context({'activation_link':link,'username':mailData['username'],'first_name':mailData['first_name']})
         EMAIL_PATH = os.path.join(settings.BASE_DIR,'logbook','static', mailData['email_path'])
         file = open(EMAIL_PATH,'r')
         temp = Template(file.read())

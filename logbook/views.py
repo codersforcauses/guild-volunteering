@@ -18,6 +18,7 @@ from django.shortcuts import get_object_or_404
 #Logbook Project
 from .forms import *
 from .admin import *
+from django.conf import settings
 
 #General
 from django.utils.crypto import get_random_string
@@ -290,6 +291,7 @@ def signupView(request):
 def activation(request, key):
     activation_expired = False
     already_active = False
+    id_user = None
     lbuser = get_object_or_404(LBUser, activation_key=key)
     if lbuser.user.is_active == False:
         if timezone.now() > lbuser.key_expires:
@@ -302,8 +304,29 @@ def activation(request, key):
     #If user is already active, simply display error message
     else:
         already_active = True #Display : error message
-    return render(request, 'activation.html', locals())
+    return render(request, 'activation.html', {'activation_expired':activation_expired,'isActive':already_active,'user_id':id_user})
 
+def new_activation_link(request, user_id):
+    form = SignupForm()
+    datas={}
+    user = User.objects.get(id=user_id)
+    if user is not None and not user.is_active:
+        datas['username']=user.username
+        datas['email']=user.email
+        datas['email_path']="NewActivationEmail.txt"
+        datas['email_subject']="New Activation Link"
+        datas['first_name'] = user.first_name
+        datas['activation_key']= generate_activation_key(datas['username'])
+
+        lbuser = LBUser.objects.get(user=user)
+        lbuser.activation_key = datas['activation_key']
+        lbuser.key_expires = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=settings.DAYS_VALID), "%Y-%m-%d %H:%M:%S")
+        lbuser.save()
+
+        form.sendVerifyEmail(datas)
+        request.session['new_link']=True #Display: new link sent
+
+    return redirect('logbook:login')
 
 @transaction.atomic
 def supervisorSignupView(request):
