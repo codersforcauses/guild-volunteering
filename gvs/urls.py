@@ -21,5 +21,4 @@ from logbook.views import loginView
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^logbook/', include('logbook.urls')),
-    url(r'^logbook/accounts/', include('django.contrib.auth.urls')),
 ]
