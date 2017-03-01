@@ -72,7 +72,6 @@
                         </table>
                         <h4>Total of {{ logbook.entries_pending_total_duration|timedelta }} to be approved</h4>
                         <button class="btn btn-success" onclick="submitAll('table-{{logbook.book__id}}')">Approve All</button>
-                        <button class="btn btn-danger" onclick="declineAll('table-{{logbook.book__id}}')">Decline All</button>
                         <button class="btn btn-lg btn-inverse" onclick="location.href='mailto:{{logbook.book__user__user__username}}@student.uwa.edu.au'"><span class="glyphicon glyphicon-envelope"></span></button>
                     </div>
                 </div>
@@ -105,15 +104,6 @@
             checkboxes[i].checked = true;
         }
         actions.value = 'approve';
-        form.submit()
-    }
-    function declineAll(tableid) {
-        table = document.getElementById(tableid);
-        checkboxes = table.querySelectorAll('[name=model_selected]');
-        for (var i=0; i<checkboxes.length; i++) {
-            checkboxes[i].checked = true;
-        }
-        actions.value = 'decline';
         form.submit()
     }
 </script>
