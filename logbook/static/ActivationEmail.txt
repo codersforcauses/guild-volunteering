@@ -1,0 +1,3 @@
+Hi {{ first_name }},
+
+Here {{ activation_link }} is the activation link.
