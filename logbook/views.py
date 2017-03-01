@@ -107,6 +107,26 @@ def modelActions(request, model, permissionCheck):
                     return redirect('edit_entry',args=(logentry.book.id, logentry.id))
                 except:
                     print('rip')
+    if action == 'approve':
+        for i in modelIDs:
+            try:
+                m = model.objects.get(id=i)
+            except model.DoesNotExist:
+                pass
+            if permissionCheck(request.user, m, 'approve'):
+                if m.status == 'Pending':
+                    m.status = 'Approved'
+                    m.save()
+    if action == 'decline':
+        for i in modelIDs:
+            try:
+                m = model.objects.get(id=i)
+            except model.DoesNotExist:
+                pass
+            if permissionCheck(request.user, m, 'decline'):
+                if m.status == 'Pending':
+                    m.status = 'Unapproved'
+                    m.save()
 
 
 def logbookPermissionCheck(user, logbook, action):
@@ -126,6 +146,15 @@ def logentryPermissionCheck(user, logentry, action):
     user = LBUser.objects.get(user=user)
     return user == logentry.book.user
 
+def approvePermissionCheck(user, logentry, action):
+    user = Supervisor.objects.get(user=user)
+    #limit actions to only allowed ones.
+    if action == 'approve':
+        return True
+    if action == 'decline':
+        return True
+    return False
+        
 
 def indexView(request):
     if not request.user.is_authenticated():
@@ -151,10 +180,12 @@ def hasAllApproved(logbook):
 @login_required
 def booksView(request):
     if is_supervisor(request.user):
+        if request.method == 'POST':
+            modelActions(request, LogEntry, approvePermissionCheck)
         entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')\
-                  .values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id')\
-                  .annotate(entries_pending=Count('id'))\
-                  .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'), output_field=fields.DurationField())))
+              .values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id')\
+              .annotate(entries_pending=Count('id'))\
+              .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'), output_field=fields.DurationField())))
         #use books to get the student numbers
         logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
         return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
