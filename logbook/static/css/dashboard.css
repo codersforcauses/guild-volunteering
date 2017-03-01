@@ -23,19 +23,25 @@
 /*
  * Base structure
  */
-html {
-    position: relative;
+html,body {
+    position:relative; 
     min-height: 100%;
+    margin:0;
 }
 /* Move down content because we have a fixed navbar that is 50px tall */
 body {
+    height: 100%;
+    min-height: 100%;
     font-family: "Proxima Nova Thin", "Proxima Nova Regular", "HelveticaNeue", "Helvetica Neue", Arial, sans-serif;
     font-size: 16px;
     color: #666666;
     padding-top: 50px;
-    margin-bottom: 262px;
 }
-
+.wrapper {
+    position:relative;
+    min-height: 100%;
+    margin-bottom: 248px;
+}
 /*
  * Global add-ons
  */
@@ -163,13 +169,14 @@ body {
 }
 
 .footer {
-  padding: 10px;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  z-index: 1001;
-  height: 248px;
-  background-color: #1c1c1c;
+    clear: both;
+    position: absolute;
+    padding: 10px;
+    width: 100%;
+    z-index: 1001;
+    height: 248px;
+    margin-top: -248px;
+    background-color: #1c1c1c;
 }
 
 .footer p {

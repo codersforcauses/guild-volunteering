@@ -57,53 +57,53 @@
 </head>
 
 <body>
+    <div class="wrapper">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Guild Volunteering System</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="visible-xs"><a href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
+                        <li class="hidden-xs"><a href="{% url 'logbook:faq' %}">FAQ</a></li>
+                        <li class="visible-xs"><a href="{% url 'logbook:faq' %}"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> FAQ</a></li>
+                        {% if user.is_authenticated %}
+                        <li class="hidden-xs"><a href="{% url 'logbook:profile' %}">{{ user.username }}</a></li>
+                        <li class="visible-xs"><a href="{% url 'logbook:profile' %}"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ user.username }}</a></li>
+                        <li class="hidden-xs"><a href="{% url 'logbook:logout' %}">Logout</a></li>
+                        <li class="visible-xs"><a href="{% url 'logbook:logout' %}"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a></li>
+                        {% else %}
+                        <li class="hidden-xs"><a href="{% url 'logbook:login' %}">Login</a></li>
+                        <li class="visible-xs"><a href="{% url 'logbook:login' %}"><span class="glyphicon glyphicon-log-in" aria-hidden='true'></span> Login</a></li>
+                        <li><a href="{% url 'logbook:signup' %}">Sign Up!</a></li>
+                        {% endif %}
+                    </ul>
+                    <form class="navbar-form navbar-right">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button">Go!</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </nav>
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Guild Volunteering System</a>
+            <div class="row">
+                {% block sideblock %}{% endblock %}
+                {% block bodyblock %}{% endblock %}
             </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="visible-xs"><a href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
-                    <li class="hidden-xs"><a href="{% url 'logbook:faq' %}">FAQ</a></li>
-                    <li class="visible-xs"><a href="{% url 'logbook:faq' %}"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> FAQ</a></li>
-                    {% if user.is_authenticated %}
-                    <li class="hidden-xs"><a href="{% url 'logbook:profile' %}">{{ user.username }}</a></li>
-                    <li class="visible-xs"><a href="{% url 'logbook:profile' %}"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ user.username }}</a></li>
-                    <li class="hidden-xs"><a href="{% url 'logbook:logout' %}">Logout</a></li>
-                    <li class="visible-xs"><a href="{% url 'logbook:logout' %}"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a></li>
-                    {% else %}
-                    <li class="hidden-xs"><a href="{% url 'logbook:login' %}">Login</a></li>
-                    <li class="visible-xs"><a href="{% url 'logbook:login' %}"><span class="glyphicon glyphicon-log-in" aria-hidden='true'></span> Login</a></li>
-                    <li><a href="{% url 'logbook:signup' %}">Sign Up!</a></li>
-                    {% endif %}
-                </ul>
-                <form class="navbar-form navbar-right">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search...">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="button">Go!</button>
-                        </span>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container-fluid">
-        <div class="row">
-            {% block sideblock %}{% endblock %}
-            {% block bodyblock %}{% endblock %}
         </div>
     </div>
-
     <footer class="footer hidden-xs">
         <div class="container">
             <div class="row">
