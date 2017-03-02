@@ -141,8 +141,8 @@ class LogEntryForm(forms.Form):
         return cleaned_data
 
 class EditNamesForm(forms.ModelForm):
-    first_name = FirstNameField()
-    last_name = FirstNameField()
+    first_name = FirstNameField(label='')
+    last_name = LastNameField(label='')
 
     class Meta:
         model = User

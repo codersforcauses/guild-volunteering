@@ -6,9 +6,10 @@ from django.db import transaction
 from django.db.models import ExpressionWrapper, F, Count, Sum, fields
 
 # User authentication
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.forms import PasswordChangeForm
 
 #Redirect
 from django.http import HttpResponseNotFound, HttpResponseForbidden
@@ -395,21 +396,26 @@ def profileView(request):
     user = request.user
     if request.method == 'POST':
         editNamesForm = EditNamesForm(request.POST)
+        changePasswordForm = PasswordChangeForm(request.user, request.POST)
         deleteForm = DeleteUserForm(request.POST, instance=user)
         if editNamesForm.is_valid():
             user.first_name = editNamesForm.cleaned_data['first_name']
             user.last_name = editNamesForm.cleaned_data['last_name']
             user.save()
             return redirect('logbook:profile')
+        elif changePasswordForm.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
         elif deleteForm.is_valid:
             active = deleteForm.save()
             #Logout User
             return redirect('logbook:login')
     else:
         editNamesForm = EditNamesForm(instance=user)
+        changePasswordForm = PasswordChangeForm(request.user)
         deleteForm = DeleteUserForm(instance=user)
 
-    return render(request, 'profile.html', {'names_form':editNamesForm,'delete_form':deleteForm})
+    return render(request, 'profile.html', {'names_form':editNamesForm,'delete_form':deleteForm,'change_password_form':changePasswordForm})
 
 @login_required
 def addLogbookView(request):
