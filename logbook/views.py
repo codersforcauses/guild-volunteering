@@ -9,7 +9,6 @@ from django.db.models import ExpressionWrapper, F, Count, Sum, fields
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
-from django.contrib.auth.forms import PasswordChangeForm
 
 #Redirect
 from django.http import HttpResponseNotFound, HttpResponseForbidden
@@ -404,14 +403,14 @@ def profileView(request):
             user.save()
             return redirect('logbook:profile')
         elif changePasswordForm.is_valid():
-            user = form.save()
+            user = changePasswordForm.save()
             update_session_auth_hash(request, user)
-        elif deleteForm.is_valid:
+        elif deleteForm.is_valid():
             active = deleteForm.save()
             #Logout User
             return redirect('logbook:login')
     else:
-        editNamesForm = EditNamesForm(instance=user)
+        editNamesForm = EditNamesForm(instance=request.user)
         changePasswordForm = PasswordChangeForm(request.user)
         deleteForm = DeleteUserForm(instance=user)
 
