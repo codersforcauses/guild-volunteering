@@ -27,16 +27,12 @@
     <!-- Custom styles -->
     <link href="{% static "css/dashboard.css" %}" rel="stylesheet">
     
-    <link href="{% static "css/bootstrap-datetimepicker.min.css" %}" rel="stylesheet">
-    
     <!-- Javascript + dependencies -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <!-- Bootstrap JS CDN -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-    <!-- Bootstrap JS LOCAL -->
-    <script>if(typeof($.fn.modal) === 'undefined') {document.write('<script src="{% static "bootstrap/js/bootstrap.min.js"%}"><\/script>')}</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.js"></script>
-    <script src="{% static "js/bootstrap-datetimepicker.js" %}"></script>
+    <!-- Dependencies of date-time widget LOCAL -->
+    {% block date_timeblock %}{% endblock %}
     
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
