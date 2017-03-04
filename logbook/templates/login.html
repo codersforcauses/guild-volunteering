@@ -9,7 +9,7 @@
 {% block bodyblock %}
 <link href="{% static "css/signin.css" %}" rel="stylesheet">
 
-<div class="col-lg-7 col-lg-offset-2" style="padding-top: 4%;">
+<div class="col-lg-8 col-lg-offset-2">
     <form class="form-signin" role="form" method="post" action=".">
         {% csrf_token %}
         <h2 class="form-signin-heading">Please Sign In</h2> {{ loginForm.as_p }}

@@ -18,12 +18,7 @@
     <!-- Bootstrap CSS CDN -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <!-- BootStrap CSS LOCAL -->
-    <script>
-        $(document).ready(function() {
-        var bodyColor = $('body').css('color');
-        if(bodyColor != 'rgb(51, 51, 51)') {
-        $("head").prepend('<link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.css" %}">');}});
-    </script>
+    
     <!-- Custom styles -->
     <link href="{% static "css/dashboard.css" %}" rel="stylesheet">
     
@@ -134,17 +129,11 @@
                         </ul>
                     </div>
                     <div class="row align-right">
-                        <div class="col-sm-1 col-sm-offset-8">
+                        <div class="social-footer">
                             <a target="_blank" title="Facebook" href="http://www.facebook.com/GuildVolunteering"><img src="{% static "images/facebook-logo.png" %}" border="0" width="32" alt="Facebook" style="margin: 2px; opacity: 1;"></a>
-                        </div>
-                        <div class="col-sm-1">
                             <a target="_blank" title="Twitter" href="http://twitter.com/GuildVolunteer"><img src="{% static "images/twitter-logo.png" %}" border="0" width="32" alt="Twitter" style="margin: 2px; opacity: 1;"></a>
-                        </div>
-                        <div class="col-sm-1">
                             <a target="_blank" title="Instagram" href="http://www.instagram.com/guildvolunteeringuwa/"><img src="{% static "images/instagram-logo.png" %}" border="0" width="32" alt="Instagram" style="margin: 2px; opacity: 1;"></a>
-                        </div>
-                        <div class="col-sm-1">
-                            <a target="_blank" title="Email" href="mailto:volunteering@guild.uwa.edu.au"><img src="{% static "images/envelope-logo.png" %}" border="0" width="32" alt="Email" style="margin: 2px; opacity: 1;"></a>
+                            <a target="_blank" title="Email" href="mailto:volunteering@guild.uwa.edu.au"><img src="{% static "images/envelope-logo.png" %}" border="0" width="36px" height="38px" alt="Email" style="margin: 2px; opacity: 1;"></a>
                         </div>
                     </div>
                 </div>
