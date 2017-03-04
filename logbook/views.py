@@ -10,15 +10,22 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 
+#Redirect
 from django.http import HttpResponseNotFound, HttpResponseForbidden
-
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
 
+#Logbook Project
 from .forms import *
 from .admin import *
+from django.conf import settings
 
+#General
+from django.utils.crypto import get_random_string
+import hashlib
 import string
 import datetime
+from django.utils import timezone
 
 def is_supervisor(user):
     return user.groups.filter(name='LBSupervisor').exists()
@@ -100,6 +107,26 @@ def modelActions(request, model, permissionCheck):
                     return redirect('edit_entry',args=(logentry.book.id, logentry.id))
                 except:
                     print('rip')
+    if action == 'approve':
+        for i in modelIDs:
+            try:
+                m = model.objects.get(id=i)
+            except model.DoesNotExist:
+                pass
+            if permissionCheck(request.user, m, 'approve'):
+                if m.status == 'Pending':
+                    m.status = 'Approved'
+                    m.save()
+    if action == 'decline':
+        for i in modelIDs:
+            try:
+                m = model.objects.get(id=i)
+            except model.DoesNotExist:
+                pass
+            if permissionCheck(request.user, m, 'decline'):
+                if m.status == 'Pending':
+                    m.status = 'Unapproved'
+                    m.save()
 
 
 def logbookPermissionCheck(user, logbook, action):
@@ -122,6 +149,15 @@ def logentryPermissionCheck(user, logentry, action):
     user = LBUser.objects.get(user=user)
     return user == logentry.book.user
 
+def approvePermissionCheck(user, logentry, action):
+    user = Supervisor.objects.get(user=user)
+    #limit actions to only allowed ones.
+    if action == 'approve':
+        return True
+    if action == 'decline':
+        return True
+    return False
+        
 
 def indexView(request):
     if not request.user.is_authenticated():
@@ -147,10 +183,12 @@ def hasAllApproved(logbook):
 @login_required
 def booksView(request):
     if is_supervisor(request.user):
+        if request.method == 'POST':
+            modelActions(request, LogEntry, approvePermissionCheck)
         entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')\
-                  .values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id')\
-                  .annotate(entries_pending=Count('id'))\
-                  .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'), output_field=fields.DurationField())))
+              .values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id')\
+              .annotate(entries_pending=Count('id'))\
+              .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'), output_field=fields.DurationField())))
         #use books to get the student numbers
         logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
         return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
@@ -246,28 +284,80 @@ def loginView(request):
         form = LoginForm()
     return render(request, 'login.html', {'loginForm':form})
 
+def generate_activation_key(username):
+    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    secret_key = get_random_string(20, chars)
+    return hashlib.sha256((secret_key + username).encode('utf-8')).hexdigest()
+
 @transaction.atomic
 def signupView(request):
+    if request.user.is_authenticated():
+        return redirect('logbook:index')
     '''
     View for handling student registration
     '''
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
-            user = User.objects.create_user(form.cleaned_data['username'],
-                                            form.cleaned_data['username'] + '@student.uwa.edu.au',
-                                            form.cleaned_data['password'])
+            data = {}
+            data['username'] = form.cleaned_data['username']
+            data['email'] = form.cleaned_data['username'] + '@student.uwa.edu.au'
+            data['first_name'] = form.cleaned_data['first_name']
+            data['last_name'] = form.cleaned_data['last_name']
+            data['password'] = form.cleaned_data['password']
+            data['activation_key'] = generate_activation_key(data['username'])
+            
+            data['email_path']="ActivationEmail.txt"
+            data['email_subject']="Activate your Guild Volunteering account"
 
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
-            user.save()
-            group = Group.objects.get(name='LBStudent')
-            group.user_set.add(user)
-            group.save()
+            form.sendVerifyEmail(data)
+            form.save(data) #Save the user and lbuser
+
+            request.session['registered']=True #For display purposes
             return redirect('logbook:login')
     else:
         form = SignupForm()
     return render(request, 'signup.html', {'signupForm':form})
+
+def activation(request, key):
+    activation_expired = False
+    already_active = False
+    id_user = None
+    lbuser = get_object_or_404(LBUser, activation_key=key)
+    if lbuser.user.is_active == False:
+        if timezone.now() > lbuser.key_expires:
+            activation_expired = True #Display: offer the user to send a new activation link
+            id_user = lbuser.user.id
+        else: #Activation successful
+            lbuser.user.is_active = True
+            lbuser.user.save()
+
+    #If user is already active, simply display error message
+    else:
+        already_active = True #Display : error message
+    return render(request, 'activation.html', {'activation_expired':activation_expired,'isActive':already_active,'user_id':id_user})
+
+def new_activation_link(request, user_id):
+    form = SignupForm()
+    datas={}
+    user = User.objects.get(id=user_id)
+    if user is not None and not user.is_active:
+        datas['username']=user.username
+        datas['email']=user.email
+        datas['email_path']="NewActivationEmail.txt"
+        datas['email_subject']="New Activation Link"
+        datas['first_name'] = user.first_name
+        datas['activation_key']= generate_activation_key(datas['username'])
+
+        lbuser = LBUser.objects.get(user=user)
+        lbuser.activation_key = datas['activation_key']
+        lbuser.key_expires = datetime.datetime.strftime(datetime.datetime.now() + datetime.timedelta(days=settings.DAYS_VALID), "%Y-%m-%d %H:%M:%S")
+        lbuser.save()
+
+        form.sendVerifyEmail(datas)
+        request.session['new_link']=True #Display: new link sent
+
+    return redirect('logbook:login')
 
 @transaction.atomic
 def supervisorSignupView(request):
