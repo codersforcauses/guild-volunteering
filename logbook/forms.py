@@ -1,11 +1,17 @@
 from django import forms
 from django.core.validators import RegexValidator, EmailValidator
-from django.contrib.auth.models import User
-from django.contrib.admin import widgets  
-from .models import *
+from django.contrib.auth.models import User, Group
+from django.contrib.admin import widgets
+from django.template import Context,Template
+from django.core.mail import send_mail
 
-import re
+from .models import *
+from django.conf import settings
+
 from datetimewidget.widgets import DateTimeWidget
+import os
+import re
+import socket
 
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
@@ -55,6 +61,36 @@ class SignupForm(SignupFormBase):
     username = StundetNumField(label='')
     first_name = FirstNameField(label='')
     last_name = LastNameField(label='')
+
+    def save(self, data):
+        user = User.objects.create_user(data['username'],
+                                        data['username'] + '@student.uwa.edu.au',
+                                        data['password'])
+
+        user.first_name = data['first_name']
+        user.last_name = data['last_name']
+        user.is_active = False
+        group = Group.objects.get(name='LBStudent')
+        group.user_set.add(user)
+        group.save()
+        user.save()
+        lbUser = LBUser()
+        lbUser.user = user
+        lbUser.activation_key = data['activation_key']
+        lbUser.key_expires = datetime.datetime.strftime(datetime.datetime.now()+ datetime.timedelta(days=settings.DAYS_VALID), "%Y-%m-%d %H:%M:%S")
+        lbUser.save()
+        return user
+
+    def sendVerifyEmail(self, mailData):
+        hostname = socket.gethostbyname(socket.gethostname())
+        link = "http://"+hostname+":8000/logbook/activate/"+mailData['activation_key']
+        contxt = Context({'activation_link':link,'username':mailData['username'],'first_name':mailData['first_name']})
+        EMAIL_PATH = os.path.join(settings.BASE_DIR,'logbook','static', mailData['email_path'])
+        file = open(EMAIL_PATH,'r')
+        temp = Template(file.read())
+        file.close
+        message = temp.render(contxt)
+        send_mail(mailData['email_subject'],message,'Guild Volunteering <volunteering@guild.uwa.edu.au',[mailData['email']], fail_silently=False)
 
 class SupervisorSignupForm(SignupFormBase):
     username = EmailField(label='')
