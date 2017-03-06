@@ -39,6 +39,7 @@ For development the line `DEBUG = True` can be added to the file.
 Need to install:
 - [django-datetime-widget](https://github.com/asaglimbeni/django-datetime-widget)
 - [django-adminplus](https://github.com/jsocol/django-adminplus)
+- [django-autocomplete-light](https://github.com/yourlabs/django-autocomplete-light)
 
 ## Testing
 To run the tests use
