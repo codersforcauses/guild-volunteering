@@ -21,10 +21,7 @@ urlpatterns = [
     url(r'^accounts/reset/done/$', password_reset_complete, name='password_reset_complete'),
     url(r'^profile/$', views.profileView, name='profile'),
     url(r'^b/$', views.booksView, name='list'),
-    url(r'^b/(?P<pk>[0-9]+)/$',
-        views.logentryView, name='view'),
-    url(r'^b/(?P<pk>[0-9]+)/add/$',
-        views.addLogEntryView, name='add_entry'),
-    url(r'^b/(?P<pk>[0-9]+)/(?P<log_id>[0-9]+)/edit/$',
-        views.editLogEntryView, name='edit_entry'),
+    url(r'^b/(?P<pk>[0-9]+)/$',views.logentryView, name='view'),
+    url(r'^b/(?P<pk>[0-9]+)/add/$',views.addLogEntryView, name='add_entry'),
+    url(r'^b/(?P<pk>[0-9]+)/(?P<log_id>[0-9]+)/edit/$',views.editLogEntryView, name='edit_entry'),
     ]

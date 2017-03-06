@@ -4,11 +4,15 @@ from django.contrib.auth.models import User, Group
 from django.contrib.admin import widgets
 from django.template import Context,Template
 from django.core.mail import send_mail
+from django.urls import reverse
 
 from .models import *
 from django.conf import settings
 
+# Added apps
 from datetimewidget.widgets import DateTimeWidget
+from dal import autocomplete
+
 import os
 import re
 import socket
@@ -115,8 +119,10 @@ class LogEntryForm(forms.Form):
         super(LogEntryForm,self).__init__(*args,**kwargs)
         # Allow user to select supervisor from a list of supervisors 
         self.fields['supervisor'].queryset = Supervisor.objects.filter(organisation = org_id)
+        self.fields['supervisor'].widget = autocomplete.ListSelect2(url=reverse('supervisor_autocomplete',kwargs={'org_id':org_id}),
+                                                                     attrs={'class':'form-control', 'placeholder':'Supervisor'})
         
-    supervisor = forms.ModelChoiceField(queryset = [], label = 'Supervisor')
+    supervisor = forms.ModelChoiceField(queryset = [], label = 'Supervisor',)
     
     dateTimeOptions = {
         'format': 'dd/mm/yyyy hh:ii:00',

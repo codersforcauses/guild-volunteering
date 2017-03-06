@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     # App must be before contrib.auth
     'logbook.apps.LogbookConfig',
     'datetimewidget',
+    'dal',
+    'dal_select2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

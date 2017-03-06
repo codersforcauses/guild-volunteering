@@ -1,5 +1,3 @@
-from django.shortcuts import render, redirect
-
 # Database
 from .forms import *
 from django.db import transaction
@@ -11,14 +9,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 
 #Redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.http import HttpResponseNotFound, HttpResponseForbidden
 from django.urls import reverse
-from django.shortcuts import get_object_or_404
 
 #Logbook Project
 from .forms import *
 from .admin import *
 from django.conf import settings
+
+# Added apps
+from dal import autocomplete
 
 #General
 from django.utils.crypto import get_random_string
@@ -222,6 +223,25 @@ def booksView(request):
                 logbooks_list.remove(book)
                 
         return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers,'form':add_form})
+
+class SupervisorAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated():
+            return Supervisor.objects.none()
+
+        qs = Supervisor.objects.all()
+        
+        if self.kwargs.get('org_id'):
+            print('works')
+            org_id = self.kwargs.get('org_id')
+            
+            qs = Supervisor.objects.filter(organisation=org_id)
+
+        if self.q:
+            qs = qs.filter(supervisor__istartswith=self.q)
+
+        return qs
+    
 
 @login_required
 def logentryView(request, pk):
