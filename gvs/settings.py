@@ -35,8 +35,6 @@ INSTALLED_APPS = [
     # App must be before contrib.auth
     'logbook.apps.LogbookConfig',
     'datetimewidget',
-    'dal',
-    'dal_select2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -128,9 +126,9 @@ STATIC_URL = '/static/'
 
 STATIC_PATH = os.path.join(BASE_DIR,'static')
 
-STATICFILES_DIRS = [
+STATICFILES_DIRS = (
     STATIC_PATH,
-]
+)
 
 try:
     from .local_settings import *

@@ -224,25 +224,6 @@ def booksView(request):
                 
         return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers,'form':add_form})
 
-class SupervisorAutocomplete(autocomplete.Select2QuerySetView):
-    def get_queryset(self):
-        if not self.request.user.is_authenticated():
-            return Supervisor.objects.none()
-
-        qs = Supervisor.objects.all()
-        
-        if self.kwargs.get('org_id'):
-            print('works')
-            org_id = self.kwargs.get('org_id')
-            
-            qs = Supervisor.objects.filter(organisation=org_id)
-
-        if self.q:
-            qs = qs.filter(supervisor__istartswith=self.q)
-
-        return qs
-    
-
 @login_required
 def logentryView(request, pk):
     logbook = LogBook.objects.get(id=pk)

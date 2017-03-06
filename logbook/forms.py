@@ -119,10 +119,8 @@ class LogEntryForm(forms.Form):
         super(LogEntryForm,self).__init__(*args,**kwargs)
         # Allow user to select supervisor from a list of supervisors 
         self.fields['supervisor'].queryset = Supervisor.objects.filter(organisation = org_id)
-        self.fields['supervisor'].widget = autocomplete.ListSelect2(url=reverse('supervisor_autocomplete',kwargs={'org_id':org_id}),
-                                                                     attrs={'class':'form-control', 'placeholder':'Supervisor'})
         
-    supervisor = forms.ModelChoiceField(queryset = [], label = 'Supervisor',)
+    supervisor = forms.ModelChoiceField(queryset = [], label = 'Supervisor')
     
     dateTimeOptions = {
         'format': 'dd/mm/yyyy hh:ii:00',
