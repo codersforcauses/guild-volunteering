@@ -76,17 +76,17 @@
                 <thead>
                     <tr>
                         <th class="col-xs-1">#</th>
-                        {% comment %}
                         {% for header in headers %}
                         <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
                         {% endfor %}
-                        {% endcomment %}
+                        {% comment %}
                         <th>Name</th>
                         <th>Supervisor</th>
                         <th>Start Time</th>
                         <th>End Time</th>
                         <th class="hidden-xs">Status</th>
                         <th class="visible-xs">Edit</th>
+                        {% endcomment %}
                     </tr>
                 </thead>
                 <tbody>
