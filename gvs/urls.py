@@ -16,10 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
-from logbook.views import SupervisorAutocomplete
-
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^logbook/', include('logbook.urls')),
-    url(r'^logbook/supervisor_autocomplete/(?P<org_id>[0-9]+)?$', SupervisorAutocomplete.as_view(), name='supervisor_autocomplete'),
 ]
