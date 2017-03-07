@@ -44,6 +44,7 @@ class SupervisorAdmin(admin.ModelAdmin):
 
 def getFileName(user, organisation):
     if not user == None and not organisation == None:
+        return organisation.name + "-" + user.user.username
     if not user == None:
         return user.user.username
     else:
