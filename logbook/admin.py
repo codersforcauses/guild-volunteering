@@ -3,10 +3,11 @@ from django.contrib.auth.models import User
 from django.contrib import admin
 from .adminForms import *
 from .models import *
-from django.db.models import F, Min, Max
-
+from django.db.models import F, Min, Max, ExpressionWrapper, Sum, fields
 from django.http import HttpResponse
+
 import csv
+import datetime
 
 @admin.register(LBUser)
 class LBUserAdmin(admin.ModelAdmin):
@@ -50,7 +51,38 @@ def getFileName(user, organisation):
     else:
         return organisation.name
 
-@admin.site.register_view(r'logbook/export', visible='false', name="Export Logbooks")
+@admin.site.register_view(r'logbook/export/statistics', visible='true', name="Export Statistics")
+def statisticsView(request):
+
+    if request.method == 'POST':
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="Guild_Volunteering_Stats.csv"'
+        writer = csv.writer(response)
+        
+        writer.writerow(['No. Students This Year','No. Organisations'])
+        num_orgs = len(Organisation.objects.all())
+        num_students = len(LogEntry.objects.filter(start__year=datetime.datetime.now().year).values('book__user').distinct())
+        print(num_students)
+        writer.writerow([num_students,num_orgs])
+
+        total_hrs = LogEntry.objects.filter(start__year=datetime.datetime.now().year,status="Approved"
+                                            ).annotate(total_duration=Sum(ExpressionWrapper(F('end') - F('start'),  output_field=fields.DurationField()))
+                                            ).aggregate(total_time = Sum('total_duration'))
+        
+        total_sec = total_hrs['total_time']
+        total_hrs = total_sec.total_seconds()/3600.0
+        writer.writerow(' ')
+        writer.writerow(['Total Hrs/Yr'])
+        writer.writerow([total_hrs])
+
+        return response
+    
+    else:
+        
+        return render(request, 'admin/logbook/statistics.html',{})
+
+@admin.site.register_view(r'logbook/export/logbooks', visible='false', name="Export Logbooks")
 def exportView(request):
     DATE_FORMAT = '%d/%m/%Y'
     if request.method == 'POST':
