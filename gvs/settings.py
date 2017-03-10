@@ -32,14 +32,15 @@ DAYS_VALID = 2
 # Application definition
 
 INSTALLED_APPS = [
+    # App must be before contrib.auth
+    'logbook.apps.LogbookConfig',
+    'datetimewidget',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'logbook.apps.LogbookConfig',
-    'datetimewidget'
 ]
 
 MIDDLEWARE = [

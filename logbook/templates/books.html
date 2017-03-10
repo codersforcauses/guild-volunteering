@@ -16,7 +16,7 @@
 
 
 {% block sideblock %}
-<div class="col-sm-2 col-md-2 sidebar" id="sidebar">
+<div class="col-sm-2 col-md-2 sidebar" id="sidebar" style='padding-bottom:6%;'>
     <ul class="nav" style="display: inline-block;">
         <li>
             <h3 style="color:1c1c1e;">Overview</h3>
@@ -31,13 +31,13 @@
             <ul class="nav nav-stacked left-submenu" id="item2">
                 <li><a data-toggle="modal" href="#addBookModal">Add Log Book</a></li>
                 <li><a href="#edit_book">Edit Log Book</a></li>
-                <li><a onclick="doAction('submit')">Submit Log Book/s</a></li>
+                <li><a href="#" onclick="doAction('submit')">Submit Log Book/s</a></li>
                 <li><a data-toggle="modal" href="#deleteBookModal">Delete Log Book/s</a></li>
             </ul>
         </li>
         <li>
             <ul class="pager">
-                <li class="previous"><a href="{% url 'logbook:index' %}">&larr; Home</a></li>
+                <li class="previous"><a href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
             </ul>
         </li>
     </ul>
