@@ -102,7 +102,7 @@ class LoginForm(forms.Form):
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
 
 class LogBookForm(forms.Form):
-    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation',help_text='<span data-toggle="tooltip" style="pading:20px" title="Please email Guild Volunteering if an organisation is not listed"><a>?</a></span>')                                              
+    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all().order_by('name'), label='Organisation',help_text='<span data-toggle="tooltip" style="pading:20px" title="Please email Guild Volunteering if an organisation is not listed"><a>?</a></span>')                                              
     bookCategory = forms.ModelChoiceField(queryset = Category.objects.all(), label='Category',help_text='Choose a category that <strong>best</strong> describes your work.')
     bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
     bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}), required=False)
