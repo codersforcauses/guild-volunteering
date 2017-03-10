@@ -31,17 +31,18 @@
             <ul class="nav nav-stacked" id="item2">
                 {% if logbooks %}
                 {% for logbook in logbooks %}
-                    {% if logbook.name != book.name %}
+                    {% if logbook.name != book.name and not logbook.active == False %}
                     <li><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></li>
                     {% endif %}
                 {% endfor %}
+                {% else %}
+                    <p style="padding-top:10px; padding-left: 10px;">No other Log Books</p>
                 {% endif %}
             </ul>
         </li>
+        <br>
         <li>
-            <ul class="pager">
-                <li class="previous"><a href="{% url 'logbook:list' %}">&larr; Back to Logbooks</a></li>
-            </ul>
+            <li class="previous"><a href="{% url 'logbook:list' %}">&larr; Back to Logbooks</a></li>
         </li>
     </ul>
 </div>

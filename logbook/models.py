@@ -39,6 +39,8 @@ class LogBook(models.Model):
     description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    finalised = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     
     def __str__(self):
         return str(self.user) + " - " + self.name

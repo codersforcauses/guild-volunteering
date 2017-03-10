@@ -65,6 +65,7 @@ def orderModels(order, unformattedHeaderNames, models):
 def modelActions(request, model, permissionCheck):
     action = request.POST['selectedAction']
     modelIDs = request.POST.getlist('model_selected')
+    #Delete log book/s or entry/s
     if action == 'delete':
         for i in modelIDs:
             try:
@@ -74,7 +75,7 @@ def modelActions(request, model, permissionCheck):
             # ensure user has permission
             if permissionCheck(request.user, m, 'delete'):
                 m.delete()
-
+    #Submit log book/entries to be approved
     if action == 'submit':
         for i in modelIDs:
             try:
@@ -93,6 +94,7 @@ def modelActions(request, model, permissionCheck):
                         if log.status == 'Unapproved':
                             log.status = 'Pending'
                             log.save()
+    #Edit logbook or entry
     if action == 'edit':
         for i in modelIDs:
             try:
@@ -107,6 +109,18 @@ def modelActions(request, model, permissionCheck):
                     return redirect('edit_entry',args=(logentry.book.id, logentry.id))
                 except:
                     print('rip')
+    #Finalise Log Book/s
+    if action == 'finalise':
+        for i in modelIDs:
+            try:
+                m = model.objects.get(i)
+            except model.DoesNotExist:
+                pass
+            if permissionCheck(request.user, m, 'finalise'):
+                if m.finalised == False:
+                    m.finalised == True
+                    m.save()
+    #Supervisor approve log entry
     if action == 'approve':
         for i in modelIDs:
             try:
@@ -117,6 +131,7 @@ def modelActions(request, model, permissionCheck):
                 if m.status == 'Pending':
                     m.status = 'Approved'
                     m.save()
+    #Supervisor decline log entry
     if action == 'decline':
         for i in modelIDs:
             try:
@@ -136,18 +151,27 @@ def logbookPermissionCheck(user, logbook, action):
         entries = LogEntry.objects.filter(book=logbook, status=LogEntry.APPROVED)
         if len(entries) > 0:
             return False
+    if action == 'finalise':
+        if hasAllApproved(logbook) == True:
+            return True
+        else:
+            return False
+        
     return user == logbook.user
 
 def getCreator():
-    return 'Created by Coders for Causes Members: Samuel Heath, Lachlan Walking and Zen Ly'
+    return 'Created by Coders for Causes Members: Samuel J S Heath, Lachlan Walking and Zen Ly'
 
 def logentryPermissionCheck(user, logentry, action):
-    if action == 'delete':
-        # don't delete an approved entry
-        if logentry.status == LogEntry.APPROVED:
-            return False
-    user = LBUser.objects.get(user=user)
-    return user == logentry.book.user
+    if logentry.book_id.finalised == True or logentry.book_id.active == False:
+        return False
+    else:
+        if action == 'delete':
+            # don't delete an approved entry
+            if logentry.status == LogEntry.APPROVED:
+                return False
+        user = LBUser.objects.get(user=user)
+        return user == logentry.book.user
 
 def approvePermissionCheck(user, logentry, action):
     user = Supervisor.objects.get(user=user)
@@ -196,13 +220,18 @@ def booksView(request):
         if request.method == 'POST':
             add_form = LogBookForm(request.POST)
             if add_form.is_valid():
-                logbook = LogBook.objects.create(name=add_form.cleaned_data['bookName'],
-                                             description=add_form.cleaned_data['bookDescription'],
-                                             organisation=add_form.cleaned_data['bookOrganisation'],
-                                             category=add_form.cleaned_data['bookCategory'],
-                                             user=LBUser.objects.get(user=request.user))
-                logbook.save()
-                return redirect('logbook:list')
+                org = add_form.cleaned_data['bookOrganisation']
+                #Restricts user to only 1 active logbook per organisation
+                if len(LogBook.objects.filter(user__user=request.user, active = True, organisation = org)) == 0:
+                    logbook = LogBook.objects.create(name=add_form.cleaned_data['bookName'],
+                                                 description=add_form.cleaned_data['bookDescription'],
+                                                 organisation=add_form.cleaned_data['bookOrganisation'],
+                                                 category=add_form.cleaned_data['bookCategory'],
+                                                 user=LBUser.objects.get(user=request.user))
+                    logbook.save()
+                    return redirect('logbook:list')
+                else:
+                    return redirect('logbook:list')
             else:
                 modelActions(request, LogBook, logbookPermissionCheck)
         add_form = LogBookForm()
@@ -210,24 +239,31 @@ def booksView(request):
         currentOrder = request.GET.get('order', [])
         if currentOrder:
             currentOrder = currentOrder.split('.')
-        unformattedHeaderNames = LogBookAdmin.list_display[1:5] # leave out the sutdent
+        unformattedHeaderNames = LogBookAdmin.list_display[1:5] # leave out the student
         headers = makeHeaders(unformattedHeaderNames, currentOrder)
-        logbooks = LogBook.objects.filter(user__user=request.user)
+        logbooks = LogBook.objects.filter(user__user=request.user, active = True)
         logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
         logbooks_list = list(logbooks)
         approvedLogbooks = list()
+
+        finalisedbooks = LogBook.objects.filter(user__user=request.user, active = True, finalised = True)
+        
         for book in logbooks:
             if hasAllApproved(book):
                 approvedLogbooks.append(book)
                 logbooks_list.remove(book)
                 
-        return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers,'form':add_form})
+        isFinalisable = False
+        if len(approvedLogbooks) > 0:
+            isFinalisable = True
+            
+        return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers,'form':add_form,'isFinalisable':isFinalisable,'finalisedbooks':finalisedbooks})
 
 @login_required
 def logentryView(request, pk):
     logbook = LogBook.objects.get(id=pk)
     org = logbook.organisation
-    if logbook == None:
+    if logbook == None or logbook.finalised == True or logbook.active == False:
         return HttpResponseNotFound
 
     # check that user is accessing their own book

@@ -22,7 +22,6 @@
             <h3 style="color:1c1c1e;">Overview</h3>
             <ul class="nav nav-stacked left-submenu" id="item1">
                 <li class="active"><a href="#">Manage Log Books</a><span class="sr-only">(current)</span></li>
-                <li><a href="#statistics">Statistics</a></li>
             </ul>
         </li>
 
@@ -33,12 +32,14 @@
                 <li><a href="#edit_book">Edit Log Book</a></li>
                 <li><a href="#" onclick="doAction('submit')">Submit Log Book/s</a></li>
                 <li><a data-toggle="modal" href="#deleteBookModal">Delete Log Book/s</a></li>
+                {% if isFinalisable %}
+                <li><a data-toggle="modal" href="#finaliseBookModal">Finalise Log Book/s</a></li>
+                {% endif%}
             </ul>
         </li>
+        <br>
         <li>
-            <ul class="pager">
-                <li class="previous"><a href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-            </ul>
+            <a href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home"></span> Home</a>
         </li>
     </ul>
 </div>
@@ -54,6 +55,7 @@
                 <option value="none"></option>
                 <option value="submit">Submit</option>
                 <option value="delete">Delete</option>
+                <option value="finalise">Finalise</option>
             </select>
             <table class="table table-striped table-sm">
                 <thead>
@@ -76,7 +78,7 @@
                         <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
                         <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
                         {# TODO make this use the headers instead of hardcoded #}
-                        <td>{{ logbook.organisation }}</td>
+                        <td><a target="blank" href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
 			<td>{{ logbook.category }}
                         <td>{{ logbook.description }}</td>
                         <td class="visible-xs">
@@ -111,7 +113,38 @@
                         <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
                         <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
                         {# TODO make this use the headers instead of hardcoded #}
-                        <td>{{ logbook.organisation }}</td>
+                        <td><a href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
+			<td>{{ logbook.category }}
+                        <td>{{ logbook.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+            {% if finalisedbooks %}
+                <hr>
+            <h2 class="sub-heading">Past Log Books</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        {% for header in headers %}
+                        <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
+                        {% endfor %} {% comment %}
+                        <th>Name</th>
+                        <th>Organisation</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        {% endcomment %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for logbook in finalisedbooks %}
+                    <tr class="success">
+                        <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
+                        <td>{{ logbook.name }}</td>
+                        {# TODO make this use the headers instead of hardcoded #}
+                        <td><a href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
 			<td>{{ logbook.category }}
                         <td>{{ logbook.description }}</td>
                     </tr>
@@ -185,6 +218,33 @@
             <div class = "modal-footer text-left">
                 <button type = "button" class = "btn btn-default" data-dismiss = "modal">Cancel</button>
                 <button onClick="doAction('delete')" class = "btn btn-primary">Confirm</button>
+            </div>
+          </div>
+    </div>
+</div>
+<div class = "modal fade" id = "finaliseBookModal" tabindex = "-1" role = "dialog" 
+   aria-labelledby = "myModalLabel" aria-hidden = "true">
+   
+    <div class = "modal-dialog">
+        <div class = "modal-content">
+
+            <div class = "modal-header">
+                <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
+                <h4 class = "modal-title" id = "myModalLabel">Finalise Log Book/s</h4>
+            </div>
+            
+            <div class = "modal-body">
+                <div class="row" style="padding: 10">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p>Are you sure you want to finalise this Log Book?</p>
+                        <p>Doing so will make the book/s unchangeable despite being visible. If you accidentally finalise a  book please contact Guild Volunteering to undo this action.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class = "modal-footer text-left">
+                <button type = "button" class = "btn btn-default" data-dismiss = "modal">Cancel</button>
+                <button onClick="doAction('finalise')" class = "btn btn-primary">Finalise</button>
             </div>
           </div>
     </div>
