@@ -102,7 +102,7 @@
             <h4>Edit Name:</h4>
             <div class="row">
                 <div class="col-xs-8 col-sm-10 col-md-8">
-                <form action="." method="post" class="form-inline">
+                <form action="{% url 'logbook:edit_names' %}" method="post" class="form-inline">
                     {% csrf_token %}
                     {% if names_form.non_field_errors %}
                         {% for error in names_form.non_field_errors %}
@@ -123,7 +123,7 @@
             <h4>Change Password:</h4>
             <div class="row">
                 <div class="col-xs-8 col-sm-12 col-md-8">
-                <form action="." method="post">
+                <form action="{% url 'logbook:profile' %}" method="post">
                     {% csrf_token %}
                     {% if change_password_form.non_field_errors %}
                         {% for error in change_password_form.non_field_errors %}
@@ -170,7 +170,7 @@
                 <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
                 <h4 class = "modal-title" id = "myModalLabel">Delete Account</h4>
             </div>
-            <form action="." method="post">
+            <form action="{% url 'logbook:delete_user' %}" method="post">
                 <div class = "modal-body">
                     <div class="row" style="padding: 10">
                         <div class="col-xs-12 col-sm-12 col-md-12">

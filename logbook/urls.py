@@ -13,6 +13,8 @@ urlpatterns = [
     url(r'^login/$', views.loginView, name='login'),
     url(r'^logout/$', views.logoutView, name='logout'),
     url(r'^profile/$', views.profileView, name='profile'),
+    url(r'^delete_user/$', views.deleteUserView, name='delete_user'),
+    url(r'^edit_names/$', views.editNamesView, name='edit_names'),
     url(r'^b/$', views.booksView, name='list'),
     url(r'^b/(?P<pk>[0-9]+)/$',
         views.logentryView, name='view'),

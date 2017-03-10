@@ -182,6 +182,7 @@ def booksView(request):
     if is_supervisor(request.user):
         if request.method == 'POST':
             modelActions(request, LogEntry, approvePermissionCheck)
+            
         entries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')\
               .values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id')\
               .annotate(entries_pending=Count('id'))\
@@ -388,27 +389,43 @@ def logoutView(request):
     return redirect('logbook:login')
 
 @login_required
+def deleteUserView(request):
+    user = request.user
+    if request.method == 'POST':
+        deleteForm = DeleteUserForm(request.POST, instance=user)
+        if deleteForm.is_valid():
+            active = deleteForm.save()
+            #Logout User
+            return redirect('logbook:login')
+    else:
+        return redirect('logbook:profile')
+
+@login_required
+def editNamesView(request):
+    user = request.user
+    if request.method == 'POST':
+        editNamesForm = EditNamesForm(request.POST)
+        if editNamesForm.is_valid():
+            user.first_name = editNamesForm.cleaned_data['first_name']
+            user.last_name = editNamesForm.cleaned_data['last_name']
+            user.save()
+            return redirect('logbook:profile')
+    else:
+        return redirect('logbook:profile')
+    
+@login_required
 def profileView(request):
     # Staff member can view analytics in profile or in index
     if request.user.is_staff:
         print('Staff User')
     user = request.user
     if request.method == 'POST':
-        editNamesForm = EditNamesForm(request.POST)
         changePasswordForm = PasswordChangeForm(request.user, request.POST)
-        deleteForm = DeleteUserForm(request.POST, instance=user)
-        if editNamesForm.is_valid():
-            user.first_name = editNamesForm.cleaned_data['first_name']
-            user.last_name = editNamesForm.cleaned_data['last_name']
-            user.save()
-            return redirect('logbook:profile')
-        elif changePasswordForm.is_valid():
+        if changePasswordForm.is_valid():
             user = changePasswordForm.save()
             update_session_auth_hash(request, user)
-        elif deleteForm.is_valid():
-            active = deleteForm.save()
-            #Logout User
-            return redirect('logbook:login')
+            request.method = 'GET'
+        return redirect('logbook:profile')
     else:
         editNamesForm = EditNamesForm(instance=request.user)
         changePasswordForm = PasswordChangeForm(request.user)
