@@ -28,7 +28,7 @@
             <h3 style="color:1c1c1e;">Manage Entries</h3>
             <ul class="nav nav-stacked left-submenu" id="item1">
                 <li><a data-toggle="modal" href="#addEntryModal">Add Entry</a></li>
-                <li><a href='#' onclick="doAction('edit')">Edit Entry/s</a></li>
+                <li><a href='#' onclick="doAction('edit')">Edit Entry</a></li>
                 <li><a href='#' onclick="doAction('submit')">Submit Entry/s</a></li>
                 <li><a data-toggle="modal" href="#deleteEntryModal">Delete Entry/s</a></li>
             </ul>
@@ -38,17 +38,18 @@
             <ul class="nav nav-stacked" id="item2">
                 {% if logbooks %}
                 {% for logbook in logbooks %}
-                    {% if logbook.name != book.name %}
+                    {% if logbook.name != book.name and not logbook.active == False %}
                     <li><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></li>
                     {% endif %}
                 {% endfor %}
+                {% else %}
+                    <p style="padding-top:10px; padding-left: 10px;">No other Log Books</p>
                 {% endif %}
             </ul>
         </li>
+        <br>
         <li>
-            <ul class="pager">
-                <li class="previous"><a href="{% url 'logbook:list' %}">&larr; Back to Logbooks</a></li>
-            </ul>
+            <li class="previous"><a href="{% url 'logbook:list' %}">&larr; Back to Logbooks</a></li>
         </li>
     </ul>
 </div>
@@ -59,11 +60,10 @@
     {% if book %}
     
     <h1 class="page-header"><a href="{% url 'logbook:list' %}" class="visible-xs">&larr;</a> {{ book.name }}</h1>
-    <h3 class="sub-heading">{{ book.description }}</h3>
     {% else %}
     <h1 class="page-header">Manage Entries</h1>
     {% endif %}
-    <div class="table table-responsive table-sm">
+    <div class="table table-responsive">
         <form action="." method="post" id="modelForm">
             {% csrf_token %}
             <select name="selectedAction" hidden="true" id="actions">
@@ -101,7 +101,7 @@
                         <td>{{ logentry.end|date:"P"}}</td>
                         <td class="hidden-xs">{{ logentry.status }}</td>
                         <td class="visible-xs">
-                            <button class="btn btn-inverse"><span class="glyphicon glyphicon-pencil"></span></button>
+                            <button class="btn btn-warning"><span class="glyphicon glyphicon-edit"></span></button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -111,11 +111,14 @@
         </form>
     </div>
     <div class='btn-toolbar'>
-        <div class="btn-group">
+        <div class="btn-group" style="padding-top:5px;">
             <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addEntryModal">Add Log Entry</button>
         </div>
-        <div class="btn-group">
+        <div class="btn-group" style="padding-top:5px;">
             <button type="button" class="btn btn-danger visible-xs" data-toggle="modal" data-target="#deleteEntryModal">Delete Log Entry/s</button>
+        </div>
+        <div class="btn-group" style="padding-top:5px;">
+            <button type="button" class="btn btn-success visible-xs" onclick="doAction('submit')">Send Entry/s For Approval</button>
         </div>
     </div>
 </div>
@@ -129,10 +132,10 @@
                 <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
                 <h4 class = "modal-title" id = "myModalLabel">Add Log Entry</h4>
             </div>
-            <form action="." method="post">
+            <form action="{% url 'logbook:add_entry' book.id %}" method="post">
             <div class = "modal-body">
                 <div class="row" style="padding-top: 10">
-                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                    <div class="col-xs-10 col-xs-offset-1 col-sm-12 col-md-12 col-lg-12 col-lg-offset-0">
                         {% csrf_token %} 
                         {{ addentry_form.as_p }}
                     </div>

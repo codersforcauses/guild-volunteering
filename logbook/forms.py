@@ -1,9 +1,10 @@
 from django import forms
-from django.core.validators import RegexValidator, EmailValidator
 from django.contrib.auth.models import User, Group
 from django.contrib.admin import widgets
-from django.template import Context,Template
+from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
+from django.template import Context,Template
+from django.core.validators import RegexValidator, EmailValidator
 from django.urls import reverse
 
 from .models import *
@@ -106,21 +107,28 @@ class LoginForm(forms.Form):
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
 
 class LogBookForm(forms.Form):
-    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all().order_by('name'), label='Organisation',help_text='<span data-toggle="tooltip" style="pading:20px" title="Please email Guild Volunteering if an organisation is not listed"><a>?</a></span>')                                              
-    bookCategory = forms.ModelChoiceField(queryset = Category.objects.all(), label='Category',help_text='Choose a category that <strong>best</strong> describes your work.')
+    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all().order_by('name'), label='', empty_label='Choose Organisation...',
+                                              widget=forms.Select(attrs={'class':'form-control'}),
+                                              help_text='<span data-toggle="tooltip" style="pading:20px" title="Please email Guild Volunteering if an organisation is not listed"><a>?</a></span>')                                              
+
+    bookCategory = forms.ModelChoiceField(queryset = Category.objects.all().order_by('name'), empty_label='Select Volunteer Category...', label='',
+                                          widget=forms.Select(attrs={'class':'form-control'}),
+                                          help_text='Choose a category that <strong>best</strong> describes your work.')
+
     bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
     bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}), required=False)
 
 class LogEntryForm(forms.Form):
-    description = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name'}))
+    description = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name Entry'}))
 
     def __init__(self, *args, **kwargs):
         org_id = kwargs.pop('org_id')
         super(LogEntryForm,self).__init__(*args,**kwargs)
         # Allow user to select supervisor from a list of supervisors 
-        self.fields['supervisor'].queryset = Supervisor.objects.filter(organisation = org_id)
+        self.fields['supervisor'].queryset = Supervisor.objects.filter(organisation = org_id).order_by('user__username')
+        self.fields['supervisor'].empty_label = 'Select Supervisor...'
         
-    supervisor = forms.ModelChoiceField(queryset = [], label = 'Supervisor')
+    supervisor = forms.ModelChoiceField(queryset = [], label='', widget=forms.Select(attrs={'class':'form-control'}))
     
     dateTimeOptions = {
         'format': 'dd/mm/yyyy hh:ii:00',
@@ -135,13 +143,13 @@ class LogEntryForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-
+        
         start = cleaned_data.get('start')
         end = cleaned_data.get('end')
         if start != None or end != None:
             timediff = end-start
             if timediff.total_seconds() < 0:
-                raise forms.ValidationError('Invalid start or end time')
+                raise ValidationError('Invalid start or end time')
         
         return cleaned_data
 

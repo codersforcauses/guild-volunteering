@@ -39,6 +39,8 @@ class LogBook(models.Model):
     description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    finalised = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     
     def __str__(self):
         return str(self.user) + " - " + self.name
@@ -63,6 +65,11 @@ class LogEntry(models.Model):
             (APPROVED, 'Approved'), # Supervisor has approved the log entry.
         )
     status = models.CharField(choices = STATUS_CHOICES, max_length = 15, default = UNAPPROVED)
+
+    def save(self, *args, **kwargs):
+        if not self.book.finalised == True or not self.book.active == False:
+            super(LogEntry, self).save(*args, **kwargs)
+    
     def __str__(self):
         return str(self.book) + " - " + self.description
     readonly_fields = ('created_at','updated_at',)

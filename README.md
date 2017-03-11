@@ -43,3 +43,6 @@ Need to install:
 ## Testing
 To run the tests use
 ```python manage.py test logbook/tests```
+
+## Use:
+- Only get students so finalise logbooks at the end of semester, so they can still volunteer for an organisation.
