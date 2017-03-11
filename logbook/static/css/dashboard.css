@@ -46,6 +46,47 @@ body {
     color: #666666;
     padding-top: 50px;
 }
+@media (min-width: 768px) {
+    .wrapper {
+        position:relative;
+        min-height: 100%;
+        margin-bottom: 248px;
+    }
+/*
+ * Global add-ons
+ */
+.page-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+.sub-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.question {
+    padding-bottom: 10px;
+}
+
+/*
+ * Top navigation
+ * Hide default border to remove 1px line.
+ */
+.navbar-fixed-top {
+  border: 0;
+  color: #1c1c1c;
+}
+#brand {
+    color: #ffffff;
+}
+#brand:hover, #brand:focus {
+    color: #75C19D;
+}
+#navbar a {
+    color: #ffffff;
+}
+#navbar a:hover,a:focus {
+    color: #75C19D;
+}
 
 /*
  * Sidebar
@@ -187,7 +228,6 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
-
 .footer {
     clear: both;
     position: absolute;
@@ -205,19 +245,19 @@ body {
 }
 .footer a {
     color: #ffffff;
-    font-size: 14px;
+    font-size: 13px;
 }
 .footer a:hover, a:focus {
     text-decoration: none;
     color: #75C19D;
 }
 .footer ul li {
-    font-size: 14px;
+    font-size: 13px;
     display: inline;
     list-style-type: none;
 }
 .footer li:after {
-    font-size: 14px;
+    font-size: 13px;
     color: #ffffff;
     content: "|";
     padding-left: 6px;
@@ -227,7 +267,7 @@ body {
     content: "";
 }
 .footer .social-footer a {
-    padding-left: 15px;
+    padding-left: 10px;
 }
 .tooltip {
     display:none;

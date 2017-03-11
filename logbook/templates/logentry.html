@@ -12,6 +12,13 @@
 {% endif %}
 {% endblock %}
 
+{% block date_timeblock %}
+<link href="{% static "css/bootstrap-datetimepicker.min.css" %}" rel="stylesheet">
+<script>if(typeof($.fn.modal) === 'undefined') {document.write('<script src="{% static "bootstrap/js/bootstrap.min.js"%}"><\/script>')}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.js"></script>
+<script src="{% static "js/bootstrap-datetimepicker.js" %}"></script>
+{% endblock %}
+
 {{ form.media }}
 
 {% block sideblock %}
@@ -69,17 +76,17 @@
                 <thead>
                     <tr>
                         <th class="col-xs-1">#</th>
-                        {% comment %}
                         {% for header in headers %}
                         <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
                         {% endfor %}
-                        {% endcomment %}
+                        {% comment %}
                         <th>Name</th>
                         <th>Supervisor</th>
                         <th>Start Time</th>
                         <th>End Time</th>
                         <th class="hidden-xs">Status</th>
                         <th class="visible-xs">Edit</th>
+                        {% endcomment %}
                     </tr>
                 </thead>
                 <tbody>
