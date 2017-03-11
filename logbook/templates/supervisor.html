@@ -23,62 +23,65 @@
     </div>
     <h1 class="page-header hidden-xs">Approve Volunteer Hours</h1>
     {% if logbooks %}
-    <div class="panel-group" id="accordion">
-        <form method="post" id="modelForm">
+    <form method="post" id="modelForm">
             {% csrf_token %}
             <select name="selectedAction" hidden="true" id="actions">
                 <option value="none"></option>
                 <option value="approve"></option>
                 <option value="decline"></option>
             </select>
-        {% for logbook in logbooks %}
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4>
-                        <a href="#{{ logbook.book__id }}" data-toggle="collapse" data-parent="#accordion"><span class="collapse in"><h4>{{ logbook.book__user__user__first_name }} {{ logbook.book__user__user__last_name }} - {{ logbook.book__user__user__username }} <span class = "badge">{{ logbook.entries_pending }}</span> </h4></a>
-                </div>
+            
+        <div class="panel-group" id="accordion">
+            {% for logbook in logbooks %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>
+                            <a data-toggle="collapse" data-parent="#accordion" href="#{{ logbook.book__id }}"><h4>{{ logbook.book__user__user__first_name }} {{ logbook.book__user__user__last_name }} - {{ logbook.book__user__user__username }} <span class = "badge">{{ logbook.entries_pending }}</span> </h4></a>
+                    </div>
 
-                <div id="{{ logbook.book__id }}" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <table class="table table-responsive table-striped" id="table-{{logbook.book__id}}">
-                            <thead>
-                                <tr>
-                                    <th>Start Time</th>
-                                    <th>End Time</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if entries %}
-                                {% for logentry in entries %}
-                                    {% if logentry.book.id == logbook.book__id %}
-                                    <tr class = "">
-                                        <td class="hidden"><input type="checkbox" name="model_selected" value="{{ logentry.id }}" id="check-{{logentry.id}}"></td>
-                                        <td>{{ logentry.start|date:"d/m/y P" }}</td>
-                                        <td>{{ logentry.end|date:"d/m/y P" }}</td>
-                                        <td>
-                                            <div class='btn-toolbar'>
-                                                <button class="btn btn-success visible-xs" onclick="doOne('check-{{logentry.id}}','approve')"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
-                                                <button class="btn btn-danger visible-xs" onclick="doOne('check-{{logentry.id}}', 'decline')"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                                                <button class="btn btn-success hidden-xs" onclick="doOne('check-{{logentry.id}}','approve')">Approve</button>
-                                                <button class="btn btn-danger hidden-xs" onclick="doOne('check-{{logentry.id}}', 'decline')">Decline</button>
-                                            </div>
-                                        </td>
+                    <div id="{{ logbook.book__id }}" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table class="table table-responsive table-striped" id="table-{{logbook.book__id}}">
+                                <thead>
+                                    <tr>
+                                        <th>Start Time</th>
+                                        <th>End Time</th>
+                                        <th>Action</th>
                                     </tr>
+                                </thead>
+                                <tbody>
+                                    {% if entries %}
+                                    {% for logentry in entries %}
+                                        {% if logentry.book.id == logbook.book__id %}
+                                        <tr class = "">
+                                            <td class="hidden"><input type="checkbox" name="model_selected" value="{{ logentry.id }}" id="check-{{logentry.id}}"></td>
+                                            <td>{{ logentry.start|date:"d/m/y P" }}</td>
+                                            <td>{{ logentry.end|date:"d/m/y P" }}</td>
+                                            <td>
+                                                <div class='btn-toolbar'>
+                                                    <button class="btn btn-success visible-xs" onclick="doOne('check-{{logentry.id}}','approve')"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+                                                    <button class="btn btn-danger visible-xs" onclick="doOne('check-{{logentry.id}}', 'decline')"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                                                    <button class="btn btn-success hidden-xs" onclick="doOne('check-{{logentry.id}}','approve')">Approve</button>
+                                                    <button class="btn btn-danger hidden-xs" onclick="doOne('check-{{logentry.id}}', 'decline')">Decline</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
                                     {% endif %}
-                                {% endfor %}
-                                {% endif %}
-                            </tbody>
-                        </table>
-                        <h4>Total of {{ logbook.entries_pending_total_duration|timedelta }} to be approved</h4>
-                        <button class="btn btn-success" onclick="submitAll('table-{{logbook.book__id}}')">Approve All</button>
-                        <button class="btn btn-lg btn-inverse" onclick="location.href='mailto:{{logbook.book__user__user__username}}@student.uwa.edu.au'"><span class="glyphicon glyphicon-envelope"></span></button>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="panel-footer">
+                            <h4>Total of {{ logbook.entries_pending_total_duration|timedelta }} to be approved</h4>
+                            <button class="btn btn-success" onclick="submitAll('table-{{logbook.book__id}}')">Approve All</button>
+                            <button class="btn btn-lg btn-inverse" onclick="location.href='mailto:{{logbook.book__user__user__username}}@student.uwa.edu.au'"><span class="glyphicon glyphicon-envelope"></span></button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-        </form>
-    </div>
+            {% endfor %}
+        </div>
+    </form>
     {% else %}
     <div style="padding-top: 10px;">
         <p><h4>You do not have any hours to approve, please come back later and check.</h4></p>
