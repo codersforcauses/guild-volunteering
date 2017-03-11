@@ -163,7 +163,7 @@ def getCreator():
     return 'Created by Coders for Causes Members: Samuel J S Heath, Lachlan Walking and Zen Ly'
 
 def logentryPermissionCheck(user, logentry, action):
-    if logentry.book.finalised == True or logentry.book.active == False:
+    if logentry.book.finalised == True or logentry.book_id.active == False:
         return False
     else:
         if action == 'delete':
@@ -260,6 +260,23 @@ def booksView(request):
         return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers,'form':add_form,'isFinalisable':isFinalisable,'finalisedbooks':finalisedbooks})
 
 @login_required
+def addLogEntryView(request, pk):
+    logbook = LogBook.objects.get(id=pk)
+    org = logbook.organisation
+    if request.method == 'POST':
+        addEntryForm = LogEntryForm(request.POST, org_id = org.id)
+        if addEntryForm.is_valid():
+            logentry = LogEntry.objects.create(description=addEntryForm.cleaned_data['description'],
+                                               supervisor=addEntryForm.cleaned_data['supervisor'],
+                                               start=addEntryForm.cleaned_data['start'],
+                                               end=addEntryForm.cleaned_data['end'],
+                                               book=logbook)
+            logentry.save()
+            return redirect(reverse('logbook:view', args=[logbook.id]))
+
+        return redirect(reverse('logbook:view', args=[logbook.id]))
+
+@login_required
 def logentryView(request, pk):
     logbook = LogBook.objects.get(id=pk)
     org = logbook.organisation
@@ -271,19 +288,7 @@ def logentryView(request, pk):
          return HttpResponseForbidden()
 
     if request.method == 'POST':
-
-        addEntryForm = LogEntryForm(request.POST, org_id = org.id)
-        if addEntryForm.is_valid():
-            logentry = LogEntry.objects.create(description=addEntryForm.cleaned_data['description'],
-                                               supervisor=addEntryForm.cleaned_data['supervisor'],
-                                               start=addEntryForm.cleaned_data['start'],
-                                               end=addEntryForm.cleaned_data['end'],
-                                               book=logbook)
-            logentry.save()
-            return redirect(reverse('logbook:view', args=[logbook.id]))
-
-        else:
-            modelActions(request, LogEntry, logentryPermissionCheck)
+        modelActions(request, LogEntry, logentryPermissionCheck)
 
     addEntryForm = LogEntryForm(org_id = org.id)
 
@@ -416,8 +421,6 @@ def supervisorSignupView(request):
         form = SupervisorSignupForm()
     return render(request, 'signup.html', {'signupForm':form})
 
-
-
 @login_required
 def logoutView(request):
     logout(request)
@@ -462,33 +465,6 @@ def addLogbookView(request):
     else:
         form = LogBookForm()
     return render(request, 'form.html', {'title':'Create Logbook', 'form':form, 'backUrl':reverse('logbook:list')})
-
-@login_required
-def addLogEntryView(request, pk):
-    logbook = LogBook.objects.get(id=pk)
-    if logbook == None:
-        return HttpResponseNotFound
-
-    # check that user is accessing their own book
-    if logbook.user != request.user.lbuser:
-         return HttpResponseForbidden()
-
-    if request.method == 'POST':
-        print('was post')
-        form = LogEntryForm(request.POST)
-        if form.is_valid():
-            print('was valid')
-            logentry = LogEntry.objects.create(description=form.cleaned_data['description'],
-                                               supervisor=form.cleaned_data['supervisor'],
-                                               start=form.cleaned_data['start'],
-                                               end=form.cleaned_data['end'],
-                                               book=logbook)
-            logentry.save()
-            print('redirecting')
-            return redirect(reverse('logbook:view', args=[logbook.id]))
-    else:
-        form = LogEntryForm()
-    return render(request, 'form.html', {'title':'Create Log Entry', 'form':form, 'backUrl':reverse('logbook:view', args=[logbook.id])})
 
 @login_required
 def editLogEntryView(request, pk, log_id):

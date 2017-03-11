@@ -1,9 +1,10 @@
 from django import forms
-from django.core.validators import RegexValidator, EmailValidator
 from django.contrib.auth.models import User, Group
 from django.contrib.admin import widgets
-from django.template import Context,Template
+from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
+from django.template import Context,Template
+from django.core.validators import RegexValidator, EmailValidator
 
 from .models import *
 from django.conf import settings
@@ -138,13 +139,13 @@ class LogEntryForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-
+        
         start = cleaned_data.get('start')
         end = cleaned_data.get('end')
         if start != None or end != None:
             timediff = end-start
             if timediff.total_seconds() < 0:
-                raise forms.ValidationError('Invalid start or end time')
+                raise ValidationError('Invalid start or end time')
         
         return cleaned_data
 
