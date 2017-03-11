@@ -1,5 +1,3 @@
-from django.shortcuts import render, redirect
-
 # Database
 from .forms import *
 from django.db import transaction
@@ -11,14 +9,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 
 #Redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.http import HttpResponseNotFound, HttpResponseForbidden
 from django.urls import reverse
-from django.shortcuts import get_object_or_404
 
 #Logbook Project
 from .forms import *
 from .admin import *
 from django.conf import settings
+
+# Added apps
+from dal import autocomplete
 
 #General
 from django.utils.crypto import get_random_string

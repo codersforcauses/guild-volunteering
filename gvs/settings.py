@@ -128,7 +128,7 @@ STATIC_PATH = os.path.join(BASE_DIR,'static')
 
 STATICFILES_DIRS = (
     STATIC_PATH,
-    )
+)
 
 try:
     from .local_settings import *

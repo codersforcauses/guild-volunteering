@@ -4,11 +4,15 @@ from django.contrib.auth.models import User, Group
 from django.contrib.admin import widgets
 from django.template import Context,Template
 from django.core.mail import send_mail
+from django.urls import reverse
 
 from .models import *
 from django.conf import settings
 
+# Added apps
 from datetimewidget.widgets import DateTimeWidget
+from dal import autocomplete
+
 import os
 import re
 import socket
