@@ -21,7 +21,7 @@
             <h3 style="color:1c1c1e;">Manage Entries</h3>
             <ul class="nav nav-stacked left-submenu" id="item1">
                 <li><a data-toggle="modal" href="#addEntryModal">Add Entry</a></li>
-                <li><a href='#' onclick="doAction('edit')">Edit Entry/s</a></li>
+                <li><a data-toggle="modal" href='#editEntryModal'>Edit Entry/s</a></li>
                 <li><a href='#' onclick="doAction('submit')">Submit Entry/s</a></li>
                 <li><a data-toggle="modal" href="#deleteEntryModal">Delete Entry/s</a></li>
             </ul>
@@ -94,7 +94,7 @@
                         <td>{{ logentry.end|date:"P"}}</td>
                         <td class="hidden-xs">{{ logentry.status }}</td>
                         <td class="visible-xs">
-                            <button class="btn btn-inverse"><span class="glyphicon glyphicon-pencil"></span></button>
+                            <button class="btn btn-inverse" id="edit" data-entryid="{{ logentry.id }}"><span class="glyphicon glyphicon-pencil"></span></button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -124,7 +124,7 @@
             </div>
             <form action="." method="post">
             <div class = "modal-body">
-                <div class="row" style="padding-top: 10">
+                <div class="row" style="padding-top: 10px;">
                     <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                         {% csrf_token %} 
                         {{ addentry_form.as_p }}
@@ -138,6 +138,32 @@
             </div>
             </form>
           </div>
+    </div>
+</div>
+<div class="modal fade" id="editEntryModal" tabindex="-1" role="dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+    <div class = "modal-dialog">
+        <div class = "modal-content">
+
+            <div class = "modal-header">
+                <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
+                <h4 class = "modal-title" id = "myModalLabel">Edit Log Entry</h4>
+            </div>
+            <form action="." method="post">
+                <div class = "modal-body" id="editform">
+                <div class="row" style="padding-top: 10px;">
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                        {% csrf_token %} 
+                        {{ editentry_form.as_p }}
+                    </div>
+                </div>
+            </div>
+
+            <div class = "modal-footer text-left">
+                <button type = "button" class = "btn btn-default" data-dismiss = "modal">Close</button>
+                <button type = "submit" value="Submit" class = "btn btn-primary">Save Changes</button>
+            </div>
+            </form>
+        </div>
     </div>
 </div>
 <div class = "modal fade" id = "deleteEntryModal" tabindex = "-1" role = "dialog" 
