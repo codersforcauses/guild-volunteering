@@ -104,7 +104,7 @@
     this.linkField = options.linkField || this.element.data('link-field') || false;
     this.linkFormat = DPGlobal.parseFormat(options.linkFormat || this.element.data('link-format') || DPGlobal.getDefaultFormat(this.formatType, 'link'), this.formatType);
     this.minuteStep = options.minuteStep || this.element.data('minute-step') || 5;
-    this.pickerPosition = options.pickerPosition || this.element.data('picker-position') || 'bottom-right';
+    this.pickerPosition = options.pickerPosition || this.element.data('picker-position') || 'bottom-left';
     this.showMeridian = options.showMeridian || this.element.data('show-meridian') || false;
     this.initialDate = options.initialDate || new Date();
     this.zIndex = options.zIndex || this.element.data('z-index') || undefined;

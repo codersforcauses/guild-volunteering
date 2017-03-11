@@ -57,7 +57,7 @@
                 <option value="delete">Delete</option>
                 <option value="finalise">Finalise</option>
             </select>
-            <table class="table table-striped table-sm">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -69,6 +69,7 @@
                         <th>Description</th>
                         <th>Last Updated</th>
                         {% endcomment %}
+                        <th class="visible-xs">Edit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,7 +83,7 @@
 			<td>{{ logbook.category }}
                         <td>{{ logbook.description }}</td>
                         <td class="visible-xs">
-                            <button class="btn btn-lg"><span class="glyphicon glyphicon-pencil"></span></button>
+                            <button class="btn btn-warning btn-lg"><span class="glyphicon glyphicon-edit"></span></button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -161,9 +162,11 @@
         <div class="btn-group">
             <button type="button" class="btn btn-danger visible-xs" data-toggle="modal" data-target="#deleteBookModal">Delete Log Book/s</button>
         </div>
+        {% if isFinalisable %}
         <div class="btn-group">
             <button type="button" class="btn btn-success visible-xs">Finalise Log Book/s</button>
         </div>
+        {% endif %}
     </div>
 </div>
 
@@ -180,7 +183,7 @@
             <form action="." method="post">
             <div class = "modal-body">
                 <div class="row" style="padding-top: 10">
-                    <div class="col-xs-8 col-sm-6 col-md-6 col-lg-6">
+                    <div class="col-xs-10 col-sm-12 col-md-12 col-lg-12">
                             {% csrf_token %} 
                             {{ form.as_p}}
                     </div>

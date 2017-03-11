@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 # Database
 from .forms import *
 from django.db import transaction
-from django.db.models import ExpressionWrapper, F, Count, Sum, fields
+from django.db.models import ExpressionWrapper, F, Count, Sum, fields, Q
 
 # User authentication
 from django.contrib.auth import authenticate, login, logout
@@ -148,7 +148,7 @@ def logbookPermissionCheck(user, logbook, action):
     user = LBUser.objects.get(user=user)
     if action == 'delete':
         # Don't delete the book if it contains approved entries
-        entries = LogEntry.objects.filter(book=logbook, status=LogEntry.APPROVED)
+        entries = LogEntry.objects.filter(book=logbook, status__in=['Approved','Pending'])
         if len(entries) > 0:
             return False
     if action == 'finalise':
@@ -163,7 +163,7 @@ def getCreator():
     return 'Created by Coders for Causes Members: Samuel J S Heath, Lachlan Walking and Zen Ly'
 
 def logentryPermissionCheck(user, logentry, action):
-    if logentry.book_id.finalised == True or logentry.book_id.active == False:
+    if logentry.book.finalised == True or logentry.book.active == False:
         return False
     else:
         if action == 'delete':
