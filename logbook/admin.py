@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from .adminForms import *
 from .models import *
 from django.db.models import F, Min, Max, ExpressionWrapper, Sum, fields
@@ -84,6 +85,19 @@ def statisticsView(request):
         
         return render(request, 'admin/logbook/statistics.html',{})
 
+@admin.site.register_view(r'logbook/clear_finalised_logbooks', visible='true', name='Clear Finalised Books')
+def clearLogBooksView(request):
+    if request.method == 'POST':
+        logbooks = LogBook.objects.filter(finalised = True, active = True)
+        for book in logbook:
+            book.active = False
+            book.save
+            
+        #Redirect to a completed action page.
+        return render(request, 'admin/logbook/action_complete.html',{})
+    else:
+        return render(request, 'admin/logbook/clear_finalised_logbooks.html', {})
+
 @admin.site.register_view(r'logbook/export/logbooks', visible='false', name="Export Logbooks")
 def exportView(request):
     DATE_FORMAT = '%d/%m/%Y'
@@ -101,21 +115,21 @@ def exportView(request):
             writer.writerow(['StudentID','First Name','Surname','Calendar Year','Position Type','Host Organisation Code','Host Organisation Description','Start Date','End Date','Hours'])
 
             fields = ['book__user__user__username', 'book__user__user__first_name','book__user__user__last_name', 'year', 'book__category__name', 'book__organisation__code','book__organisation__name']
-            entries = []
+            entries = LogEntry.objects.filter(book__finalised=True,supervisor__validated=True,book__active=True, status='Approved')
             
             if not user == None and not organisation == None:
-                entries = LogEntry.objects.filter(book__organisation__exact = organisation,book__user = user, status='Approved'
+                entries = LogEntry.objects.filter(book__organisation__exact = organisation,book__user = user
                     ).extra(select={'year': "EXTRACT(year FROM start)"}
                     ).values(*fields
                     ).annotate(startDate=Min('start'), endDate=Max('end'))
                 print(entries)
             elif not user == None:
-                entries = LogEntry.objects.filter(book__user = user,status='Approved'
+                entries = LogEntry.objects.filter(book__user = user
                     ).extra(select={'year': "EXTRACT(year FROM start)"}
                     ).values(*fields
                     ).annotate(startDate=Min('start'), endDate=Max('end'))
             elif not organisation == None:
-                entries = LogEntry.objects.filter(book__organisation = organisation,status='Approved'
+                entries = LogEntry.objects.filter(book__organisation = organisation
                     ).extra(select={'year': "EXTRACT(year FROM start)"}
                     ).values(*fields
                     ).annotate(startDate=Min('start'), endDate=Max('end'))
