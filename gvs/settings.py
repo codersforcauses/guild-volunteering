@@ -35,7 +35,8 @@ INSTALLED_APPS = [
     # App must be before contrib.auth
     'logbook.apps.LogbookConfig',
     'datetimewidget',
-    'django.contrib.admin',
+    'django.contrib.admin.apps.SimpleAdminConfig',
+    'adminplus',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
