@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib import admin
-from django.contrib.auth.decorators import login_required
 from .adminForms import *
 from .models import *
 from django.db.models import F, Min, Max, ExpressionWrapper, Sum, fields

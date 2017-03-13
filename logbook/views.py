@@ -31,6 +31,9 @@ from django.utils import timezone
 def is_supervisor(user):
     return user.groups.filter(name='LBSupervisor').exists()
 
+def is_lbuser(user):
+    return user.groups.filter(name='LBUser').exists()
+
 def makeHeaders(unformattedHeaderNames, currentOrder):
     '''
     Makes the headers and ordering urls for a list of models
@@ -187,9 +190,14 @@ def approvePermissionCheck(user, logentry, action):
 def indexView(request):
     if not request.user.is_authenticated():
         return redirect('logbook:login')
-    else:
-        is_super = is_supervisor(request.user)
+    elif is_supervisor(request.user):
+        is_super = True
         return render(request, 'index.html', {'is_super':is_super})
+    elif is_lbuser(request.user):
+        is_super = False
+        return render(request, 'index.html', {'is_super':is_super})
+    else:
+        return render(request, 'error.html', {})
 
 def faqView(request):
 
@@ -218,7 +226,7 @@ def booksView(request):
         #use books to get the student numbers
         logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
         return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
-    else:
+    elif is_lbuser(request.user):
         if request.method == 'POST':
             add_form = LogBookForm(request.POST)
             if add_form.is_valid():
@@ -260,7 +268,9 @@ def booksView(request):
             isFinalisable = True
             
         return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers,'form':add_form,'isFinalisable':isFinalisable,'finalisedbooks':finalisedbooks})
-
+    else:
+        return render(request, 'error.html', {})
+    
 @login_required
 def addLogEntryView(request, pk):
     logbook = LogBook.objects.get(id=pk)
