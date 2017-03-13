@@ -46,10 +46,12 @@ class SupervisorAdmin(admin.ModelAdmin):
 def getFileName(user, organisation):
     if not user == None and not organisation == None:
         return organisation.name + "-" + user.user.username
-    if not user == None:
+    elif not user == None:
         return user.user.username
-    else:
+    elif not organisation == None:
         return organisation.name
+    else:
+        return "" #return an empty string
 
 @admin.site.register_view(r'logbook/export/statistics', visible='true', name="Export Statistics")
 def statisticsView(request):
@@ -112,12 +114,14 @@ def exportView(request):
                     ).extra(select={'year': "EXTRACT(year FROM start)"}
                     ).values(*fields
                     ).annotate(startDate=Min('start'), endDate=Max('end'))
-            else:
+            elif not organisation == None:
                 entries = LogEntry.objects.filter(book__organisation = organisation,status='Approved'
                     ).extra(select={'year': "EXTRACT(year FROM start)"}
                     ).values(*fields
                     ).annotate(startDate=Min('start'), endDate=Max('end'))
-            
+            else:
+                return(request, 'admin/logbook/export.html', {})
+                
             for entry in entries:
                 writer.writerow([entry[f] for f in fields]
                         + [ entry['startDate'].strftime(DATE_FORMAT), entry['endDate'].strftime(DATE_FORMAT), round((entry['endDate']-entry['startDate']).seconds/3600)])
