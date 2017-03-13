@@ -16,29 +16,30 @@
 
 
 {% block sideblock %}
-<div class="col-sm-2 col-md-2 sidebar" id="sidebar">
-    <ul class="nav" id="#accordion" style="display: inline-block;">
+<div class="col-sm-2 col-md-2 sidebar" id="sidebar" style='padding-bottom:6%;'>
+    <ul class="nav" style="display: inline-block;">
         <li>
             <h3 style="color:1c1c1e;">Overview</h3>
             <ul class="nav nav-stacked left-submenu" id="item1">
                 <li class="active"><a href="#">Manage Log Books</a><span class="sr-only">(current)</span></li>
-                <li><a href="#statistics">Statistics</a></li>
             </ul>
         </li>
 
         <li>
             <h3 style="color:1c1c1e;">Options</h3>
             <ul class="nav nav-stacked left-submenu" id="item2">
-                <li><a data-toggle="modal" href="#addModal">Add Log Book</a></li>
+                <li><a data-toggle="modal" href="#addBookModal">Add Log Book</a></li>
                 <li><a href="#edit_book">Edit Log Book</a></li>
-                <li><a onclick="doAction('submit')">Submit Log Book/s</a></li>
-                <li><a onclick="doAction('delete')">Delete Log Book/s</a></li>
+                <li><a href="#" onclick="doAction('submit')">Submit Log Book/s</a></li>
+                <li><a data-toggle="modal" href="#deleteBookModal">Delete Log Book/s</a></li>
+                {% if isFinalisable %}
+                <li><a data-toggle="modal" href="#finaliseBookModal">Finalise Log Book/s</a></li>
+                {% endif%}
             </ul>
         </li>
+        <br>
         <li>
-            <ul class="pager">
-                <li class="previous"><a href="{% url 'logbook:index' %}">&larr; Home</a></li>
-            </ul>
+            <a href="{% url 'logbook:index' %}"><span class="glyphicon glyphicon-home"></span> Home</a>
         </li>
     </ul>
 </div>
@@ -51,10 +52,11 @@
         <form action="." method="post" id="modelForm">
             {% csrf_token %}
             <select name="selectedAction" hidden="true" id="actions">
-                    <option value="none"></option>
-                    <option value="submit">Submit</option>
-                    <option value="delete">Delete</option>
-                </select>
+                <option value="none"></option>
+                <option value="submit">Submit</option>
+                <option value="delete">Delete</option>
+                <option value="finalise">Finalise</option>
+            </select>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -67,6 +69,7 @@
                         <th>Description</th>
                         <th>Last Updated</th>
                         {% endcomment %}
+                        <th class="visible-xs">Edit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,21 +79,52 @@
                         <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
                         <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
                         {# TODO make this use the headers instead of hardcoded #}
-                        <td>{{ logbook.organisation }}</td>
+                        <td><a target="blank" href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
 			<td>{{ logbook.category }}
                         <td>{{ logbook.description }}</td>
                         <td class="visible-xs">
-                            <img width="40px" height="30px" src="{% static "images/edit-icon.png" %}" />
-                            <img width="30px" height="30px" src="{% static "images/delete-icon.png" %}" />
+                            <button class="btn btn-warning btn-lg"><span class="glyphicon glyphicon-edit"></span></button>
                         </td>
                     </tr>
                     {% endfor %}
                     {% endif %}
                 </tbody>
             </table>
-            <hr>
+            
             {% if approvedbooks %}
+            <hr>
+            {% comment %}
             <h2 class="sub-heading">Log Books Ready To Be Finalised</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        {% for header in headers %}
+                        <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
+                        {% endfor %}
+                        <th>Name</th>
+                        <th>Organisation</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for logbook in approvedbooks %}
+                    <tr class="success">
+                        <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
+                        <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
+                        {# TODO make this use the headers instead of hardcoded #}
+                        <td><a href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
+			<td>{{ logbook.category }}
+                        <td>{{ logbook.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+            {% if finalisedbooks %}
+                <hr>
+            <h2 class="sub-heading">Past Log Books</h2>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -106,12 +140,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for logbook in approvedbooks %}
+                    {% for logbook in finalisedbooks %}
                     <tr class="success">
                         <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
-                        <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
+                        <td>{{ logbook.name }}</td>
                         {# TODO make this use the headers instead of hardcoded #}
-                        <td>{{ logbook.organisation }}</td>
+                        <td><a href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
 			<td>{{ logbook.category }}
                         <td>{{ logbook.description }}</td>
                     </tr>
@@ -122,12 +156,21 @@
         </form>
     </div>
     <div class='btn-toolbar'>
-        <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addModal">Add Log Book</button>
-        <button type="button" class="btn btn-success visible-xs">Finalise Log Book/s</button>
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addBookModal">Add Log Book</button>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-danger visible-xs" data-toggle="modal" data-target="#deleteBookModal">Delete Log Book/s</button>
+        </div>
+        {% if isFinalisable %}
+        <div class="btn-group">
+            <button type="button" class="btn btn-success visible-xs">Finalise Log Book/s</button>
+        </div>
+        {% endif %}
     </div>
 </div>
 
-<div class = "modal fade" id = "addModal" tabindex = "-1" role = "dialog" 
+<div class = "modal fade" id = "addBookModal" tabindex = "-1" role = "dialog" 
    aria-labelledby = "myModalLabel" aria-hidden = "true">
    
     <div class = "modal-dialog">
@@ -140,7 +183,7 @@
             <form action="." method="post">
             <div class = "modal-body">
                 <div class="row" style="padding-top: 10">
-                    <div class="col-xs-8 col-sm-6 col-md-6 col-lg-6">
+                    <div class="col-xs-10 col-sm-12 col-md-12 col-lg-12">
                             {% csrf_token %} 
                             {{ form.as_p}}
                     </div>
@@ -155,7 +198,7 @@
           </div>
     </div>
 </div>
-<div class = "modal fade" id = "deleteModal" tabindex = "-1" role = "dialog" 
+<div class = "modal fade" id = "deleteBookModal" tabindex = "-1" role = "dialog" 
    aria-labelledby = "myModalLabel" aria-hidden = "true">
    
     <div class = "modal-dialog">
@@ -168,16 +211,43 @@
             
             <div class = "modal-body">
                 <div class="row" style="padding: 10">
-                    <div class="col-xs-12 col-sm-12 col-md-12">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                         <p>Are you sure you want to delete this Log Book?</p>
-                        <p>Doing so will only remove all the <strong>unapproved</strong> entries, all others will remain behind.</p>
+                        <p>Doing so will remove all the books with only <strong>unapproved</strong> and <strong>pending</strong> entries, any books with approved entries will <strong>not</strong> be deleted.</p>
                     </div>
                 </div>
             </div>
 
             <div class = "modal-footer text-left">
-                <button type = "button" class = "btn btn-default" data-dismiss = "modal">No</button>
-                <button type = "submit" value="Submit" class = "btn btn-primary">Yes</button>
+                <button type = "button" class = "btn btn-default" data-dismiss = "modal">Cancel</button>
+                <button onClick="doAction('delete')" class = "btn btn-primary">Confirm</button>
+            </div>
+          </div>
+    </div>
+</div>
+<div class = "modal fade" id = "finaliseBookModal" tabindex = "-1" role = "dialog" 
+   aria-labelledby = "myModalLabel" aria-hidden = "true">
+   
+    <div class = "modal-dialog">
+        <div class = "modal-content">
+
+            <div class = "modal-header">
+                <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
+                <h4 class = "modal-title" id = "myModalLabel">Finalise Log Book/s</h4>
+            </div>
+            
+            <div class = "modal-body">
+                <div class="row" style="padding: 10">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p>Are you sure you want to finalise this Log Book?</p>
+                        <p>Doing so will make the book/s unchangeable despite being visible. If you accidentally finalise a  book please contact Guild Volunteering to undo this action.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class = "modal-footer text-left">
+                <button type = "button" class = "btn btn-default" data-dismiss = "modal">Cancel</button>
+                <button onClick="doAction('finalise')" class = "btn btn-primary">Finalise</button>
             </div>
           </div>
     </div>
@@ -189,10 +259,8 @@
     form = document.getElementById('modelForm');
     actions = document.getElementById('actions');
     function doAction(action) {
-        if (confirm("Are you sure you want to "+action+" the selected book/s\n")) {
-            actions.value = action;
-            form.submit()
-        }
+        actions.value = action;
+        form.submit();
     }
 </script>
 {% endblock%}

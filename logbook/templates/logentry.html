@@ -12,6 +12,13 @@
 {% endif %}
 {% endblock %}
 
+{% block date_timeblock %}
+<link href="{% static "css/bootstrap-datetimepicker.css" %}" rel="stylesheet">
+<script>if(typeof($.fn.modal) === 'undefined') {document.write('<script src="{% static "bootstrap/js/bootstrap.min.js"%}"><\/script>')}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.js"></script>
+<script src="{% static "js/bootstrap-datetimepicker.js" %}"></script>
+{% endblock %}
+
 {{ form.media }}
 
 {% block sideblock %}
@@ -21,8 +28,8 @@
             <h3 style="color:1c1c1e;">Manage Entries</h3>
             <ul class="nav nav-stacked left-submenu" id="item1">
                 <li><a data-toggle="modal" href="#addEntryModal">Add Entry</a></li>
-                <li><a onclick="doAction('edit')">Edit Entry/s</a></li>
-                <li><a onclick="doAction('submit')">Submit Entry/s</a></li>
+                <li><a href='#' onclick="doAction('edit')">Edit Entry</a></li>
+                <li><a href='#' onclick="doAction('submit')">Submit Entry/s</a></li>
                 <li><a data-toggle="modal" href="#deleteEntryModal">Delete Entry/s</a></li>
             </ul>
         </li>
@@ -31,17 +38,18 @@
             <ul class="nav nav-stacked" id="item2">
                 {% if logbooks %}
                 {% for logbook in logbooks %}
-                    {% if logbook.name != book.name %}
+                    {% if logbook.name != book.name and not logbook.active == False %}
                     <li><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></li>
                     {% endif %}
                 {% endfor %}
+                {% else %}
+                    <p style="padding-top:10px; padding-left: 10px;">No other Log Books</p>
                 {% endif %}
             </ul>
         </li>
+        <br>
         <li>
-            <ul class="pager">
-                <li class="previous"><a href="{% url 'logbook:list' %}">&larr; Back to Logbooks</a></li>
-            </ul>
+            <li class="previous"><a href="{% url 'logbook:list' %}">&larr; Back to Logbooks</a></li>
         </li>
     </ul>
 </div>
@@ -51,12 +59,11 @@
 <div class="col-xs-12 col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 col-lg-10 col-lg-offset-2 main">
     {% if book %}
     
-    <h1 class="page-header"><a href="{% url 'logbook:list' %}" class="hidden-sm hidden-md hidden-lg">&larr;</a> {{ book.name }}</h1>
-    <h3 class="sub-heading">{{ book.description }}</h3>
+    <h1 class="page-header"><a href="{% url 'logbook:list' %}" class="visible-xs">&larr;</a> {{ book.name }}</h1>
     {% else %}
     <h1 class="page-header">Manage Entries</h1>
     {% endif %}
-    <div class="table-responsive">
+    <div class="table table-responsive">
         <form action="." method="post" id="modelForm">
             {% csrf_token %}
             <select name="selectedAction" hidden="true" id="actions">
@@ -69,16 +76,17 @@
                 <thead>
                     <tr>
                         <th class="col-xs-1">#</th>
-                        {% comment %}
                         {% for header in headers %}
                         <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
                         {% endfor %}
+                        {% comment %}
+                        <th>Name</th>
+                        <th>Supervisor</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th class="hidden-xs">Status</th>
+                        <th class="visible-xs">Edit</th>
                         {% endcomment %}
-                        <th class="col-xs-2">Category</th>
-                        <th class="col-xs-2">Supervisor</th>
-                        <th class="col-xs-3">Start Time</th>
-                        <th class="col-xs-3">End Time</th>
-                        <th class="col-xs-1 hidden-xs">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -87,14 +95,13 @@
                     <tr class = "{% if logentry.status == 'Approved' %}success{% elif logentry.status == 'Pending' %}warning{% elif logentry.status == 'Unapproved' %}danger{%endif%}">
                         <td><input type="checkbox" name="model_selected" value="{{ logentry.id }}"></td>
                         <td><a href="{% url 'logbook:edit_entry' logentry.book.id logentry.id %}">{{ logentry.description }}</a></td>
-                        <td class="hidden-xs"><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
-                        <td class="visible-xs"><a href="mailto:{{ logentry.supervisor }}"><img src="" alt="super" width="40px" height="40px"></a></td>
+                        <td class="hidden-xs hidden-sm"><a href="mailto:{{ logentry.supervisor }}">{{ logentry.supervisor }}</a></td>
+                        <td class="visible-xs visible-sm"><button class="btn btn-primary" onclick="location.href='mailto:{{ logentry.supervisor }}'"><span class="glyphicon glyphicon-user"></span></button></td>
                         <td>{{ logentry.start|date:"P" }}</td>
                         <td>{{ logentry.end|date:"P"}}</td>
                         <td class="hidden-xs">{{ logentry.status }}</td>
                         <td class="visible-xs">
-                            <img width="40px" height="30px" src="{% static "images/edit-icon.png" %}" />
-                            <img width="30px" height="30px" src="{% static "images/delete-icon.png" %}" />
+                            <button class="btn btn-warning"><span class="glyphicon glyphicon-edit"></span></button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -104,7 +111,15 @@
         </form>
     </div>
     <div class='btn-toolbar'>
-        <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addEntryModal">Add Log Entry</button>
+        <div class="btn-group" style="padding-top:5px;">
+            <button type="button" class="btn btn-primary visible-xs" data-toggle="modal" data-target="#addEntryModal">Add Log Entry</button>
+        </div>
+        <div class="btn-group" style="padding-top:5px;">
+            <button type="button" class="btn btn-danger visible-xs" data-toggle="modal" data-target="#deleteEntryModal">Delete Log Entry/s</button>
+        </div>
+        <div class="btn-group" style="padding-top:5px;">
+            <button type="button" class="btn btn-success visible-xs" onclick="doAction('submit')">Send Entry/s For Approval</button>
+        </div>
     </div>
 </div>
 <div class = "modal fade" id = "addEntryModal" tabindex = "-1" role = "dialog" 
@@ -117,10 +132,10 @@
                 <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
                 <h4 class = "modal-title" id = "myModalLabel">Add Log Entry</h4>
             </div>
-            <form action="." method="post">
+            <form action="{% url 'logbook:add_entry' book.id %}" method="post">
             <div class = "modal-body">
                 <div class="row" style="padding-top: 10">
-                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                    <div class="col-xs-10 col-xs-offset-1 col-sm-12 col-md-12 col-lg-12 col-lg-offset-0">
                         {% csrf_token %} 
                         {{ addentry_form.as_p }}
                     </div>
@@ -147,8 +162,8 @@
             </div>
             <div class = "modal-body">
                 <div class="row" style="padding-top: 10">
-                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-                        <p>If you confirm this action, you will permanently delete the selected Log Entries.</p>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p>If you confirm this action you will <strong>permanently</strong> delete the selected Log Entries, with the exception of <strong class="success">Approved</strong> entries. If for some reason you require an approved entry deleted please contact <a href="mailto:volunteering@guild.uwa.edu.au">Guild Volunteering</a>.</p>
                     </div>
                 </div>
             </div>

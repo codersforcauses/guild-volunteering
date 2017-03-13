@@ -1,10 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
-from django.template.defaultfilters import slugify
+
+import datetime
 
 class LBUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    activation_key = models.CharField(max_length=64)
+    key_expires = models.DateTimeField(default=datetime.datetime.now()+datetime.timedelta(days=7))
     def __str__(self):
         return str(self.user)
 
@@ -36,10 +39,8 @@ class LogBook(models.Model):
     description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        self.name_slug = slugify(self.name)
-        super(LogBook,self).save(*args,**kwargs)
+    finalised = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     
     def __str__(self):
         return str(self.user) + " - " + self.name
@@ -64,6 +65,11 @@ class LogEntry(models.Model):
             (APPROVED, 'Approved'), # Supervisor has approved the log entry.
         )
     status = models.CharField(choices = STATUS_CHOICES, max_length = 15, default = UNAPPROVED)
+
+    def save(self, *args, **kwargs):
+        if not self.book.finalised == True or not self.book.active == False:
+            super(LogEntry, self).save(*args, **kwargs)
+    
     def __str__(self):
         return str(self.book) + " - " + self.description
     readonly_fields = ('created_at','updated_at',)

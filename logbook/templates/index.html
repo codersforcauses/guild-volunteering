@@ -19,33 +19,35 @@
 </style>
 
 {% block bodyblock %}
-
-<div style="display: inline-block; vertical-align: middle; float: none; padding-top: 6%" class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+<div style="display: inline-block; vertical-align: middle; float: none; padding-top: 6%; padding-bottom: 6%;" class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 main" id="main">
     <h1 class="page-header" style="text-align: center;">Welcome to the Guild Volunteering System</h1>
     <div class="row placeholders">
-        <div class="col-xs-3 col-xs-offset-1 col-sm-3 col-sm-offset-1 col-md-3 col-md-offset-1">
-            <a href="{% url 'logbook:list' %}"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Logs">
-                {% if is_super %}
-                <h4>Approve Volunteer Hours</h4>
-                {% else %}
-                <h4>Manage Your Log Books</h4>
-                {% endif %}
+        <div class="col-xs-4 col-sm-4 col-md-4">
+            <a href="{% url 'logbook:list' %}">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Logs">
             </a>
             {% if is_super %}
+            <h4><a href="{% url 'logbook:list' %}">Approve Volunteer Hours</a></h4>
             <span class="text-muted hidden-xs">Approve or unapprove volunteer's logged hours you have supervised.</span>
             {% else %}
+            <a href="{% url 'logbook:list' %}"><h4>Manage Your Log Books</h4></a>
             <span class="text-muted hidden-xs">Add entries to your log books and get them approved by your supervisor.</span>
             {% endif %}
         </div>
-        <div class="col-xs-3 col-xs-offset-0 col-sm-3 col-sm-offset-0 col-md-3">
+        <div class="col-xs-4 col-xs-offset-0 col-sm-4 col-sm-offset-0 col-md-4">
             <a href="{% url 'logbook:profile' %}">
                 <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+            </a>
+            <a href="{% url 'logbook:profile' %}">
                 <h4>View Your Profile</h4>
             </a>
             <span class="text-muted hidden-xs">Change your account details, view stats, and see what badges you've earnt.</span>
         </div>
-        <div class="col-xs-3 col-xs-offset-0 col-sm-3 col-sm-offset-0 col-md-3">
-            <a href="{% url 'logbook:faq' %}"><img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+        <div class="col-xs-4 col-xs-offset-0 col-sm-4 col-sm-offset-0 col-md-4">
+            <a href="{% url 'logbook:faq' %}">
+                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+            </a>
+            <a href="{% url 'logbook:faq' %}">
                 <h4>FAQ</h4>
             </a>
             <span class="text-muted hidden-xs">View a guide on using this site, and any frequently asked questions that may help you.</span>

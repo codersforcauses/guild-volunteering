@@ -1,11 +1,22 @@
 from django import forms
+from django.contrib.auth.models import User, Group
+from django.contrib.admin import widgets
+from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
+from django.template import Context,Template
 from django.core.validators import RegexValidator, EmailValidator
-from django.contrib.auth.models import User
-from django.contrib.admin import widgets  
-from .models import *
+from django.urls import reverse
 
-import re
+from .models import *
+from django.conf import settings
+
+# Added apps
 from datetimewidget.widgets import DateTimeWidget
+from dal import autocomplete
+
+import os
+import re
+import socket
 
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
@@ -56,6 +67,36 @@ class SignupForm(SignupFormBase):
     first_name = FirstNameField(label='')
     last_name = LastNameField(label='')
 
+    def save(self, data):
+        user = User.objects.create_user(data['username'],
+                                        data['username'] + '@student.uwa.edu.au',
+                                        data['password'])
+
+        user.first_name = data['first_name']
+        user.last_name = data['last_name']
+        user.is_active = False
+        group = Group.objects.get(name='LBStudent')
+        group.user_set.add(user)
+        group.save()
+        user.save()
+        lbUser = LBUser()
+        lbUser.user = user
+        lbUser.activation_key = data['activation_key']
+        lbUser.key_expires = datetime.datetime.strftime(datetime.datetime.now()+ datetime.timedelta(days=settings.DAYS_VALID), "%Y-%m-%d %H:%M:%S")
+        lbUser.save()
+        return user
+
+    def sendVerifyEmail(self, mailData):
+        hostname = socket.gethostbyname(socket.gethostname())
+        link = "http://"+hostname+":8000/logbook/activate/"+mailData['activation_key']
+        contxt = Context({'activation_link':link,'username':mailData['username'],'first_name':mailData['first_name']})
+        EMAIL_PATH = os.path.join(settings.BASE_DIR,'logbook','static', mailData['email_path'])
+        file = open(EMAIL_PATH,'r')
+        temp = Template(file.read())
+        file.close
+        message = temp.render(contxt)
+        send_mail(mailData['email_subject'],message,'Guild Volunteering <volunteering@guild.uwa.edu.au',[mailData['email']], fail_silently=False)
+
 class SupervisorSignupForm(SignupFormBase):
     username = EmailField(label='')
     first_name = FirstNameField(widget=forms.HiddenInput(), initial=None)
@@ -66,33 +107,55 @@ class LoginForm(forms.Form):
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
 
 class LogBookForm(forms.Form):
-    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='Organisation',help_text='<span data-toggle="tooltip" style="pading:20px" title="Please email Guild Volunteering if an organisation is not listed"><a>?</a></span>')                                              
-    bookCategory = forms.ModelChoiceField(queryset = Category.objects.all(), label='Category',help_text='Choose a category that <strong>best</strong> describes your work.')
+    bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all().order_by('name'), label='', empty_label='Choose Organisation...',
+                                              widget=forms.Select(attrs={'class':'form-control'}),
+                                              help_text='<span data-toggle="tooltip" style="pading:20px" title="Please email Guild Volunteering if an organisation is not listed"><a>?</a></span>')                                              
+
+    bookCategory = forms.ModelChoiceField(queryset = Category.objects.all().order_by('name'), empty_label='Select Volunteer Category...', label='',
+                                          widget=forms.Select(attrs={'class':'form-control'}),
+                                          help_text='Choose a category that <strong>best</strong> describes your work.')
+
     bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
-    bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}))
+    bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}), required=False)
 
 class LogEntryForm(forms.Form):
-    description = forms.CharField(label='',help_text="What did your volunteering entail.", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Description'}))
+    description = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name Entry'}))
 
     def __init__(self, *args, **kwargs):
         org_id = kwargs.pop('org_id')
         super(LogEntryForm,self).__init__(*args,**kwargs)
         # Allow user to select supervisor from a list of supervisors 
-        self.fields['supervisor'].queryset = Supervisor.objects.filter(organisation = org_id)
+        self.fields['supervisor'].queryset = Supervisor.objects.filter(organisation = org_id).order_by('user__username')
+        self.fields['supervisor'].empty_label = 'Select Supervisor...'
         
-    supervisor = forms.ModelChoiceField(queryset = [], label = 'Supervisor')
+    supervisor = forms.ModelChoiceField(queryset = [], label='', widget=forms.Select(attrs={'class':'form-control'}))
     
     dateTimeOptions = {
-        'format': 'dd/mm/yyyy HH:ii P',
+        'format': 'dd/mm/yyyy hh:ii:00',
+        'weekStart' : '1',
         'autoclose': True,
-        'showMeridian' : True,
+        'showMeridian': True,
+        'minuteStep' : '15',
+        'clearBtn' : True,
         }
-    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')
-    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=True,options = dateTimeOptions, bootstrap_version=3),label='')        
+    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3),label='',)
+    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3),label='',)        
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        start = cleaned_data.get('start')
+        end = cleaned_data.get('end')
+        if start != None or end != None:
+            timediff = end-start
+            if timediff.total_seconds() < 0:
+                raise ValidationError('Invalid start or end time')
+        
+        return cleaned_data
 
 class EditNamesForm(forms.ModelForm):
-    first_name = FirstNameField()
-    last_name = FirstNameField()
+    first_name = FirstNameField(label='')
+    last_name = LastNameField(label='')
 
     class Meta:
         model = User
@@ -113,3 +176,50 @@ class DeleteUserForm(forms.ModelForm):
         # Reverses true/false for your form prior to validation
         is_active = not(self.cleaned_data["is_active"])
         return is_active
+
+class SetPasswordForm(forms.Form):
+    """
+    A form that lets a user change set their password without entering the old
+    password
+    """
+    error_messages = {
+        'password_mismatch':("The two password fields didn't match."),
+    }
+    new_password1 = forms.CharField(label='',widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
+    new_password2 = forms.CharField(label='',widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password Again'}))
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(SetPasswordForm, self).__init__(*args, **kwargs)
+
+    def clean_new_password2(self):
+        password1 = self.cleaned_data.get('new_password1')
+        password2 = self.cleaned_data.get('new_password2')
+        if password1 and password2:
+            if password1 != password2:
+                raise forms.ValidationError(self.error_messages['password_mismatch'],code='password_mismatch',)
+        return password2
+
+    def save(self, commit=True):
+        self.user.set_password(self.cleaned_data['new_password1'])
+        if commit:
+            self.user.save()
+        return self.user
+
+class PasswordChangeForm(SetPasswordForm):
+    """
+    A form that lets a user change their password by entering their old
+    password.
+    """
+    error_messages = dict(SetPasswordForm.error_messages, **{
+        'password_incorrect': ("Your old password was entered incorrectly. Please enter it again."),})
+    old_password = forms.CharField(label='',widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Old Password'}))
+
+    def clean_old_password(self):
+        """
+        Validates that the old_password field is correct.
+        """
+        old_password = self.cleaned_data["old_password"]
+        if not self.user.check_password(old_password):
+            raise forms.ValidationError(self.error_messages['password_incorrect'],code='password_incorrect',)
+        return old_password

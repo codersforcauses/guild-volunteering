@@ -25,10 +25,16 @@ SECRET_KEY = '5de1_txz%-chu&9of#e(ygn_f5%=c9#!-ym_j_sj-^v@j@qj!a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
+# Registration
+DAYS_VALID = 2
+
 
 # Application definition
 
 INSTALLED_APPS = [
+    # App must be before contrib.auth
+    'logbook.apps.LogbookConfig',
+    'datetimewidget',
     'django.contrib.admin.apps.SimpleAdminConfig',
     'adminplus',
     'django.contrib.auth',
@@ -36,8 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'logbook.apps.LogbookConfig',
-    'datetimewidget'
 ]
 
 MIDDLEWARE = [
@@ -105,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-uk'
 
 TIME_ZONE = 'UTC'
 
@@ -125,7 +129,7 @@ STATIC_PATH = os.path.join(BASE_DIR,'static')
 
 STATICFILES_DIRS = (
     STATIC_PATH,
-    )
+)
 
 try:
     from .local_settings import *
