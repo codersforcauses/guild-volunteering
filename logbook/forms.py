@@ -153,6 +153,40 @@ class LogEntryForm(forms.Form):
         
         return cleaned_data
 
+class TempSupervisorForm(forms.Form):
+    email = EmailField(label='')
+    organisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='', widget=forms.Select(attrs={'class':'form-control'}))
+    validated = forms.BooleanField(label='', initial=False, widget=forms.HiddenInput())
+    user = None
+    
+    def __init__(self, *args, **kwargs):
+        org_id = kwargs.pop('org_id')
+        super(TempSupervisorForm,self).__init__(*args,**kwargs)
+        # Allow user to select supervisor from a list of supervisors 
+        self.fields['organisation'].queryset = Organisation.objects.filter(id=org_id)
+        self.fields['organisation'].empty_label = 'Select The Organisation Below...'
+
+    def save(self, data):
+        suprvisr = Supervisor()
+        suprvisr.email = data['supervisor_email']
+        suprvisr.validated = False
+        suprvisr.organisation = data['organisation']
+        suprvisr.user = None
+        suprvisr.save()
+        
+        return suprvisr
+    
+    def sendMail(self, mailData):
+        hostname = socket.gethostbyname(socket.gethostname())
+        link = "http://"+hostname+":8000/logbook/activate/"+mailData['activation_key']
+        contxt = Context({'supervisor_email':mailData['supervisor_email'],'organisation':mailData['organisation']})
+        EMAIL_PATH = os.path.join(settings.BASE_DIR,'logbook','static', mailData['email_path'])
+        file = open(EMAIL_PATH,'r')
+        temp = Template(file.read())
+        file.close
+        message = temp.render(contxt)
+        send_mail(mailData['email_subject'],message,'Guild Volunteering <volunteering@guild.uwa.edu.au',[mailData['mail_list']], fail_silently=False)
+
 class EditNamesForm(forms.ModelForm):
     first_name = FirstNameField(label='')
     last_name = LastNameField(label='')

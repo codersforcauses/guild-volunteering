@@ -25,5 +25,6 @@ urlpatterns = [
     url(r'^b/$', views.booksView, name='list'),
     url(r'^b/(?P<pk>[0-9]+)/$',views.logentryView, name='view'),
     url(r'^b/(?P<pk>[0-9]+)/add/$',views.addLogEntryView, name='add_entry'),
+    url(r'^b/(?P<pk>[0-9]+)/create_supervisor/$',views.createSupervisorView, name='create_super'),
     url(r'^b/(?P<pk>[0-9]+)/(?P<log_id>[0-9]+)/edit/$',views.editLogEntryView, name='edit_entry'),
     ]

@@ -132,21 +132,43 @@
                 <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">&times;</button>
                 <h4 class = "modal-title" id = "myModalLabel">Add Log Entry</h4>
             </div>
-            <form action="{% url 'logbook:add_entry' book.id %}" method="post">
+    
+            <form action="{% url 'logbook:add_entry' book.id %}" method="post" id="logform">
             <div class = "modal-body">
                 <div class="row" style="padding-top: 10">
-                    <div class="col-xs-10 col-xs-offset-1 col-sm-12 col-md-12 col-lg-12 col-lg-offset-0">
-                        {% csrf_token %} 
+                    <div class="col-xs-10 col-xs-offset-1 col-sm-12 col-md-12 col-lg-12 col-lg-offset-0 text-right">
+                        {% csrf_token %}
                         {{ addentry_form.as_p }}
+                        <button type="submit" class="btn btn-primary" name="btn1" id="btn1">Add Entry</button>
                     </div>
                 </div>
+                </form>
+                <form action="{% url 'logbook:create_super' book.id %}" method="post" id="createsuper_form">
+                <div class="panel-group" id="accordion" style="padding-top:45px;">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>
+                                <a data-toggle="collapse" data-parent="#accordion" href="#createsuper"><h4>Add Supervisor</h4></a>
+                            </h4>
+                        </div>
+                        <div id="createsuper" class="panel-collapse collapse">
+                            <div class="panel-body">
+                            {% csrf_token %}
+                            {{ createsuper_form.as_p }}
+                            </div>
+                            <div class="panel-footer text-right">
+                                <input type="submit" class="btn btn-primary" name="btn2" id="btn2" value="Add Supervisor"/>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            
             </div>
 
             <div class = "modal-footer text-left">
                 <button type = "button" class = "btn btn-default" data-dismiss = "modal">Close</button>
-                <button type = "submit" value="Submit" class = "btn btn-primary">Add</button>
             </div>
-            </form>
           </div>
     </div>
 </div>
@@ -178,6 +200,12 @@
 
 {% block footerblock %}
 <script type="text/javascript">
+    $("#btn1").click(function(){  
+      $("#logform").submit();
+    }
+    $("#btn2").click(function(){  
+      $("#createsuper_form").submit();
+    }
     form = document.getElementById('modelForm');
     actions = document.getElementById('actions');
     function doAction(action) {

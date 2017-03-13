@@ -32,7 +32,7 @@ def is_supervisor(user):
     return user.groups.filter(name='LBSupervisor').exists()
 
 def is_lbuser(user):
-    return user.groups.filter(name='LBUser').exists()
+    return user.groups.filter(name='LBStudent').exists()
 
 def makeHeaders(unformattedHeaderNames, currentOrder):
     '''
@@ -270,7 +270,29 @@ def booksView(request):
         return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers,'form':add_form,'isFinalisable':isFinalisable,'finalisedbooks':finalisedbooks})
     else:
         return render(request, 'error.html', {})
-    
+
+@login_required
+def createSupervisorView(request, pk):
+    logbook = LogBook.objects.get(id=pk)
+    org = logbook.organisation
+    if request.method == 'POST':
+        form = TempSupervisorForm(request.POST, org_id = org.id)
+        if form.is_valid():
+            data = {}
+            data['supervisor_email'] = form.cleaned_data['email']
+            data['organisation'] = form.cleaned_data['organisation']
+            data['mail_list'] = settings.EMAIL_LIST
+            data['email_path']="TempSupervisor.txt"
+            data['email_subject']="Verify Supervisor Account"
+
+            form.sendVerifyEmail(data)
+            form.save(data) #Save the user and lbuser
+            return redirect(reverse('logbook:view', args=[logbook.id]))
+        else:
+            return redirect(reverse('logbook:view', args=[logbook.id]))
+    else:
+        return redirect(reverse('logbook:view', args=[logbook.id]))
+
 @login_required
 def addLogEntryView(request, pk):
     logbook = LogBook.objects.get(id=pk)
@@ -303,6 +325,7 @@ def logentryView(request, pk):
         modelActions(request, LogEntry, logentryPermissionCheck)
 
     addEntryForm = LogEntryForm(org_id = org.id)
+    tempSupervisorForm = TempSupervisorForm(org_id = org.id)
 
     logentries = {}
     logbooks = {}
@@ -323,7 +346,8 @@ def logentryView(request, pk):
                                              'logbooks':logbooks,
                                              'book':logbook,
                                              'headers':headers,
-                                             'addentry_form':addEntryForm,})
+                                             'addentry_form':addEntryForm,
+                                             'createsuper_form':tempSupervisorForm})
 
 def loginView(request):
     if request.method == 'POST':
