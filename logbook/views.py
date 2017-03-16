@@ -156,11 +156,12 @@ in the selected selected way by the user, if not it will return False.
 def logbookPermissionCheck(user, logbook, action):
     user = LBUser.objects.get(user=user)
     if action == 'delete':
-        # Don't delete the book if it contains approved entries
+        # Don't delete the book if it contains approved or pending entries
         entries = LogEntry.objects.filter(book=logbook, status__in=['Approved','Pending'])
-        if len(entries) > 0:
-            return False
-    if action == 'finalise':
+        if len(entries) == 0:
+            return True
+        
+    elif action == 'finalise':
         if hasAllApproved(logbook) == True:
             return True
         else:
@@ -172,15 +173,20 @@ def getCreator():
     return 'Created by Coders for Causes Members: Samuel J S Heath, Lachlan Walking and Zen Ly'
 
 def logentryPermissionCheck(user, logentry, action):
-    if logentry.book.finalised == True or logentry.book_id.active == False:
+    if logentry.book.finalised == True:
         return False
     else:
-        if action == 'delete':
-            # don't delete an approved entry
-            if logentry.status == LogEntry.APPROVED:
-                return False
         user = LBUser.objects.get(user=user)
-        return user == logentry.book.user
+        if user == logentry.book.user:
+            if action == 'delete':
+                # don't delete an approved entry
+                if not logentry.status == 'Approved':
+                    return True
+        
+            if action == 'submit':
+                return True
+
+            return False
     
 """
 A specific check for supervisors
@@ -240,7 +246,6 @@ def addLogbookView(request):
         form = LogBookForm(request.POST)
         if form.is_valid():
             logbook = LogBook.objects.create(name=form.cleaned_data['bookName'],
-                                             description=form.cleaned_data['bookDescription'],
                                              organisation=form.cleaned_data['bookOrganisation'],
                                              category=form.cleaned_data['bookCategory'],
                                              user=LBUser.objects.get(user=request.user))
@@ -286,7 +291,6 @@ def booksView(request):
                 #Restricts user to only 1 active logbook per organisation
                 if len(LogBook.objects.filter(user__user=request.user, active = True, organisation = org)) == 0:
                     logbook = LogBook.objects.create(name=add_form.cleaned_data['bookName'],
-                                                 description=add_form.cleaned_data['bookDescription'],
                                                  organisation=add_form.cleaned_data['bookOrganisation'],
                                                  category=add_form.cleaned_data['bookCategory'],
                                                  user=LBUser.objects.get(user=request.user))
@@ -303,7 +307,7 @@ def booksView(request):
         currentOrder = request.GET.get('order', [])
         if currentOrder:
             currentOrder = currentOrder.split('.')
-        unformattedHeaderNames = LogBookAdmin.list_display[1:5] # leave out the student
+        unformattedHeaderNames = LogBookAdmin.list_display[1:4] # leave out the student
         headers = makeHeaders(unformattedHeaderNames, currentOrder)
         
         logbooks = LogBook.objects.filter(user__user=request.user, active = True)
@@ -340,17 +344,15 @@ def createTempSupervisorView(request, pk):
     
     if request.method == 'POST':
         
-        form = TempSupervisorForm(request.POST, org_id = org.id)
-        
+        form = TempSupervisorForm(request.POST)
         if form.is_valid():
             data = {}
             data['supervisor_email'] = form.cleaned_data['email']
-            data['organisation'] = form.cleaned_data['organisation']
-            data['mail_list'] = settings.EMAIL_LIST
-            data['email_path']="TempSupervisor.txt"
+            data['organisation'] = org
+            data['email_path']="email_templatesTempSupervisor.txt"
             data['email_subject']="Verify Supervisor Account"
 
-            form.sendVerifyEmail(data)
+            form.sendMail(data)
             form.save(data) #Save the Supervisor model NO user in the system YET!.
             return redirect(reverse('logbook:view', args=[logbook.id]))
         else:
@@ -374,7 +376,7 @@ def editLogEntryView(request, pk, log_id):
     if request.method == 'POST':
         editForm = LogEntryForm(request.POST)
         if editForm.valid():
-            LogEntry.objects.get(id=log_id).update(description=form.cleaned_data['description'],
+            LogEntry.objects.get(id=log_id).update(name=form.cleaned_data['name'],
                                                supervisor=form.cleaned_data['supervisor'],
                                                start=form.cleaned_data['start'],
                                                end=form.cleaned_data['end'],
@@ -400,7 +402,7 @@ def addLogEntryView(request, pk):
     if request.method == 'POST':
         addEntryForm = LogEntryForm(request.POST, org_id = org.id)
         if addEntryForm.is_valid():
-            logentry = LogEntry.objects.create(description=addEntryForm.cleaned_data['description'],
+            logentry = LogEntry.objects.create(name=addEntryForm.cleaned_data['name'],
                                                supervisor=addEntryForm.cleaned_data['supervisor'],
                                                start=addEntryForm.cleaned_data['start'],
                                                end=addEntryForm.cleaned_data['end'],
@@ -429,7 +431,7 @@ def logentryView(request, pk):
         modelActions(request, LogEntry, logentryPermissionCheck)
 
     addEntryForm = LogEntryForm(org_id = org.id)
-    tempSupervisorForm = TempSupervisorForm(org_id = org.id)
+    tempSupervisorForm = TempSupervisorForm()
 
     logentries = {}
     logbooks = {}
@@ -444,7 +446,7 @@ def logentryView(request, pk):
     if currentOrder:
         currentOrder = currentOrder.split('.')
         
-    unformattedHeaderNames = LogEntryAdmin.list_display[1:5] # leave out book name and creation/update times
+    unformattedHeaderNames = LogEntryAdmin.list_display[1:6] # leave out book name and creation/update times
     headers = makeHeaders(unformattedHeaderNames, currentOrder)
     logentries = orderModels(currentOrder, unformattedHeaderNames, logentries)
 
@@ -501,7 +503,7 @@ def signupView(request):
             data['password'] = form.cleaned_data['password']
             data['activation_key'] = generate_activation_key(data['username'])
             
-            data['email_path']="ActivationEmail.txt"
+            data['email_path']="email_templates/ActivationEmail.txt"
             data['email_subject']="Activate your Guild Volunteering account"
 
             form.sendVerifyEmail(data)
@@ -552,7 +554,7 @@ def new_activation_link(request, user_id):
     if user is not None and not user.is_active:
         datas['username']=user.username
         datas['email']=user.email
-        datas['email_path']="NewActivationEmail.txt"
+        datas['email_path']="email_templates/NewActivationEmail.txt"
         datas['email_subject']="New Activation Link"
         datas['first_name'] = user.first_name
         datas['activation_key']= generate_activation_key(datas['username'])

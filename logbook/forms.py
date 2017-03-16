@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.models import User, Group
 from django.contrib.admin import widgets
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
+from django.core.mail import send_mail, mail_admins
 from django.template import Context,Template
 from django.core.validators import RegexValidator, EmailValidator
 from django.urls import reverse
@@ -125,10 +125,9 @@ class LogBookForm(forms.Form):
                                           help_text='Choose a category that <strong>best</strong> describes your work.')
 
     bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
-    bookDescription = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Description'}), required=False)
 
 class LogEntryForm(forms.Form):
-    description = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name Entry'}))
+    name = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name Entry'}))
 
     def __init__(self, *args, **kwargs):
         org_id = kwargs.pop('org_id')
@@ -165,17 +164,14 @@ class LogEntryForm(forms.Form):
 #Creates an unverified supervisor
 class TempSupervisorForm(forms.Form):
     email = EmailField(label='')
-    organisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='', widget=forms.Select(attrs={'class':'form-control'}))
-    validated = forms.BooleanField(label='', initial=False, widget=forms.HiddenInput())
-    user = None
-    
-    def __init__(self, *args, **kwargs):
-        org_id = kwargs.pop('org_id')
-        super(TempSupervisorForm,self).__init__(*args,**kwargs)
-        # Allow user to select supervisor from a list of supervisors 
-        self.fields['organisation'].queryset = Organisation.objects.filter(id=org_id)
-        self.fields['organisation'].empty_label = 'Select The Organisation Below...'
 
+    def clean(self):
+        cleaned_data = super().clean()
+        if len(Supervisor.objects.filter(email = cleaned_data['email'])) > 0:
+            raise ValidationError('Supervisor exists in the system.')
+        
+        return cleaned_data
+    
     #!!IMPORTANT!! GUILD MUST MUST MUST set the supervisor to the supervisor group
     #when adding the supervisor account otherwise will get an error page.
     def save(self, data):
@@ -192,14 +188,14 @@ class TempSupervisorForm(forms.Form):
     #Supervisor and verify them or not.
     def sendMail(self, mailData):
         hostname = socket.gethostbyname(socket.gethostname())
-        link = "http://"+hostname+":8000/logbook/activate/"+mailData['activation_key']
+        #link = "http://"+hostname+":8000/logbook/activate/"+mailData['activation_key']
         contxt = Context({'supervisor_email':mailData['supervisor_email'],'organisation':mailData['organisation']})
         EMAIL_PATH = os.path.join(settings.BASE_DIR,'logbook','static', mailData['email_path'])
         file = open(EMAIL_PATH,'r')
         temp = Template(file.read())
         file.close
         message = temp.render(contxt)
-        send_mail(mailData['email_subject'],message,'Guild Volunteering <volunteering@guild.uwa.edu.au',[mailData['mail_list']], fail_silently=False)
+        mail_admins(mailData['email_subject'],message,fail_silently=False)
 
 #Allows a logged in user to edit their first and last name, they entered.
 class EditNamesForm(forms.ModelForm):
