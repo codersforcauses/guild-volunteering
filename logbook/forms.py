@@ -1,3 +1,4 @@
+#Django imports
 from django import forms
 from django.contrib.auth.models import User, Group
 from django.contrib.admin import widgets
@@ -7,6 +8,7 @@ from django.template import Context,Template
 from django.core.validators import RegexValidator, EmailValidator
 from django.urls import reverse
 
+#Logbook app imports
 from .models import *
 from django.conf import settings
 
@@ -14,12 +16,15 @@ from django.conf import settings
 from datetimewidget.widgets import DateTimeWidget
 from dal import autocomplete
 
+#General imports
 import os
 import re
 import socket
 
 studentNumRegex = re.compile(r'^[0-9]{8}$')
 
+#Checks to see if the student number entered on account creation match
+#the required regex.
 class StundetNumField(forms.CharField):
     default_validators = [RegexValidator(regex=studentNumRegex, message='Enter a valid student number')]
     widget = forms.TextInput(attrs={'class':'form-control', 'placeholder':'Student Number'}) # bootstrap class for styling
@@ -81,11 +86,13 @@ class SignupForm(SignupFormBase):
         user.save()
         lbUser = LBUser()
         lbUser.user = user
+        #Below sets the key which much be in the link a user sends, and how long until it will expire.
         lbUser.activation_key = data['activation_key']
         lbUser.key_expires = datetime.datetime.strftime(datetime.datetime.now()+ datetime.timedelta(days=settings.DAYS_VALID), "%Y-%m-%d %H:%M:%S")
         lbUser.save()
         return user
 
+    #Used for account creation, where users must verify their email address by clicking link.
     def sendVerifyEmail(self, mailData):
         hostname = socket.gethostbyname(socket.gethostname())
         link = "http://"+hostname+":8000/logbook/activate/"+mailData['activation_key']
@@ -97,6 +104,8 @@ class SignupForm(SignupFormBase):
         message = temp.render(contxt)
         send_mail(mailData['email_subject'],message,'Guild Volunteering <volunteering@guild.uwa.edu.au',[mailData['email']], fail_silently=False)
 
+#May not be needed as supervisors either added by Guild Volunteering
+#Or students create an unverified account in the log entry.
 class SupervisorSignupForm(SignupFormBase):
     username = EmailField(label='')
     first_name = FirstNameField(widget=forms.HiddenInput(), initial=None)
@@ -153,6 +162,7 @@ class LogEntryForm(forms.Form):
         
         return cleaned_data
 
+#Creates an unverified supervisor
 class TempSupervisorForm(forms.Form):
     email = EmailField(label='')
     organisation = forms.ModelChoiceField(queryset = Organisation.objects.all(), label='', widget=forms.Select(attrs={'class':'form-control'}))
@@ -166,6 +176,8 @@ class TempSupervisorForm(forms.Form):
         self.fields['organisation'].queryset = Organisation.objects.filter(id=org_id)
         self.fields['organisation'].empty_label = 'Select The Organisation Below...'
 
+    #!!IMPORTANT!! GUILD MUST MUST MUST set the supervisor to the supervisor group
+    #when adding the supervisor account otherwise will get an error page.
     def save(self, data):
         suprvisr = Supervisor()
         suprvisr.email = data['supervisor_email']
@@ -175,7 +187,9 @@ class TempSupervisorForm(forms.Form):
         suprvisr.save()
         
         return suprvisr
-    
+
+    #As with account creation it will send an email to the guild to look up this
+    #Supervisor and verify them or not.
     def sendMail(self, mailData):
         hostname = socket.gethostbyname(socket.gethostname())
         link = "http://"+hostname+":8000/logbook/activate/"+mailData['activation_key']
@@ -187,6 +201,7 @@ class TempSupervisorForm(forms.Form):
         message = temp.render(contxt)
         send_mail(mailData['email_subject'],message,'Guild Volunteering <volunteering@guild.uwa.edu.au',[mailData['mail_list']], fail_silently=False)
 
+#Allows a logged in user to edit their first and last name, they entered.
 class EditNamesForm(forms.ModelForm):
     first_name = FirstNameField(label='')
     last_name = LastNameField(label='')
@@ -195,6 +210,8 @@ class EditNamesForm(forms.ModelForm):
         model = User
         fields = ['first_name','last_name',]
 
+#Suspends a users account so that their logbooks are kept in the database
+#but they cant log in, will need to see about th rules regarding deleting accounts.
 class DeleteUserForm(forms.ModelForm):
     is_active = forms.BooleanField(label='', initial=False)
     
@@ -211,6 +228,11 @@ class DeleteUserForm(forms.ModelForm):
         is_active = not(self.cleaned_data["is_active"])
         return is_active
 
+"""
+Below forms SetPasswordForm and ChangePasswordForm are taken directly
+from the django documentation except I've flipped the position of the
+old_password and altering the placeholders and attrs{} of the password fields.
+"""
 class SetPasswordForm(forms.Form):
     """
     A form that lets a user change set their password without entering the old
