@@ -279,3 +279,8 @@ class PasswordChangeForm(SetPasswordForm):
         if not self.user.check_password(old_password):
             raise forms.ValidationError(self.error_messages['password_incorrect'],code='password_incorrect',)
         return old_password
+
+class SearchBarForm(forms.Form):
+    query = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Search'}),
+                            label='',required = True)
+    

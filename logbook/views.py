@@ -18,11 +18,9 @@ from .forms import *
 from .admin import *
 from django.conf import settings
 
-# Added apps
-from dal import autocomplete
-
 #General
 from django.utils.crypto import get_random_string
+from django.template import RequestContext
 import hashlib
 import string
 import datetime
@@ -250,7 +248,9 @@ def addLogbookView(request):
             return redirect('logbook:list')
     else:
         form = LogBookForm()
-    return render(request, 'form.html', {'title':'Create Logbook', 'form':form, 'backUrl':reverse('logbook:list')})
+    return render(request, 'form.html', {'title':'Create Logbook',
+                                         'form':form,
+                                         'backUrl':reverse('logbook:list')})
 """
 View used as the main page to do with the logbook system for both supervisors
 and students
@@ -275,7 +275,8 @@ def booksView(request):
               .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'), output_field=fields.DurationField())))
         #use books to get the student numbers
         logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
-        return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
+        return render(request, 'supervisor.html', {'logbooks':entries,
+                                                   'entries':logentries})
     #Student
     elif is_lbuser(request.user):
         if request.method == 'POST':
@@ -295,13 +296,16 @@ def booksView(request):
                     return redirect('logbook:list')
             else:
                 modelActions(request, LogBook, logbookPermissionCheck)
+                
         add_form = LogBookForm()
+        
         # display page
         currentOrder = request.GET.get('order', [])
         if currentOrder:
             currentOrder = currentOrder.split('.')
         unformattedHeaderNames = LogBookAdmin.list_display[1:5] # leave out the student
         headers = makeHeaders(unformattedHeaderNames, currentOrder)
+        
         logbooks = LogBook.objects.filter(user__user=request.user, active = True)
         logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
         logbooks_list = list(logbooks)
@@ -643,5 +647,22 @@ def profileView(request):
 
     return render(request, 'profile.html', {'names_form':editNamesForm,
                                             'delete_form':deleteForm,
-                                            'change_password_form':changePasswordForm})
+                                            'change_password_form':changePasswordForm}
+                  )
 
+"""
+View used to query the Guild Volunteering site, but also supplies context if 'get' used
+"""
+def searchBarView(request):
+    if request.method == 'POST':
+        
+        search_form = SearchBarForm(request.POST)
+        if search_form.is_valid():
+            search_query = search_form.cleaned_data['query']
+            search_url = "http://websiteindevelopment.biz/wordpress/volunteering/?s="+search_query
+            return redirect(search_url)
+
+        else:
+            print('No')
+    else:
+        print('No')
