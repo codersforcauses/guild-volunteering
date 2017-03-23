@@ -368,7 +368,7 @@ def editLogEntryView(request, pk, log_id):
     logbook = LogBook.objects.get(id=pk)
     logentry = LogEntry.objects.get(id = log_id)
     if logentry == None:
-        return HttpResponseNotFound
+        return HttpResponseForbidden()
 
     if logbook.user != request.user.lbuser:
         return HttpResponseForbidden()

@@ -2,7 +2,7 @@
 from django.contrib.auth.models import User
 from django.contrib import admin
 from django.db.models import F, Min, Max, ExpressionWrapper, Sum, fields
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -75,7 +75,7 @@ def mailStudents(request):
         if emailForm.is_valid():
             #Could also do the query on AUTH_USER table and check if they are in the student
             #group, but could be better just to query LBUser as only students are assigned to that.
-            students = LBUser.objects.filter(user__last_login__gt = (timezone.now() - datetime.timedelta(days=1*365))
+            students = LBUser.objects.filter(user__last_login__gt = (timezone.now() - datetime.timedelta(days=2*365))
                                              ).values('user__email')
 
             #Name of dict element user__email comes from here^^
@@ -106,7 +106,7 @@ def mailSupervisors(request):
         if emailForm.is_valid():
             #Could also do the query on AUTH_USER table and check if they are in the supervisor
             #group, but could be better just to query Supervisor as only students are assigned to that.
-            supervisors = Supervisor.objects.filter(user__last_login__gt = (timezone.datetime.now() - datetime.timedelta(days=1*365))
+            supervisors = Supervisor.objects.filter(user__last_login__gt = (timezone.datetime.now() - datetime.timedelta(days=2*365))
                                                     ).values('user__email')
 
             #Name of dict element user__email comes from here^^
@@ -129,6 +129,9 @@ def mailSupervisors(request):
         
         return render(request, 'admin/logbook/mass_mail.html', {'email_form':emailForm,'supervisors':True})
 
+"""
+Does some very basic queries on the database, and outputs it in a csv file.
+"""
 @admin.site.register_view(r'logbook/export/statistics', visible='true', name="Export Statistics")
 def statisticsView(request):
 
@@ -164,22 +167,29 @@ def statisticsView(request):
         
         return render(request, 'admin/logbook/statistics.html',{'unexported_entries':getNumUnexported()})
 
+"""
+View that allows users to 'clear' logbooks from the database. It actually just sets any log books which
+are active, finalised and have been exported, to INACTIVE, which simply means the logbook wont be changable.
+"""
 @admin.site.register_view(r'logbook/clear_finalised_logbooks', visible='true', name='Clear Finalised Books')
 def clearLogBooksView(request):
     if request.method == 'POST':
-        logbooks = LogBook.objects.filter(finalised = True, active = True, exported=True)
-        for book in logbook:
-            book.active = False
-            book.save
-            
-        #Redirect to a completed action page.
-        return render(request, 'admin/logbook/action_complete.html',{'unexported_entries':getNumUnexported})
+        if getNumUnexported() == 0:
+            logbooks = LogBook.objects.filter(finalised = True, active = True, exported=True)
+            for book in logbook:
+                book.active = False
+                book.save
+                
+            #Redirect to a completed action page.
+            return render(request, 'admin/logbook/action_complete.html',{})
+        else:
+            return HttpResponseForbidden()
     else:
-        return render(request, 'admin/logbook/clear_finalised_logbooks.html', {'unexported_entries':getNumUnexported})
+        return render(request, 'admin/logbook/clear_finalised_logbooks.html', {'unexported_entries':getNumUnexported()})
 
 #Function which simply tells views how many log entries havent been exported yet.
 def getNumUnexported():
-    return len(LogEntry.objects.filter(book__finalised = True, book__active = True, book__exported = False))
+    return len(LogBook.objects.filter(finalised = True, active = True, exported = False))
 
 #Function that sets all the lobgooks which were exported to 'True'
 def setExported(entries):
@@ -195,6 +205,10 @@ def setExported(entries):
             book.exported = True
             book.save()
 
+"""
+View that handles 'exporting' of data from the database, e.g. just putting it into CSV files,
+which will then be uploaded to Calista so it is on the students transcript.
+"""
 @admin.site.register_view(r'logbook/export/logbooks', visible='false', name="Export Logbooks")
 def exportView(request):
     DATE_FORMAT = '%d/%m/%Y'
