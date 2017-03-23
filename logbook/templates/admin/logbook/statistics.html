@@ -1,6 +1,8 @@
 {% extends 'admin/base_site.html' %}
 
 {% if not is_popup %}
+{% load static %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">Home</a>
@@ -13,6 +15,11 @@
 {% endif %}
 
 {% block content %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="{% static '/css/admin_logbook.css' %}">
+
+{% if unexported_entries == 0 %}
+<h2>There are: 0 un-exported log entries still in the system. <span class="glyphicon glyphicon-ok icon-success"></span></h2>
 <p>
     Some basic statistics may be downloaded to your computer. These will include the following statistics:
     <ul>
@@ -22,10 +29,22 @@
     </ul>
 </p>
 <p>
-    Please press the buton below to download
+    Please press the button below to download
 </p>
 <form action="./statistics" method="post">
     {% csrf_token %}
     <button type = "submit" value="Submit" class = "btn" data-dismiss = "modal">Download</button>
 </form>
+{% else %}
+<h2>There are: {{ unexported_entries }} un-exported log entries still in the system. <span class="glyphicon glyphicon-remove icon-warning"></span></h2>
+<p>
+    Some basic statistics may be downloaded to your computer. These will include the following statistics:
+    <ul>
+        <li>Number of students who have used the system in the last year.</li>
+        <li>Number of hours logged in the past year.</li>
+        <li>Number of organisations in the system.</li>
+    </ul>
+</p>
+{% endif %}
+
 {% endblock %}

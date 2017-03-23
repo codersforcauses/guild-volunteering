@@ -8,6 +8,8 @@ from django.http import HttpResponse
 
 import csv
 import datetime
+import io
+import zipfile
 
 @admin.register(LBUser)
 class LBUserAdmin(admin.ModelAdmin):
@@ -28,7 +30,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(LogBook)
 class LogBookAdmin(admin.ModelAdmin):
-    list_display = ['user','name','organisation','category','created_at','updated_at',]
+    list_display = ['user','name','organisation','category','exported','finalised','active','created_at','updated_at',]
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
@@ -51,7 +53,7 @@ def getFileName(user, organisation):
     elif not organisation == None:
         return organisation.name
     else:
-        return "" #return an empty string
+        return "All Organisations"
 
 def get_total_hrs(time):
     return int(time.total_seconds()/3600.0)
@@ -89,20 +91,38 @@ def statisticsView(request):
     
     else:
         
-        return render(request, 'admin/logbook/statistics.html',{})
+        return render(request, 'admin/logbook/statistics.html',{'unexported_entries':getNumUnexported()})
 
 @admin.site.register_view(r'logbook/clear_finalised_logbooks', visible='true', name='Clear Finalised Books')
 def clearLogBooksView(request):
     if request.method == 'POST':
-        logbooks = LogBook.objects.filter(finalised = True, active = True)
+        logbooks = LogBook.objects.filter(finalised = True, active = True, exported=True)
         for book in logbook:
             book.active = False
             book.save
             
         #Redirect to a completed action page.
-        return render(request, 'admin/logbook/action_complete.html',{})
+        return render(request, 'admin/logbook/action_complete.html',{'unexported_entries':getNumUnexported})
     else:
-        return render(request, 'admin/logbook/clear_finalised_logbooks.html', {})
+        return render(request, 'admin/logbook/clear_finalised_logbooks.html', {'unexported_entries':getNumUnexported})
+
+#Function which simply tells views how many log entries havent been exported yet.
+def getNumUnexported():
+    return len(LogEntry.objects.filter(book__finalised = True, book__active = True, book__exported = False))
+
+#Function that sets all the lobgooks which were exported to 'True'
+def setExported(entries):
+    """
+    Find all distinct books which are in the entries being exported, (these entries should only be in in system as student has finalised
+    the log book, so all entries exported are within these logbooks) then set the value of exported to True, so it is known
+    how many un-exported log entries remain.
+    """
+    exportedBooks = LogBook.objects.filter(id__in=entries.values('book')).distinct()
+
+    for book in exportedBooks:
+        if book.exported == False:
+            book.exported = True
+            book.save()
 
 @admin.site.register_view(r'logbook/export/logbooks', visible='false', name="Export Logbooks")
 def exportView(request):
@@ -120,7 +140,7 @@ def exportView(request):
             writer = csv.writer(response)
             writer.writerow(['StudentID','First Name','Surname','Calendar Year','Position Type','Host Organisation Code','Host Organisation Description','Start Date','End Date','Hours'])
 
-            fields = ['book__user__user__username', 'book__user__user__first_name','book__user__user__last_name', 'year', 'book__category__name', 'book__organisation__code','book__organisation__name'] 
+            fields = ['book__user__user__username','book__user__user__first_name','book__user__user__last_name','year','book__category__name','book__organisation__code','book__organisation__name'] 
             entries=[]
             
             if not user == None and not organisation == None:
@@ -129,24 +149,63 @@ def exportView(request):
                     ).extra(select={'year': "EXTRACT(year FROM start)"}
                     ).values(*fields
                     ).annotate(startDate=Min('start'), endDate=Max('end'))
-                print(entries)
             elif not user == None:
                 entries = LogEntry.objects.filter(book__finalised=True,supervisor__validated=True,book__active=True,
                     status='Approved',book__user = user
                     ).extra(select={'year': "EXTRACT(year FROM start)"}
                     ).values(*fields
                     ).annotate(startDate=Min('start'), endDate=Max('end'))
-                print(entries)
             elif not organisation == None:
                 entries = LogEntry.objects.filter(book__finalised=True,supervisor__validated=True,book__active=True,
                     status='Approved',book__organisation = organisation
                     ).extra(select={'year': "EXTRACT(year FROM start)"}
                     ).values(*fields
                     ).annotate(startDate=Min('start'), endDate=Max('end'))
-                print(entries)
             else:
-                return(request, 'admin/logbook/export.html', {})
+                """"
+                Export ALL THE DATAS
+                """
+                out = io.BytesIO()
+                orgs = Organisation.objects.all()
+                entries = {}
+                bufferedIO = []
+                for org in orgs:
+                    entries = LogEntry.objects.filter(book__finalised=True,supervisor__validated=True,book__active=True,
+                    status='Approved',book__organisation = org
+                    ).extra(select={'year': "EXTRACT(year FROM start)"}
+                    ).values(*fields
+                    ).annotate(startDate=Min('start'), endDate=Max('end'))
+
+                    #initialise writer object
+                    writer = None
+                    if len(entries) > 0:
+                        buffer = io.StringIO()
+                        writer = csv.writer(buffer)
+                        writer.writerow(['StudentID','First Name','Surname','Calendar Year','Position Type','Host Organisation','Host Organisation Code','Start Date','End Date','Hours'])
+                        
+                        for entry in entries:
+                            writer.writerow([entry[f] for f in fields] + [entry['startDate'].strftime(DATE_FORMAT),entry['endDate'].strftime(DATE_FORMAT),round((entry['endDate']-entry['startDate']).seconds/3600)])
+
+                        buffer.seek(0)
+                        file_dict = {'file':buffer,'filename':org.name}
+                        bufferedIO.append(file_dict)
+                        
+                    setExported(entries)
+                    
+
+                zipf = zipfile.ZipFile(out, mode='w')
+                for b in bufferedIO:
+                    zipf.writestr("{}.csv".format(b['filename']), b['file'].read())
+                        
+                zipf.close()
+                out.seek(0)
+                response = HttpResponse(out.read())
+                response['Content-Disposition'] = 'attachment; filename=All Organisations.zip'
                 
+                return response
+
+            setExported(entries)
+            
             for entry in entries:
                 writer.writerow([entry[f] for f in fields]
                         + [ entry['startDate'].strftime(DATE_FORMAT), entry['endDate'].strftime(DATE_FORMAT), round((entry['endDate']-entry['startDate']).seconds/3600)])
@@ -154,7 +213,8 @@ def exportView(request):
 
     else:
         form = ExportForm()
-
+        
     context = dict(admin.site.each_context(request),
-        form=form)
-    return render(request, 'admin/logbook/export.html',context)
+        form=form,)
+    context['unexported_entries'] = getNumUnexported()
+    return render(request, 'admin/logbook/export.html', context)

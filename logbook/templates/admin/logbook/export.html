@@ -1,6 +1,9 @@
 {% extends 'admin/base_site.html' %}
 
 {% if not is_popup %}
+
+{% load static %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">Home</a>
@@ -13,10 +16,22 @@
 {% endif %}
 
 {% block content %}
-<form method="post">
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit"></input>
-</form>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="{% static '/css/admin_logbook.css' %}">
 
+{% if unexported_entries == 0 %}
+<h2>There are: 0 un-exported log entries still in the system. <span class="glyphicon glyphicon-ok icon-success"></span></h2>
+{% else %}
+<h2>There are: {{ unexported_entries }} un-exported log entries still in the system. <span class="glyphicon glyphicon-remove icon-warning"></span></h2>
+<p class="text">To be able to clear the database of finalised books, please keep exporting organisations 
+    and/or students to ensure all important data is <strong>OUT</strong>.</p>
+{% endif %}
+<p class="text"><strong style="text-decoration: underline;">NOTE:</strong> Just press 'submit' with <strong>NO</strong> values selected to export <strong>ALL</strong> data (each organisation in a separate csv).</p>
+<div class="col-xs-5 col-sm-3 col-md-3 col-lg-3">
+    <form method="post">
+        {% csrf_token %}
+        {{form.as_p}}
+        <input type="submit"></input>
+    </form>
+</div>
 {% endblock %}

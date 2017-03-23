@@ -1,6 +1,9 @@
 {% extends 'admin/base_site.html' %}
 
 {% if not is_popup %}
+
+{% load static %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">Home</a>
@@ -13,6 +16,11 @@
 {% endif %}
 
 {% block content %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="{% static '/css/admin_logbook.css' %}">
+
+{% if unexported_entries == 0 %}
+<h2>There are: 0 un-exported log entries still in the system. <span class="glyphicon glyphicon-ok icon-success"></span></h2>
 <p>
     By pressing the below button you will make <strong>ALL</strong> finalised log books which are currently active in the system inactive.
     This means:
@@ -28,4 +36,8 @@
     {% csrf_token %}
     <button type = "submit" value="Submit" class = "btn" data-dismiss = "modal">Clear Log Books</button>
 </form>
+{% else %}
+<h2>There are: {{ unexported_entries }} un-exported log entries still in the system. <span class="glyphicon glyphicon-remove icon-warning"></span></h2>
+<p>Automatic clearing of finalised logbooks has been <strong>restricted</strong>, although is possible manually.</p>
+{% endif %}
 {% endblock %}
