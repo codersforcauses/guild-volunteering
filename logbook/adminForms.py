@@ -1,7 +1,31 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mass_mail
 
 from .models import *
+
+class EmailForm(forms.Form):
+    subject = forms.CharField(label='', required=True,
+                              widget=forms.TextInput(attrs={'placeholder':'Subject',
+                                                                     'class':'form-control'}))
+    message = forms.CharField(label='',required=True,
+                              widget=forms.Textarea(attrs={'placeholder':'Message'}))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        message = cleaned_data['message']
+        if len(message) == 0:
+            raise ValidationError('Please enter a body to the message.')
+
+        return cleaned_data
+
+    def sendMail(self, emailData):
+        data = (
+            (emailData['subject'],emailData['message'],
+             'Guild Volunteering <volunteering@guild.uwa.edu.au>',emailData['mail_list']),
+            )
+        send_mass_mail(data,fail_silently=False)
 
 class ExportForm(forms.Form):
     organisation = forms.ModelChoiceField(queryset = Organisation.objects.all().order_by('name'),

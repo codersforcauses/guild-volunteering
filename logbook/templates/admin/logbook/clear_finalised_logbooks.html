@@ -21,23 +21,23 @@
 
 {% if unexported_entries == 0 %}
 <h2>There are: 0 un-exported log entries still in the system. <span class="glyphicon glyphicon-ok icon-success"></span></h2>
-<p>
+<p class="text">
     By pressing the below button you will make <strong>ALL</strong> finalised log books which are currently active in the system inactive.
     This means:
     <ul>
-        <li>Students will <strong>NOT</strong> be able to see them anymore.</li>
-        <li>They <strong>MAY</strong> be edited by the administrator.</li>
+        <li class="text">Students will <strong>NOT</strong> be able to see them anymore.</li>
+        <li class="text">They <strong>MAY</strong> be edited by the administrator.</li>
     </ul>
 </p>
-<p>
+<p class="text">
     If you understand the above please press the button below.
 </p>
 <form action="./clear_finalised_logbooks" method="post">
     {% csrf_token %}
-    <button type = "submit" value="Submit" class = "btn" data-dismiss = "modal">Clear Log Books</button>
+    <button type = "submit" value="Submit" class = "btn btn-primary" data-dismiss = "modal">Clear Log Books</button>
 </form>
 {% else %}
 <h2>There are: {{ unexported_entries }} un-exported log entries still in the system. <span class="glyphicon glyphicon-remove icon-warning"></span></h2>
-<p>Automatic clearing of finalised logbooks has been <strong>restricted</strong>, although is possible manually.</p>
+<p class="text">Automatic clearing of finalised logbooks has been <strong>restricted</strong>, although is possible manually.</p>
 {% endif %}
 {% endblock %}

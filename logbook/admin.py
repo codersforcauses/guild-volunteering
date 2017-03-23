@@ -1,15 +1,21 @@
-from django.shortcuts import render
+#Django imports
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .adminForms import *
-from .models import *
 from django.db.models import F, Min, Max, ExpressionWrapper, Sum, fields
 from django.http import HttpResponse
+from django.shortcuts import render
+from django.utils import timezone
 
+#Logbook imports
+from .adminForms import *
+from .models import *
+
+#General Imports
 import csv
 import datetime
 import io
 import zipfile
+import datetime
 
 @admin.register(LBUser)
 class LBUserAdmin(admin.ModelAdmin):
@@ -57,6 +63,71 @@ def getFileName(user, organisation):
 
 def get_total_hrs(time):
     return int(time.total_seconds()/3600.0)
+
+"""
+View used to generate and send mass emails to groups of people e.g. students or supervisors.
+Same applies to the mailSupervisorsView, which does the same but for supervisors.
+"""
+@admin.site.register_view(r'logbook/mass_mail/students', visible='true',name="Mail Students")
+def mailStudents(request):
+    if request.method == 'POST':
+        emailForm = EmailForm(request.POST)
+        if emailForm.is_valid():
+            #Could also do the query on AUTH_USER table and check if they are in the student
+            #group, but could be better just to query LBUser as only students are assigned to that.
+            students = LBUser.objects.filter(user__last_login__gt = (timezone.now() - datetime.timedelta(days=1*365))
+                                             ).values('user__email')
+
+            #Name of dict element user__email comes from here^^
+            email_list = []
+            for email in students:
+                email_list.append(email['user__email'])
+            
+            emailData = {}
+            emailData['subject'] = emailForm.cleaned_data['subject']
+            emailData['message'] = emailForm.cleaned_data['message']
+            emailData['mail_list'] = mail_list
+
+            #Pass email data to the form to send
+            emailForm.sendMail(emailData)
+            
+            return render(request, 'admin/logbook/action_complete.html',{})
+        
+    else:
+        emailForm = EmailForm()
+        
+        return render(request, 'admin/logbook/mass_mail.html', {'email_form':emailForm, 'students':True})
+    
+
+@admin.site.register_view(r'logbook/mass_mail/supervisors', visible='true',name="Mail Supervisors")
+def mailSupervisors(request):
+    if request.method == 'POST':
+        emailForm = EmailForm(request.POST)
+        if emailForm.is_valid():
+            #Could also do the query on AUTH_USER table and check if they are in the supervisor
+            #group, but could be better just to query Supervisor as only students are assigned to that.
+            supervisors = Supervisor.objects.filter(user__last_login__gt = (timezone.datetime.now() - datetime.timedelta(days=1*365))
+                                                    ).values('user__email')
+
+            #Name of dict element user__email comes from here^^
+            email_list = []
+            for email in supervisors:
+                email_list.append(email['user__email'])
+                
+            emailData = {}
+            emailData['subject'] = emailForm.cleaned_data['subject']
+            emailData['message'] = emailForm.cleaned_data['message']
+            emailData['mail_list'] = email_list
+
+            #Pass email data to the form to send
+            emailForm.sendMail(emailData)
+
+            return render(request, 'admin/logbook/action_complete.html',{})
+        
+    else:
+        emailForm = EmailForm()
+        
+        return render(request, 'admin/logbook/mass_mail.html', {'email_form':emailForm,'supervisors':True})
 
 @admin.site.register_view(r'logbook/export/statistics', visible='true', name="Export Statistics")
 def statisticsView(request):

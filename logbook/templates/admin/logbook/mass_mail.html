@@ -1,0 +1,51 @@
+{% extends 'admin/base_site.html' %}
+
+{% if not is_popup %}
+
+{% load static %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo;
+    <a href="{% url 'admin:app_list' app_label='logbook' %}">Logbook</a>
+    &rsaquo;
+    Export
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="{% static '/css/admin_logbook.css' %}">
+
+{% if students %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-6 col-xs-offset-3 col-sm-6 col-offset-3 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3 main">
+            <h3>You are mass mailing Students who are in the system.</h3>
+            <form method="post">
+                {% csrf_token %}
+                {{email_form.as_p}}
+                <button class="btn btn-primary" type="submit">Send <span class="glyphicon glyphicon-envelope"></span></button>
+            </form>
+        </div>
+    </div>
+</div>
+{% elif supervisors %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-8 col-xs-offset-3 col-sm-8 col-offset-3 col-md-8 col-md-offset-3 col-lg-8 col-lg-offset-2 main">
+            <h3>You are mass mailing Supervisors who are in the system.</h3>
+            <form method="post">
+                {% csrf_token %}
+                {{email_form.as_p}}
+                <button class="btn btn-primary" type="submit">Send! <span class="glyphicon glyphicon-envelope"></span></button>
+            </form>
+        </div>
+    </div>
+</div>
+{% else %}
+{% endif %}
+
+{% endblock %}

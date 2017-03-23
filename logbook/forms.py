@@ -102,7 +102,7 @@ class SignupForm(SignupFormBase):
         temp = Template(file.read())
         file.close
         message = temp.render(contxt)
-        send_mail(mailData['email_subject'],message,'Guild Volunteering <volunteering@guild.uwa.edu.au',[mailData['email']], fail_silently=False)
+        send_mail(mailData['email_subject'],message,'Guild Volunteering <volunteering@guild.uwa.edu.au>',[mailData['email']], fail_silently=False)
 
 #May not be needed as supervisors either added by Guild Volunteering
 #Or students create an unverified account in the log entry.
