@@ -18,19 +18,23 @@ from .forms import *
 from .admin import *
 from django.conf import settings
 
-# Added apps
-from dal import autocomplete
-
 #General
 from django.utils.crypto import get_random_string
+from django.template import RequestContext
 import hashlib
 import string
 import datetime
 from django.utils import timezone
 
+#Checks to see if the user passed to the function is a supervisor.
 def is_supervisor(user):
     return user.groups.filter(name='LBSupervisor').exists()
 
+#Checks to see if th user passed to the function is a student.
+def is_lbuser(user):
+    return user.groups.filter(name='LBStudent').exists()
+
+#Creates headers which can be sorted for the tables in log books and log entries.
 def makeHeaders(unformattedHeaderNames, currentOrder):
     '''
     Makes the headers and ordering urls for a list of models
@@ -63,6 +67,8 @@ def orderModels(order, unformattedHeaderNames, models):
             sortArgs.append(unformattedHeaderNames[int(i[0])-1])
     return models.order_by(*sortArgs)
 
+#Controls the actions when a user submits a POST on a form containing a number
+# of elements in a table.
 def modelActions(request, model, permissionCheck):
     action = request.POST['selectedAction']
     modelIDs = request.POST.getlist('model_selected')
@@ -104,12 +110,11 @@ def modelActions(request, model, permissionCheck):
                 pass
             if permissionCheck(request.user, m, 'edit'):
                 try:
-                    print('yes')
                     logentry = LogEntry.objects.get(id=m.id)
                     print(logentry.book.id,logentry.id)
                     return redirect('edit_entry',args=(logentry.book.id, logentry.id))
                 except:
-                    print('rip')
+                    print('Error occured when editing model')
     #Finalise Log Book/s
     if action == 'finalise':
         for i in modelIDs:
@@ -144,15 +149,19 @@ def modelActions(request, model, permissionCheck):
                     m.status = 'Unapproved'
                     m.save()
 
-
+"""
+Below are checks to ensure the log book or the log entry can be interacted with
+in the selected selected way by the user, if not it will return False.
+"""
 def logbookPermissionCheck(user, logbook, action):
     user = LBUser.objects.get(user=user)
     if action == 'delete':
-        # Don't delete the book if it contains approved entries
+        # Don't delete the book if it contains approved or pending entries
         entries = LogEntry.objects.filter(book=logbook, status__in=['Approved','Pending'])
-        if len(entries) > 0:
-            return False
-    if action == 'finalise':
+        if len(entries) == 0:
+            return True
+        
+    elif action == 'finalise':
         if hasAllApproved(logbook) == True:
             return True
         else:
@@ -164,16 +173,24 @@ def getCreator():
     return 'Created by Coders for Causes Members: Samuel J S Heath, Lachlan Walking and Zen Ly'
 
 def logentryPermissionCheck(user, logentry, action):
-    if logentry.book.finalised == True or logentry.book_id.active == False:
+    if logentry.book.finalised == True:
         return False
     else:
-        if action == 'delete':
-            # don't delete an approved entry
-            if logentry.status == LogEntry.APPROVED:
-                return False
         user = LBUser.objects.get(user=user)
-        return user == logentry.book.user
+        if user == logentry.book.user:
+            if action == 'delete':
+                # don't delete an approved entry
+                if not logentry.status == 'Approved':
+                    return True
+        
+            if action == 'submit':
+                return True
 
+            return False
+    
+"""
+A specific check for supervisors
+"""
 def approvePermissionCheck(user, logentry, action):
     user = Supervisor.objects.get(user=user)
     #limit actions to only allowed ones.
@@ -183,18 +200,34 @@ def approvePermissionCheck(user, logentry, action):
         return True
     return False
         
-
+"""
+Loads the 'front page' only if a user currently has an active session, otherwise
+redirects to the login page.
+"""
 def indexView(request):
     if not request.user.is_authenticated():
         return redirect('logbook:login')
-    else:
-        is_super = is_supervisor(request.user)
+    #Checks if a user is a supervisor
+    elif is_supervisor(request.user):
+        is_super = True
         return render(request, 'index.html', {'is_super':is_super})
+    #Checks to see if user is a student.
+    elif is_lbuser(request.user):
+        is_super = False
+        return render(request, 'index.html', {'is_super':is_super})
+    #If the user has not been assigned a user group this will show an error,
+    #and tell user to talk to guild volunteering to check account settings.
+    else:
+        return render(request, 'error.html', {})
 
+"""
+Simple view to show the Frequently Asked Questions page
+"""
 def faqView(request):
-
     return render(request, 'faq.html', {'names':getCreator()})
 
+#Function which checks to see if a specific logbook has all its logentries approved,
+#this is a function which is ready to be finalised by the user.
 def hasAllApproved(logbook):
     entries = LogEntry.objects.filter(book = logbook.id)
     if len(entries) == 0:
@@ -204,9 +237,39 @@ def hasAllApproved(logbook):
             return False
     return True
 
+"""
+View which handles the request from a user to add a logbook.
+"""
+@login_required
+def addLogbookView(request):
+    if request.method == 'POST':
+        form = LogBookForm(request.POST)
+        if form.is_valid():
+            logbook = LogBook.objects.create(name=form.cleaned_data['bookName'],
+                                             organisation=form.cleaned_data['bookOrganisation'],
+                                             category=form.cleaned_data['bookCategory'],
+                                             user=LBUser.objects.get(user=request.user))
+            logbook.save()
+            return redirect('logbook:list')
+    else:
+        form = LogBookForm()
+    return render(request, 'form.html', {'title':'Create Logbook',
+                                         'form':form,
+                                         'backUrl':reverse('logbook:list')})
+"""
+View used as the main page to do with the logbook system for both supervisors
+and students
 
+Supervisors: They see all the logentries which are requiring approval and
+those which they have approved.
+
+Students: See the list of logbooks they have created with different orgs,
+can edit these books to change fields e.g. the category of the volunteering.
+Allows them to finalise books as well as 
+"""
 @login_required
 def booksView(request):
+    #Supervisor
     if is_supervisor(request.user):
         if request.method == 'POST':
             modelActions(request, LogEntry, approvePermissionCheck)
@@ -217,8 +280,10 @@ def booksView(request):
               .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'), output_field=fields.DurationField())))
         #use books to get the student numbers
         logentries = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')
-        return render(request, 'supervisor.html', {'logbooks':entries,'entries':logentries})
-    else:
+        return render(request, 'supervisor.html', {'logbooks':entries,
+                                                   'entries':logentries})
+    #Student
+    elif is_lbuser(request.user):
         if request.method == 'POST':
             add_form = LogBookForm(request.POST)
             if add_form.is_valid():
@@ -226,7 +291,6 @@ def booksView(request):
                 #Restricts user to only 1 active logbook per organisation
                 if len(LogBook.objects.filter(user__user=request.user, active = True, organisation = org)) == 0:
                     logbook = LogBook.objects.create(name=add_form.cleaned_data['bookName'],
-                                                 description=add_form.cleaned_data['bookDescription'],
                                                  organisation=add_form.cleaned_data['bookOrganisation'],
                                                  category=add_form.cleaned_data['bookCategory'],
                                                  user=LBUser.objects.get(user=request.user))
@@ -236,13 +300,16 @@ def booksView(request):
                     return redirect('logbook:list')
             else:
                 modelActions(request, LogBook, logbookPermissionCheck)
+                
         add_form = LogBookForm()
+        
         # display page
         currentOrder = request.GET.get('order', [])
         if currentOrder:
             currentOrder = currentOrder.split('.')
-        unformattedHeaderNames = LogBookAdmin.list_display[1:5] # leave out the student
+        unformattedHeaderNames = LogBookAdmin.list_display[1:4] # leave out the student
         headers = makeHeaders(unformattedHeaderNames, currentOrder)
+        
         logbooks = LogBook.objects.filter(user__user=request.user, active = True)
         logbooks = orderModels(currentOrder, unformattedHeaderNames, logbooks)
         logbooks_list = list(logbooks)
@@ -259,8 +326,75 @@ def booksView(request):
         if len(approvedLogbooks) > 0:
             isFinalisable = True
             
-        return render(request, 'books.html', {'logbooks':logbooks_list,'approvedbooks':approvedLogbooks, 'headers':headers,'form':add_form,'isFinalisable':isFinalisable,'finalisedbooks':finalisedbooks})
+        return render(request, 'books.html', {'logbooks':logbooks_list,
+                                              'approvedbooks':approvedLogbooks,
+                                              'headers':headers,'form':add_form,
+                                              'isFinalisable':isFinalisable,
+                                              'finalisedbooks':finalisedbooks})
+    else:
+        return render(request, 'error.html', {})
 
+"""
+View to handle the create temp supervisor form when it is submitted in log entry
+"""
+@login_required
+def createTempSupervisorView(request, pk):
+    logbook = LogBook.objects.get(id=pk)
+    org = logbook.organisation
+    
+    if request.method == 'POST':
+        
+        form = TempSupervisorForm(request.POST)
+        if form.is_valid():
+            data = {}
+            data['supervisor_email'] = form.cleaned_data['email']
+            data['organisation'] = org
+            data['email_path']="email_templatesTempSupervisor.txt"
+            data['email_subject']="Verify Supervisor Account"
+
+            form.sendMail(data)
+            form.save(data) #Save the Supervisor model NO user in the system YET!.
+            return redirect(reverse('logbook:view', args=[logbook.id]))
+        else:
+            return redirect(reverse('logbook:view', args=[logbook.id]))
+    else:
+        return redirect(reverse('logbook:view', args=[logbook.id]))
+
+"""
+View which handles the request from a user to add a logbook.
+"""
+@login_required
+def editLogEntryView(request, pk, log_id):
+    logbook = LogBook.objects.get(id=pk)
+    logentry = LogEntry.objects.get(id = log_id)
+    if logentry == None:
+        return HttpResponseNotFound
+
+    if logbook.user != request.user.lbuser:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        editForm = LogEntryForm(request.POST)
+        if editForm.valid():
+            LogEntry.objects.get(id=log_id).update(name=form.cleaned_data['name'],
+                                               supervisor=form.cleaned_data['supervisor'],
+                                               start=form.cleaned_data['start'],
+                                               end=form.cleaned_data['end'],
+                                               updated_at=datetime.datetime.now())
+
+    else:
+        editForm = LogEntryForm()
+
+    return render(request, 'form.html', {'title':'Edit Log Entry',
+                                         'form':editForm,
+                                         'book':logbook,
+                                         'backUrl':reverse('logbook:view', args=[logbook.id])})
+
+
+
+"""
+View to handle the request to add a log entry.
+"""
 @login_required
 def addLogEntryView(request, pk):
     logbook = LogBook.objects.get(id=pk)
@@ -268,7 +402,7 @@ def addLogEntryView(request, pk):
     if request.method == 'POST':
         addEntryForm = LogEntryForm(request.POST, org_id = org.id)
         if addEntryForm.is_valid():
-            logentry = LogEntry.objects.create(description=addEntryForm.cleaned_data['description'],
+            logentry = LogEntry.objects.create(name=addEntryForm.cleaned_data['name'],
                                                supervisor=addEntryForm.cleaned_data['supervisor'],
                                                start=addEntryForm.cleaned_data['start'],
                                                end=addEntryForm.cleaned_data['end'],
@@ -278,6 +412,10 @@ def addLogEntryView(request, pk):
 
         return redirect(reverse('logbook:view', args=[logbook.id]))
 
+"""
+Shows the student the list of log entries they have which are part of this logbook
+Allows the user to add,delete and submit log entries through this page.
+"""
 @login_required
 def logentryView(request, pk):
     logbook = LogBook.objects.get(id=pk)
@@ -293,6 +431,7 @@ def logentryView(request, pk):
         modelActions(request, LogEntry, logentryPermissionCheck)
 
     addEntryForm = LogEntryForm(org_id = org.id)
+    tempSupervisorForm = TempSupervisorForm()
 
     logentries = {}
     logbooks = {}
@@ -303,9 +442,11 @@ def logentryView(request, pk):
         pass
 
     currentOrder = request.GET.get('order', [])
+    #Orders the outputted table based on the sorting of headings user has selected.
     if currentOrder:
         currentOrder = currentOrder.split('.')
-    unformattedHeaderNames = LogEntryAdmin.list_display[1:5] # leave out book name and creation/update times
+        
+    unformattedHeaderNames = LogEntryAdmin.list_display[1:6] # leave out book name and creation/update times
     headers = makeHeaders(unformattedHeaderNames, currentOrder)
     logentries = orderModels(currentOrder, unformattedHeaderNames, logentries)
 
@@ -313,8 +454,12 @@ def logentryView(request, pk):
                                              'logbooks':logbooks,
                                              'book':logbook,
                                              'headers':headers,
-                                             'addentry_form':addEntryForm,})
+                                             'addentry_form':addEntryForm,
+                                             'createsuper_form':tempSupervisorForm})
 
+"""
+Manages the logging in of a user via django.auth functions.
+"""
 def loginView(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -327,11 +472,19 @@ def loginView(request):
         form = LoginForm()
     return render(request, 'login.html', {'loginForm':form})
 
+"""
+Function to safely generate an activation key allowing the user verify their account.
+"""
 def generate_activation_key(username):
     chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
     secret_key = get_random_string(20, chars)
     return hashlib.sha256((secret_key + username).encode('utf-8')).hexdigest()
 
+"""
+Sign-up view creates a user from the entered SignUpForm and then sends the user
+an email using a generated key to ensure the user has secure access to the said
+email account.
+"""
 @transaction.atomic
 def signupView(request):
     if request.user.is_authenticated():
@@ -350,7 +503,7 @@ def signupView(request):
             data['password'] = form.cleaned_data['password']
             data['activation_key'] = generate_activation_key(data['username'])
             
-            data['email_path']="ActivationEmail.txt"
+            data['email_path']="email_templates/ActivationEmail.txt"
             data['email_subject']="Activate your Guild Volunteering account"
 
             form.sendVerifyEmail(data)
@@ -362,6 +515,12 @@ def signupView(request):
         form = SignupForm()
     return render(request, 'signup.html', {'signupForm':form})
 
+"""
+View which simply checks to see if the activation code the user has used, is
+a valid code, if not then the page will tell the user it is not a valid code.
+If the code has been user after the activation period then the user will need
+to request a new activation link
+"""
 def activation(request, key):
     activation_expired = False
     already_active = False
@@ -369,17 +528,25 @@ def activation(request, key):
     lbuser = get_object_or_404(LBUser, activation_key=key)
     if lbuser.user.is_active == False:
         if timezone.now() > lbuser.key_expires:
-            activation_expired = True #Display: offer the user to send a new activation link
+            #Display: offer the user to send a new activation link
+            activation_expired = True 
             id_user = lbuser.user.id
-        else: #Activation successful
+        else:
+            #Activation successful
             lbuser.user.is_active = True
             lbuser.user.save()
 
     #If user is already active, simply display error message
     else:
-        already_active = True #Display : error message
+        #Display : error message
+        already_active = True
     return render(request, 'activation.html', {'activation_expired':activation_expired,'isActive':already_active,'user_id':id_user})
 
+"""
+Function used to send users a new acivation code in the instance that their
+activation code expires, see the main program settings under DAYS_VALID,
+it may be altered depending on what situation admin wants.
+"""
 def new_activation_link(request, user_id):
     form = SignupForm()
     datas={}
@@ -387,7 +554,7 @@ def new_activation_link(request, user_id):
     if user is not None and not user.is_active:
         datas['username']=user.username
         datas['email']=user.email
-        datas['email_path']="NewActivationEmail.txt"
+        datas['email_path']="email_templates/NewActivationEmail.txt"
         datas['email_subject']="New Activation Link"
         datas['first_name'] = user.first_name
         datas['activation_key']= generate_activation_key(datas['username'])
@@ -423,11 +590,13 @@ def supervisorSignupView(request):
         form = SupervisorSignupForm()
     return render(request, 'signup.html', {'signupForm':form})
 
+#Simple view that ends the user's session.
 @login_required
 def logoutView(request):
     logout(request)
     return redirect('logbook:login')
 
+#Function which uses the deleteForm to simply suspend a user's account, by making it inactive.
 @login_required
 def deleteUserView(request):
     user = request.user
@@ -440,6 +609,9 @@ def deleteUserView(request):
     else:
         return redirect('logbook:profile')
 
+"""
+View to handle when a user sends a POST on a form to edit their first and last names.
+"""
 @login_required
 def editNamesView(request):
     user = request.user
@@ -452,7 +624,11 @@ def editNamesView(request):
             return redirect('logbook:profile')
     else:
         return redirect('logbook:profile')
-    
+
+"""
+View which simply gives the user some functions to do with their account
+e.g. Suspend account, change password (not have to reset password), and change names
+"""
 @login_required
 def profileView(request):
     # Staff member can view analytics in profile or in index
@@ -471,44 +647,24 @@ def profileView(request):
         changePasswordForm = PasswordChangeForm(request.user)
         deleteForm = DeleteUserForm(instance=user)
 
-    return render(request, 'profile.html', {'names_form':editNamesForm,'delete_form':deleteForm,'change_password_form':changePasswordForm})
+    return render(request, 'profile.html', {'names_form':editNamesForm,
+                                            'delete_form':deleteForm,
+                                            'change_password_form':changePasswordForm}
+                  )
 
-@login_required
-def addLogbookView(request):
+"""
+View used to query the Guild Volunteering site, but also supplies context if 'get' used
+"""
+def searchBarView(request):
     if request.method == 'POST':
-        form = LogBookForm(request.POST)
-        if form.is_valid():
-            logbook = LogBook.objects.create(name=form.cleaned_data['bookName'],
-                                             description=form.cleaned_data['bookDescription'],
-                                             organisation=form.cleaned_data['bookOrganisation'],
-                                             category=form.cleaned_data['bookCategory'],
-                                             user=LBUser.objects.get(user=request.user))
-            logbook.save()
-            return redirect('logbook:list')
+        
+        search_form = SearchBarForm(request.POST)
+        if search_form.is_valid():
+            search_query = search_form.cleaned_data['query']
+            search_url = "http://websiteindevelopment.biz/wordpress/volunteering/?s="+search_query
+            return redirect(search_url)
+
+        else:
+            print('No')
     else:
-        form = LogBookForm()
-    return render(request, 'form.html', {'title':'Create Logbook', 'form':form, 'backUrl':reverse('logbook:list')})
-
-@login_required
-def editLogEntryView(request, pk, log_id):
-    logbook = LogBook.objects.get(id=pk)
-    logentry = LogEntry.objects.get(id = log_id)
-    if logentry == None:
-        return HttpResponseNotFound
-
-    if logbook.user != request.user.lbuser:
-        return HttpResponseForbidden()
-
-    if request.method == 'POST':
-        editForm = LogEntryForm(request.POST)
-        if editForm.valid():
-            LogEntry.objects.get(id=log_id).update(description=form.cleaned_data['description'],
-                                               supervisor=form.cleaned_data['supervisor'],
-                                               start=form.cleaned_data['start'],
-                                               end=form.cleaned_data['end'],
-                                               updated_at=datetime.datetime.now())
-
-    else:
-        editForm = LogEntryForm()
-
-    return render(request, 'form.html', {'title':'Edit Log Entry', 'form':editForm,'book':logbook, 'backUrl':reverse('logbook:view', args=[logbook.id])})
+        print('No')

@@ -36,11 +36,11 @@ class LogBook(models.Model):
     organisation = models.ForeignKey(Organisation, on_delete=models.SET_NULL, null=True, default=None )
     category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, default=None)
     name = models.CharField(max_length=200)
-    description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     finalised = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
+    exported = models.BooleanField(default=False)
     
     def __str__(self):
         return str(self.user) + " - " + self.name
@@ -48,7 +48,7 @@ class LogBook(models.Model):
 
 class LogEntry(models.Model):
     book = models.ForeignKey(LogBook, on_delete=models.CASCADE)
-    description = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
     supervisor = models.ForeignKey(Supervisor, on_delete=models.SET_NULL, null=True)
     start = models.DateTimeField('task start')
     end = models.DateTimeField('task end')

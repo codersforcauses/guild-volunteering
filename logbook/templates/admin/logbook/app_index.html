@@ -5,8 +5,17 @@
 {% block extrastyle %}
 {{block.super}}
 <style type="text/css">
-    .action {
-        padding: 0px 16px 0px 16px;
+    .subheading {
+        list-style-type: none;
+    }
+    #action-heading {
+        margin-left: -15px;
+        margin-bottom: -5px;
+        padding:5px;
+    }
+    ul li {
+        list-style-type: none;
+        font-size: 14px;
     }
 </style>
 {% endblock %}
@@ -17,8 +26,18 @@
     <div class="module">
         <h2> Actions </h2>
         <ul>
-            <a href="export/logbooks" class="action"> Export For Calista </a>
-            <a href="export/statistics" class="action"> Export Statistics </a>
+            <li>
+                <h2 class="sub-heading" id="action-heading" style="padding:5px;">Calista</h2>
+                <a href="export/logbooks" class="action">Export For Calista</a>
+            </li>
+            <li>
+                <h2 class="sub-heading" id="action-heading" style="padding:5px;">Statistics</h2>
+                <a href="export/statistics" class="action">Export Statistics</a>
+            </li>
+            <li>
+                <h2 class="sub-heading" id="action-heading" style="padding:5px;">Clear Finalised Log Books</h2>
+                <a href="clear_finalised_logbooks" class="action">Clear Finished Log Books</a>
+            </li>
         </ul>
     </div>
     <div class="module" id="recent-actions-module">

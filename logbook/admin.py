@@ -28,12 +28,12 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(LogBook)
 class LogBookAdmin(admin.ModelAdmin):
-    list_display = ['user','name','organisation','category','description','created_at','updated_at',]
+    list_display = ['user','name','organisation','category','created_at','updated_at',]
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-    list_display = ['book','description','supervisor','start','end',
-                    'created_at','updated_at','status',]
+    list_display = ['book','name','supervisor','start','end','status',
+                    'created_at','updated_at',]
 @admin.register(Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
     # Will need to add the Org's Calista code when we add that to model
@@ -46,10 +46,15 @@ class SupervisorAdmin(admin.ModelAdmin):
 def getFileName(user, organisation):
     if not user == None and not organisation == None:
         return organisation.name + "-" + user.user.username
-    if not user == None:
+    elif not user == None:
         return user.user.username
-    else:
+    elif not organisation == None:
         return organisation.name
+    else:
+        return "" #return an empty string
+
+def get_total_hrs(time):
+    return int(time.total_seconds()/3600.0)
 
 @admin.site.register_view(r'logbook/export/statistics', visible='true', name="Export Statistics")
 def statisticsView(request):
@@ -66,21 +71,38 @@ def statisticsView(request):
         print(num_students)
         writer.writerow([num_students,num_orgs])
 
-        total_hrs = LogEntry.objects.filter(start__year=datetime.datetime.now().year,status="Approved"
+        total_hrs = LogEntry.objects.filter(start__year=datetime.datetime.now().year,status="Approved", supervisor__validated =  True
                                             ).annotate(total_duration=Sum(ExpressionWrapper(F('end') - F('start'),  output_field=fields.DurationField()))
                                             ).aggregate(total_time = Sum('total_duration'))
         
-        total_sec = total_hrs['total_time']
-        total_hrs = total_sec.total_seconds()/3600.0
+        total_hrs = get_total_hrs(total_hrs['total_time'])
+
+        submitted_hrs = LogEntry.objects.filter(start__year=datetime.datetime.now().year,status="Approved", supervisor__validated = True, book__finalised = True
+                                            ).annotate(total_duration=Sum(ExpressionWrapper(F('end') - F('start'),  output_field=fields.DurationField()))
+                                            ).aggregate(total_time = Sum('total_duration'))
+        calista_hrs = get_total_hrs(submitted_hrs['total_time'])
         writer.writerow(' ')
-        writer.writerow(['Total Hrs/Yr'])
-        writer.writerow([total_hrs])
+        writer.writerow(['Total Hrs This Yr','Submitted Hrs This Yr'])
+        writer.writerow([total_hrs,calista_hrs])
 
         return response
     
     else:
         
         return render(request, 'admin/logbook/statistics.html',{})
+
+@admin.site.register_view(r'logbook/clear_finalised_logbooks', visible='true', name='Clear Finalised Books')
+def clearLogBooksView(request):
+    if request.method == 'POST':
+        logbooks = LogBook.objects.filter(finalised = True, active = True)
+        for book in logbook:
+            book.active = False
+            book.save
+            
+        #Redirect to a completed action page.
+        return render(request, 'admin/logbook/action_complete.html',{})
+    else:
+        return render(request, 'admin/logbook/clear_finalised_logbooks.html', {})
 
 @admin.site.register_view(r'logbook/export/logbooks', visible='false', name="Export Logbooks")
 def exportView(request):
@@ -98,26 +120,33 @@ def exportView(request):
             writer = csv.writer(response)
             writer.writerow(['StudentID','First Name','Surname','Calendar Year','Position Type','Host Organisation Code','Host Organisation Description','Start Date','End Date','Hours'])
 
-            fields = ['book__user__user__username', 'book__user__user__first_name','book__user__user__last_name', 'year', 'book__category__name', 'book__organisation__code','book__organisation__name']
-            entries = []
+            fields = ['book__user__user__username', 'book__user__user__first_name','book__user__user__last_name', 'year', 'book__category__name', 'book__organisation__code','book__organisation__name'] 
+            entries=[]
             
             if not user == None and not organisation == None:
-                entries = LogEntry.objects.filter(book__organisation__exact = organisation,book__user = user, status='Approved'
+                entries = LogEntry.objects.filter(book__finalised=True,supervisor__validated=True,book__active=True,
+                    status='Approved',book__organisation__exact = organisation,book__user = user
                     ).extra(select={'year': "EXTRACT(year FROM start)"}
                     ).values(*fields
                     ).annotate(startDate=Min('start'), endDate=Max('end'))
                 print(entries)
             elif not user == None:
-                entries = LogEntry.objects.filter(book__user = user,status='Approved'
+                entries = LogEntry.objects.filter(book__finalised=True,supervisor__validated=True,book__active=True,
+                    status='Approved',book__user = user
                     ).extra(select={'year': "EXTRACT(year FROM start)"}
                     ).values(*fields
                     ).annotate(startDate=Min('start'), endDate=Max('end'))
+                print(entries)
+            elif not organisation == None:
+                entries = LogEntry.objects.filter(book__finalised=True,supervisor__validated=True,book__active=True,
+                    status='Approved',book__organisation = organisation
+                    ).extra(select={'year': "EXTRACT(year FROM start)"}
+                    ).values(*fields
+                    ).annotate(startDate=Min('start'), endDate=Max('end'))
+                print(entries)
             else:
-                entries = LogEntry.objects.filter(book__organisation = organisation,status='Approved'
-                    ).extra(select={'year': "EXTRACT(year FROM start)"}
-                    ).values(*fields
-                    ).annotate(startDate=Min('start'), endDate=Max('end'))
-            
+                return(request, 'admin/logbook/export.html', {})
+                
             for entry in entries:
                 writer.writerow([entry[f] for f in fields]
                         + [ entry['startDate'].strftime(DATE_FORMAT), entry['endDate'].strftime(DATE_FORMAT), round((entry['endDate']-entry['startDate']).seconds/3600)])

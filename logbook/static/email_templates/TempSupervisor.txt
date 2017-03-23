@@ -1,0 +1,7 @@
+Hi,
+
+A student has added a new temporary supervisor to the system. If this student wants their hours approved, please verify this supervisor from <strong>{{organisation}}</strong> whose email address is {{supervisor_email}}, via the admin page.
+
+Regards,
+
+The Developer
