@@ -10,7 +10,7 @@ from django.contrib.auth.models import User, Group
 
 #Redirect
 from django.shortcuts import render, redirect,get_object_or_404
-from django.http import HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponse
 from django.urls import reverse
 
 #Logbook Project
@@ -19,12 +19,15 @@ from .admin import *
 from django.conf import settings
 
 #General
-from django.utils.crypto import get_random_string
 from django.template import RequestContext
-import hashlib
-import string
-import datetime
+from django.utils.crypto import get_random_string
+from django.core import serializers
 from django.utils import timezone
+import datetime
+import hashlib
+import json
+import string
+
 
 #Checks to see if the user passed to the function is a supervisor.
 def is_supervisor(user):
@@ -160,7 +163,6 @@ def logbookPermissionCheck(user, logbook, action):
         entries = LogEntry.objects.filter(book=logbook, status__in=['Approved','Pending'])
         if len(entries) == 0:
             return True
-        
     elif action == 'finalise':
         if hasAllApproved(logbook) == True:
             return True
@@ -256,6 +258,23 @@ def addLogbookView(request):
     return render(request, 'form.html', {'title':'Create Logbook',
                                          'form':form,
                                          'backUrl':reverse('logbook:list')})
+
+def updateHoursList(request):
+    if request.is_ajax():
+        modelActions(request, LogEntry, approvePermissionCheck)
+            
+        hoursList = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')\
+              .values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id')\
+              .annotate(entries_pending=Count('id'))\
+              .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'),
+                                                                             output_field=fields.DurationField())))
+        data = {}
+        data['result'] = 'You Made Request'
+            
+        return HttpResponse(json.dumps(data), content_type='application/json')
+    else:
+        return HttpResponseForbidden
+
 """
 View used as the main page to do with the logbook system for both supervisors
 and students

@@ -71,5 +71,5 @@ class LogEntry(models.Model):
             super(LogEntry, self).save(*args, **kwargs)
     
     def __str__(self):
-        return str(self.book) + " - " + self.description
+        return str(self.book) + " - " + self.name
     readonly_fields = ('created_at','updated_at',)

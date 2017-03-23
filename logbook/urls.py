@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^delete_user/$', views.deleteUserView, name='delete_user'),
     url(r'^edit_names/$', views.editNamesView, name='edit_names'),
     url(r'^b/$', views.booksView, name='list'),
+    url(r'b/updatehrs/$', views.updateHoursList, name='update_hours'),
     url(r'^b/(?P<pk>[0-9]+)/$',views.logentryView, name='view'),
     url(r'^b/(?P<pk>[0-9]+)/add/$',views.addLogEntryView, name='add_entry'),
     url(r'^b/(?P<pk>[0-9]+)/create_supervisor/$',views.createTempSupervisorView, name='create_super'),
