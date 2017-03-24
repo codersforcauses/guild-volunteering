@@ -20,7 +20,7 @@ function doAjax(checkboxid, bookid, action){
 }
 
 
-form = document.getElementById('modelForm');
+var form = document.getElementById('modelForm');
 var actions = document.getElementById('actions');
 
 function doOne(checkboxid, action) {
@@ -35,6 +35,7 @@ function submitAll(tableid) {
         checkboxes[i].checked = true;
     }
     actions.value = 'approve';
+    form.submit();
 
 }
 
