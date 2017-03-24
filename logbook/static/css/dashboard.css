@@ -273,3 +273,7 @@ body {
     padding:25px;
     color:#fff;
 }
+
+.label-as-badge {
+    border-radius: 1em;
+}

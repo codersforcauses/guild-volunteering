@@ -94,19 +94,14 @@
             
             {% if approvedbooks %}
             <hr>
-            {% comment %}
             <h2 class="sub-heading">Log Books Ready To Be Finalised</h2>
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>#</th>
                         {% for header in headers %}
-                        <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
+                        <th>{{header.0}}</th>
                         {% endfor %}
-                        <th>Name</th>
-                        <th>Organisation</th>
-                        <th>Category</th>
-                        <th>Description</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -131,13 +126,8 @@
                     <tr>
                         <th>#</th>
                         {% for header in headers %}
-                        <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
-                        {% endfor %} {% comment %}
-                        <th>Name</th>
-                        <th>Organisation</th>
-                        <th>Category</th>
-                        <th>Description</th>
-                        {% endcomment %}
+                        <th>{{header.0}}</th>
+                        {% endfor %}
                     </tr>
                 </thead>
                 <tbody>

@@ -122,13 +122,14 @@ def modelActions(request, model, permissionCheck):
     if action == 'finalise':
         for i in modelIDs:
             try:
-                m = model.objects.get(i)
+                m = model.objects.get(id=i)
             except model.DoesNotExist:
                 pass
+            
             if permissionCheck(request.user, m, 'finalise'):
-                if m.finalised == False:
-                    m.finalised == True
-                    m.save()
+                m.finalised = True
+                m.save()
+                    
     #Supervisor approve log entry
     if action == 'approve':
         for i in modelIDs:
@@ -261,17 +262,13 @@ def addLogbookView(request):
 
 def updateHoursList(request):
     if request.is_ajax():
-        modelActions(request, LogEntry, approvePermissionCheck)
-            
-        hoursList = LogEntry.objects.filter(supervisor__user = request.user, status='Pending')\
-              .values('book__user__user__username','book__user__user__first_name','book__user__user__last_name','book__id')\
-              .annotate(entries_pending=Count('id'))\
-              .annotate(entries_pending_total_duration=Sum(ExpressionWrapper(F('end') - F('start'),
-                                                                             output_field=fields.DurationField())))
-        data = {}
-        data['result'] = 'You Made Request'
-            
-        return HttpResponse(json.dumps(data), content_type='application/json')
+        if request.method == "POST":
+            #modelActions(request, LogEntry, approvePermissionCheck)
+            logbook = request.POST['book_id']
+            data = {'entries':len(LogEntry.objects.filter(book = logbook, status='Pending')),
+                    'checkboxid':request.POST['model_selected'], 'book':request.POST['book_id']}
+                
+            return HttpResponse(json.dumps(data), content_type='application/json')
     else:
         return HttpResponseForbidden
 
@@ -335,7 +332,7 @@ def booksView(request):
         approvedLogbooks = list()
 
         finalisedbooks = LogBook.objects.filter(user__user=request.user, active = True, finalised = True)
-        
+        pastbooks = LogBook.objects.filter(user__user=request.user,active=False, finalised=True)        
         for book in logbooks:
             if hasAllApproved(book):
                 approvedLogbooks.append(book)
@@ -349,6 +346,7 @@ def booksView(request):
                                               'approvedbooks':approvedLogbooks,
                                               'headers':headers,'form':add_form,
                                               'isFinalisable':isFinalisable,
+                                              'pastbooks':pastbooks,
                                               'finalisedbooks':finalisedbooks})
     else:
         return render(request, 'error.html', {})
@@ -439,8 +437,8 @@ Allows the user to add,delete and submit log entries through this page.
 def logentryView(request, pk):
     logbook = LogBook.objects.get(id=pk)
     org = logbook.organisation
-    if logbook == None or logbook.finalised == True or logbook.active == False:
-        return HttpResponseNotFound
+    if logbook == None or logbook.active == False:
+        return HttpResponseForbidden()
 
     # check that user is accessing their own book
     if logbook.user != request.user.lbuser:
