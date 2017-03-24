@@ -1,5 +1,4 @@
 # Database
-from .forms import *
 from django.db import transaction
 from django.db.models import ExpressionWrapper, F, Count, Sum, fields, Q
 
@@ -22,6 +21,7 @@ from django.conf import settings
 from django.template import RequestContext
 from django.utils.crypto import get_random_string
 from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 import datetime
 import hashlib
@@ -240,6 +240,24 @@ def hasAllApproved(logbook):
             return False
     return True
 
+@login_required
+def loadBookView(request):
+    if request.is_ajax():
+        if request.method == "GET":
+            
+            book_id = request.GET['book_id']
+            logbook = LogBook.objects.get(id=book_id)
+            
+            output = {'name':logbook.name, 'organisation':logbook.organisation.name,'category':logbook.category.name}
+            output = json.dumps(output, cls=DjangoJSONEncoder)
+            return HttpResponse(output, content_type='application/json')
+        
+        else:
+            return HttpResponseForbidden
+        
+    else:
+        return HttpResponseForbidden
+
 """
 View which handles the request from a user to add a logbook.
 """
@@ -259,7 +277,7 @@ def addLogbookView(request):
     return render(request, 'form.html', {'title':'Create Logbook',
                                          'form':form,
                                          'backUrl':reverse('logbook:list')})
-
+@login_required
 def updateHoursList(request):
     if request.is_ajax():
         if request.method == "POST":
@@ -363,6 +381,7 @@ def createTempSupervisorView(request, pk):
         
         form = TempSupervisorForm(request.POST)
         if form.is_valid():
+            
             data = {}
             data['supervisor_email'] = form.cleaned_data['email']
             data['organisation'] = org
@@ -376,6 +395,22 @@ def createTempSupervisorView(request, pk):
             return redirect(reverse('logbook:view', args=[logbook.id]))
     else:
         return redirect(reverse('logbook:view', args=[logbook.id]))
+
+@login_required
+def loadEntryView(request):
+    if request.is_ajax():
+        if request.method == "GET":
+            entry_id = request.GET['entry']
+            book_id = request.GET['book_id']
+            logentry = LogEntry.objects.get(id=entry_id)
+            output = {'name':logentry.name, 'supervisor':logentry.supervisor.email,'start':logentry.start, 'end':logentry.end}
+            output = json.dumps(output, cls=DjangoJSONEncoder)
+            return HttpResponse(output, content_type='application/json')
+        else:
+            print('here')
+            return HttpResponseForbidden
+    else:
+        return HttpResponseForbidden
 
 """
 View which handles the request from a user to add a logbook.

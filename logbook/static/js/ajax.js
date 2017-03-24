@@ -1,8 +1,32 @@
 $(document).ready(function() {
     
 });
-    
-function doAjax(checkboxid, bookid, action){
+
+function loadBook(book_id) {
+    $.ajax({
+       type:"get",
+       url:"./load_book/",
+       contentType:'application/json',
+       data: {book_id:book_id},
+       success: function(output) {
+           console.log(output);
+       }
+    });
+}
+
+function loadEntry(entry_id) {
+    $.ajax({
+       type:"get",
+       url:"../load_entry/",
+       contentType:'application/json',
+       data: { entry:entry_id },
+       success: function(output) {
+           console.log(output);
+       }
+    });
+}
+
+function doApprove(checkboxid, bookid, action){
     
     var rowId = '#row-'+checkboxid;
     var badge = '#badge-'+bookid;
@@ -11,7 +35,7 @@ function doAjax(checkboxid, bookid, action){
     
     $.ajax({
         type: "post",
-        url: "./updatehrs/",
+        url: "./update_approvals/",
         data: { selectedAction: action, model_selected:checkboxid, book_id:bookid, csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()},
         success: function(data) {
 
@@ -19,9 +43,16 @@ function doAjax(checkboxid, bookid, action){
     });
 }
 
-
 var form = document.getElementById('modelForm');
 var actions = document.getElementById('actions');
+    
+function doAction(action) {
+    actions.value = action;
+    form.submit();
+}
+
+//Random thing, idk where it belongs :(
+$("[title]").tooltip();
 
 function doOne(checkboxid, action) {
     document.getElementById(checkboxid).checked = true;

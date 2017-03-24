@@ -64,13 +64,8 @@
                         <th>#</th>
                         {% for header in headers %}
                         <th><a href="?order={{header.1}}"> {{header.0}} </a></th>
-                        {% endfor %} {% comment %}
-                        <th>Name</th>
-                        <th>Organisation</th>
-                        <th>Description</th>
-                        <th>Last Updated</th>
-                        {% endcomment %}
-                        <th class="visible-xs">Edit</th>
+                        {% endfor %}
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,10 +77,7 @@
                         {# TODO make this use the headers instead of hardcoded #}
                         <td><a target="blank" href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
 			<td>{{ logbook.category }}
-                        <td>{{ logbook.description }}</td>
-                        <td class="visible-xs">
-                            <button class="btn btn-warning btn-lg"><span class="glyphicon glyphicon-edit"></span></button>
-                        </td>
+                        <td><button class="btn btn-warning btn-lg" onclick="loadBook('{{logbook.id}}')"><span class="glyphicon glyphicon-edit"></span></button></td>
                     </tr>
                     {% endfor %}
                     {% endif %}
@@ -112,7 +104,6 @@
                         {# TODO make this use the headers instead of hardcoded #}
                         <td><a href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
 			<td>{{ logbook.category }}
-                        <td>{{ logbook.description }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -138,7 +129,6 @@
                         {# TODO make this use the headers instead of hardcoded #}
                         <td><a href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
 			<td>{{ logbook.category }}
-                        <td>{{ logbook.description }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -246,13 +236,6 @@
 {% endblock %}
 
 {% block footerblock %}
-<script type="text/javascript">
-    form = document.getElementById('modelForm');
-    actions = document.getElementById('actions');
-    function doAction(action) {
-        actions.value = action;
-        form.submit();
-    }
-</script>
+<script src="{% static 'js/ajax.js' %}"></script>
 {% endblock%}
 
