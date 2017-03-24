@@ -126,7 +126,7 @@
                             <a target="_blank" title="Twitter" href="http://twitter.com/GuildVolunteer"><img src="{% static "images/twitter-logo.png" %}" border="0" width="32" alt="Twitter" style="margin: 2px; opacity: 1;"></a>
                             <a target="_blank" title="Instagram" href="http://www.instagram.com/guildvolunteeringuwa/"><img src="{% static "images/instagram-logo.png" %}" border="0" width="32" alt="Instagram" style="margin: 2px; opacity: 1;"></a>
                             <a target="_blank" title="Email" target="_top" href="mailto:volunteering@guild.uwa.edu.au"><img src="{% static "images/envelope-logo.png" %}" border="0" width="36px" height="38px" alt="Email" style="margin: 2px; opacity: 1;"></a>
-                            <form class="navbar-form navbar-right" id="searchForm" method="post" action="{% url 'logbook:search_bar' %}">    
+                            <form class="navbar-form navbar-right" style="padding-left:30px;" id="searchForm" method="post" action="{% url 'logbook:search_bar' %}">    
                                 <div class="form-group has-feedback">
                                     {% csrf_token %}
                                     {{ search_bar.as_p }}
