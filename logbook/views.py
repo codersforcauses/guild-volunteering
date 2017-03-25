@@ -248,7 +248,7 @@ def loadBookView(request):
             book_id = request.GET['book_id']
             logbook = LogBook.objects.get(id=book_id)
             
-            output = {'name':logbook.name, 'organisation':logbook.organisation.name,'category':logbook.category.name}
+            output = {'name':logbook.name,'category':logbook.category.name}
             output = json.dumps(output, cls=DjangoJSONEncoder)
             return HttpResponse(output, content_type='application/json')
         
@@ -258,12 +258,35 @@ def loadBookView(request):
     else:
         return HttpResponseForbidden
 
+@login_required
+def editLogBookView(request):
+    if request.method == "POST":
+        edit_form = EditLogBookForm(request.POST)
+        
+        if edit_form.is_valid():
+            name_form = edit_form.cleaned_data['name']
+            category_form = edit_form.cleaned_data['category']
+            print(category_form)
+            book_id = request.POST['book_id']
+            logbook = LogBook.objects.get(id=book_id)
+
+            logbook.name = name_form
+            logbook.category = category_form
+
+            logbook.save()
+            return redirect('logbook:list')
+        else:
+            return HttpResponseForbidden
+            
+    else:
+        return HttpResponseForbidden
+
 """
 View which handles the request from a user to add a logbook.
 """
 @login_required
-def addLogbookView(request):
-    if request.method == 'POST':
+def addLogBookView(request):
+    if request.method == "POST":
         form = LogBookForm(request.POST)
         if form.is_valid():
             logbook = LogBook.objects.create(name=form.cleaned_data['bookName'],
@@ -336,6 +359,7 @@ def booksView(request):
                 modelActions(request, LogBook, logbookPermissionCheck)
                 
         add_form = LogBookForm()
+        edit_form = EditLogBookForm()
         
         # display page
         currentOrder = request.GET.get('order', [])
@@ -362,7 +386,8 @@ def booksView(request):
             
         return render(request, 'books.html', {'logbooks':logbooks_list,
                                               'approvedbooks':approvedLogbooks,
-                                              'headers':headers,'form':add_form,
+                                              'headers':headers,
+                                              'form':add_form,'edit_form':edit_form,
                                               'isFinalisable':isFinalisable,
                                               'pastbooks':pastbooks,
                                               'finalisedbooks':finalisedbooks})

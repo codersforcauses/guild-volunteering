@@ -59,10 +59,10 @@
                                             <td>{{ logentry.end|date:"d/m/y P" }}</td>
                                             <td>
                                                 <div class='btn-toolbar'>
-                                                    <button class="btn btn-success visible-xs" onclick="doAjax('{{logentry.id}}', '{{logbook.book__id}}', 'approve')"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
-                                                    <button class="btn btn-danger visible-xs" onclick="doAjax('{{logentry.id}}', '{{logbook.book__id}}', 'decline')"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                                                    <button class="btn btn-success hidden-xs" onclick="doAjax('{{logentry.id}}', '{{logentry.book.id}}', 'approve')">Approve</button>
-                                                    <button class="btn btn-danger hidden-xs" onclick="doAjax('{{logentry.id}}', '{{logbook.book__id}}', 'decline')">Decline</button>
+                                                    <button class="btn btn-success visible-xs" type="button" onclick="doAjax('{{logentry.id}}', '{{logbook.book__id}}', 'approve')"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+                                                    <button class="btn btn-danger visible-xs" type="button" onclick="doAjax('{{logentry.id}}', '{{logbook.book__id}}', 'decline')"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                                                    <button class="btn btn-success hidden-xs" type="button" onclick="doAjax('{{logentry.id}}', '{{logentry.book.id}}', 'approve')">Approve</button>
+                                                    <button class="btn btn-danger hidden-xs" type="button" onclick="doAjax('{{logentry.id}}', '{{logbook.book__id}}', 'decline')">Decline</button>
                                                 </div>
                                             </td>
                                         </tr>

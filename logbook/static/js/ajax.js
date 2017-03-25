@@ -2,7 +2,11 @@ $(document).ready(function() {
     
 });
 
+//Used for ajax requests on editing logbooks
 function loadBook(book_id) {
+    
+    //$('#edit_form').attr("action", './edit_book/'+book_id+'/');
+    
     $.ajax({
        type:"get",
        url:"./load_book/",
@@ -10,8 +14,15 @@ function loadBook(book_id) {
        data: {book_id:book_id},
        success: function(output) {
            console.log(output);
+           $('#edit_form_name').val(output.name);
+           //See Django form to see where the id for this comes from
+           $('#edit_form_category').val($('#edit_form_category option:contains("'+output.category+'")').index());
        }
     });
+    
+    $('#edit_form').append('<input type="hidden" id="book_id" name="book_id" value="'+ book_id +'"/>');
+    
+    return false;
 }
 
 function loadEntry(entry_id) {
@@ -24,6 +35,7 @@ function loadEntry(entry_id) {
            console.log(output);
        }
     });
+    return false;
 }
 
 function doApprove(checkboxid, bookid, action){
@@ -41,6 +53,7 @@ function doApprove(checkboxid, bookid, action){
 
         }
     });
+    return false;
 }
 
 var form = document.getElementById('modelForm');

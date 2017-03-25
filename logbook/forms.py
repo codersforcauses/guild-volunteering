@@ -115,7 +115,14 @@ class LoginForm(forms.Form):
     username = UsernameField(label='')
     password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}))
 
+class EditLogBookForm(forms.Form):
+    #Students are not allowed to edit the organisation for this logbook, as all the supervisors listed are from that org!
+    name = forms.CharField(label='',required=True,widget=forms.TextInput(attrs={'class':'form-control', 'id':'edit_form_name', 'placeholder':'Book Name'}))
+    category = forms.ModelChoiceField(required=True,queryset = Category.objects.all().order_by('name'),empty_label='Volunteer Category...',
+                                          label='',widget=forms.Select(attrs={'class':'form-control','id':'edit_form_category'}))
+    
 class LogBookForm(forms.Form):
+    bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
     bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all().order_by('name'), label='', empty_label='Choose Organisation...',
                                               widget=forms.Select(attrs={'class':'form-control'}),
                                               help_text='<span data-toggle="tooltip" style="pading:20px" title="Please email Guild Volunteering if an organisation is not listed"><a>?</a></span>')                                              
@@ -123,8 +130,7 @@ class LogBookForm(forms.Form):
     bookCategory = forms.ModelChoiceField(queryset = Category.objects.all().order_by('name'), empty_label='Select Volunteer Category...', label='',
                                           widget=forms.Select(attrs={'class':'form-control'}),
                                           help_text='Choose a category that <strong>best</strong> describes your work.')
-
-    bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
+    
 
 class LogEntryForm(forms.Form):
     name = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name Entry'}))
