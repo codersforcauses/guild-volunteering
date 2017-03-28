@@ -21,3 +21,11 @@ def timedelta(value):
         return str(hours) + ' hours'
     
     return str(hours) + ' hours ' + 'and ' + str(minutes) + ' minutes'
+
+"""
+Custom filter which removes all text after '@' for the supervisor email address,
+reduces cluttering of the table on smaller devices.
+"""
+@register.filter(name="email")
+def email(value):
+    return str(value).split('@')[0]

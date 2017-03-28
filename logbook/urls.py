@@ -25,9 +25,10 @@ urlpatterns = [
     url(r'^b/load_book/$', views.loadBookView, name='load_book'),
     url(r'^b/edit_book/$', views.editLogBookView, name='edit_book'),
     url(r'b/update_approvals/$', views.updateHoursList, name='update_hours'),
-    url(r'^b/(?P<pk>[0-9]+)/$',views.logentryView, name='view'),
+    url(r'^b/(?P<pk>[0-9]+)/$',views.logEntryView, name='view'),
     url(r'^b/(?P<pk>[0-9]+)/create_supervisor/$',views.createTempSupervisorView, name='create_super'),
     url(r'b/(?P<pk>[0-9]+)/add_entry', views.addLogEntryView, name='add_entry'),
     url(r'b/load_entry/$', views.loadEntryView, name='load_entry'),
+    url(r'b/(?P<pk>[0-9]+)/edit_entry/$', views.editLogEntryView, name='edit_entry'),
     url(r'^search/$', views.searchBarView, name='search_bar'),
     ]

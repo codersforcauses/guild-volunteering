@@ -22,6 +22,14 @@ import re
 import socket
 
 studentNumRegex = re.compile(r'^[0-9]{8}$')
+dateTimeOptions = {
+    'format': 'dd/mm/yyyy hh:ii:00',
+    'weekStart' : '1',
+    'autoclose': True,
+    'showMeridian': True,
+    'minuteStep' : '15',
+    'clearBtn' : True,
+    }
 
 #Checks to see if the student number entered on account creation match
 #the required regex.
@@ -124,8 +132,7 @@ class EditLogBookForm(forms.Form):
 class LogBookForm(forms.Form):
     bookName = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Book Name'}))
     bookOrganisation = forms.ModelChoiceField(queryset = Organisation.objects.all().order_by('name'), label='', empty_label='Choose Organisation...',
-                                              widget=forms.Select(attrs={'class':'form-control'}),
-                                              help_text='<span data-toggle="tooltip" style="pading:20px" title="Please email Guild Volunteering if an organisation is not listed"><a>?</a></span>')                                              
+                                              widget=forms.Select(attrs={'class':'form-control'}))                                           
 
     bookCategory = forms.ModelChoiceField(queryset = Category.objects.all().order_by('name'), empty_label='Select Volunteer Category...', label='',
                                           widget=forms.Select(attrs={'class':'form-control'}),
@@ -144,27 +151,21 @@ class EditLogEntryForm(forms.Form):
         self.fields['supervisor'].empty_label = 'Select Supervisor...'
         
     supervisor = forms.ModelChoiceField(queryset = [], label='', widget=forms.Select(attrs={'class':'form-control','id':'edit_form_supervisor'}))
-    dateTimeOptions = {
-        'format': 'dd/mm/yyyy hh:ii:00',
-        'weekStart' : '1',
-        'autoclose': True,
-        'showMeridian': True,
-        'minuteStep' : '15',
-        'clearBtn' : True,
-        }
     
-    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3, attrs={'id':'edit_form_start'}),label='',)
-    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3,attrs={'class':'form-control','id':'edit_form_end','read-only':''}),label='',) 
+    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3, attrs={'id':'edit_form_start','readonly':''}),label='',)
+    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3,attrs={'id':'edit_form_end', 'readonly':''}),label='',) 
 
     def clean(self):
         cleaned_data = super().clean()
         
         start = cleaned_data.get('start')
         end = cleaned_data.get('end')
-        if start != None or end != None:
+        if start != None and end != None:
             timediff = end-start
             if timediff.total_seconds() < 0:
                 raise ValidationError('Invalid start or end time')
+        elif start == None or end == None:
+            raise ValidationError('You must select a time')
         
         return cleaned_data
 
@@ -180,14 +181,6 @@ class LogEntryForm(forms.Form):
         
     supervisor = forms.ModelChoiceField(queryset = [], label='', widget=forms.Select(attrs={'class':'form-control'}))
     
-    dateTimeOptions = {
-        'format': 'dd/mm/yyyy hh:ii:00',
-        'weekStart' : '1',
-        'autoclose': True,
-        'showMeridian': True,
-        'minuteStep' : '15',
-        'clearBtn' : True,
-        }
     start = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3),label='',)
     end = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3),label='',)        
 
@@ -200,7 +193,8 @@ class LogEntryForm(forms.Form):
             timediff = end-start
             if timediff.total_seconds() < 0:
                 raise ValidationError('Invalid start or end time')
-        
+            elif start == None or end == None:
+                raise ValidationError('You must select a time')
         return cleaned_data
 
 #Creates an unverified supervisor

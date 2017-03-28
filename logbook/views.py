@@ -248,10 +248,10 @@ def loadBookView(request):
             return HttpResponse(output, content_type='application/json')
         
         else:
-            return HttpResponseForbidden
+            return HttpResponseForbidden()
         
     else:
-        return HttpResponseForbidden
+        return HttpResponseForbidden()
 
 @login_required
 def editLogBookView(request):
@@ -261,7 +261,7 @@ def editLogBookView(request):
         if edit_form.is_valid():
             name_form = edit_form.cleaned_data['name']
             category_form = edit_form.cleaned_data['category']
-            print(category_form)
+            
             book_id = request.POST['book_id']
             logbook = LogBook.objects.get(id=book_id)
 
@@ -274,10 +274,10 @@ def editLogBookView(request):
             else:
                 return redirect('logbook:list')
         else:
-            return HttpResponseForbidden
+            return HttpResponseForbidden()
             
     else:
-        return HttpResponseForbidden
+        return HttpResponseForbidden()
 
 """
 View which handles the request from a user to add a logbook.
@@ -309,7 +309,7 @@ def updateHoursList(request):
                 
             return HttpResponse(json.dumps(data), content_type='application/json')
     else:
-        return HttpResponseForbidden
+        return HttpResponseForbidden()
 
 """
 View used as the main page to do with the logbook system for both supervisors
@@ -429,30 +429,40 @@ def loadEntryView(request):
             output = json.dumps(output, cls=DjangoJSONEncoder)
             return HttpResponse(output, content_type='application/json')
         else:
-            print('here')
-            return HttpResponseForbidden
+            return HttpResponseForbidden()
     else:
-        return HttpResponseForbidden
+        return HttpResponseForbidden()
 
 """
 View which handles the request from a user to add a logbook.
 """
 @login_required
-def editLogEntryView(request):
+def editLogEntryView(request, pk):
+    logbook = LogBook.objects.get(id=pk)
+    org = logbook.organisation
     if request.method == "POST":
-        editEntryForm = EditLogEntryForm(request.POST)
+        logentry_id = request.POST['entry_id']
+        if logentry_id == None:
+            return HttpResponseForbidden()
+        entry = LogEntry.objects.get(id=logentry_id)
+        editEntryForm = EditLogEntryForm(request.POST, org_id = org.id)
+
         if editEntryForm.is_valid():
-            entry = LogEntry.objects.get(id=1)
-            logbook_id = entry.book.id
+            
             if logentryPermissionCheck(request.user, entry, 'edit'):
-                print('Yay')
-                return redirect('logbook:view',args=[logbook.id])
+                entry.name = editEntryForm.cleaned_data['name']
+                entry.supervisor = editEntryForm.cleaned_data['supervisor']
+                entry.start = editEntryForm.cleaned_data['start']
+                entry.end = editEntryForm.cleaned_data['end']
+                entry.save()
+                
+                return redirect(reverse('logbook:view', args=[logbook.id]))
             else:
-                return HttpResponseForbidden
+                return HttpResponseForbidden()
         else:
-            return HttpResponseForbidden
+            return redirect(reverse('logbook:view', args=[logbook.id]))
     else:
-        return HttpResponseForbidden
+        return redirect(reverse('logbook:view', args=[logbook.id]))
 
 
 """
@@ -480,7 +490,7 @@ Shows the student the list of log entries they have which are part of this logbo
 Allows the user to add,delete and submit log entries through this page.
 """
 @login_required
-def logentryView(request, pk):
+def logEntryView(request, pk):
     logbook = LogBook.objects.get(id=pk)
     org = logbook.organisation
     if logbook == None or logbook.active == False:
@@ -496,11 +506,13 @@ def logentryView(request, pk):
     addEntryForm = LogEntryForm(org_id = org.id)
     editEntryForm = EditLogEntryForm(org_id = org.id)
     tempSupervisorForm = TempSupervisorForm()
-
+    
     logentries = {}
     logbooks = {}
     try:
+        #Get all the logbooks this user 'owns'
         logbooks = LogBook.objects.filter(user__user=request.user)
+        #Get all the log entries for this logbook
         logentries = LogEntry.objects.filter(book=logbook)
     except LogEntry.DoesNotExist:
         pass
@@ -516,7 +528,7 @@ def logentryView(request, pk):
     if currentOrder:
         currentOrder = currentOrder.split('.')
         
-    unformattedHeaderNames = LogEntryAdmin.list_display[1:6] # leave out book name and creation/update times
+    unformattedHeaderNames = LogEntryAdmin.list_display[1:5] # leave out book name and creation/update times
     headers = makeHeaders(unformattedHeaderNames, currentOrder)
     logentries = orderModels(currentOrder, unformattedHeaderNames, logentries)
 
@@ -737,6 +749,6 @@ def searchBarView(request):
             return redirect(search_url)
 
         else:
-            print('No')
+            return HttpResponseNotFound
     else:
-        print('No')
+        return HttpResponseNotFound
