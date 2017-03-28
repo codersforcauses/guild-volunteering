@@ -104,20 +104,6 @@ def modelActions(request, model, permissionCheck):
                         if log.status == 'Unapproved':
                             log.status = 'Pending'
                             log.save()
-    #Edit logbook or entry
-    if action == 'edit':
-        for i in modelIDs:
-            try:
-                m = model.objects.get(id=i)
-            except model.DoesNotExist:
-                pass
-            if permissionCheck(request.user, m, 'edit'):
-                try:
-                    logentry = LogEntry.objects.get(id=m.id)
-                    print(logentry.book.id,logentry.id)
-                    return redirect('edit_entry',args=(logentry.book.id, logentry.id))
-                except:
-                    print('Error occured when editing model')
     #Finalise Log Book/s
     if action == 'finalise':
         for i in modelIDs:
@@ -169,7 +155,11 @@ def logbookPermissionCheck(user, logbook, action):
             return True
         else:
             return False
-        
+    elif action == 'edit':
+        if logbook.finalised == True or logbook.active == False:
+            return False
+        else:
+            return True
     return user == logbook.user
 
 def getCreator():
@@ -186,9 +176,14 @@ def logentryPermissionCheck(user, logentry, action):
                 if not logentry.status == 'Approved':
                     return True
         
-            if action == 'submit':
+            elif action == 'submit':
                 return True
 
+            elif action == 'edit':
+                if not logentry.status == 'Approved':
+                    return True
+                else: return False
+                
             return False
     
 """
@@ -270,11 +265,14 @@ def editLogBookView(request):
             book_id = request.POST['book_id']
             logbook = LogBook.objects.get(id=book_id)
 
-            logbook.name = name_form
-            logbook.category = category_form
+            if logbookPermissionCheck(request.user, book_id, 'edit'):
+                logbook.name = name_form
+                logbook.category = category_form
 
-            logbook.save()
-            return redirect('logbook:list')
+                logbook.save()
+                return redirect('logbook:list')
+            else:
+                return redirect('logbook:list')
         else:
             return HttpResponseForbidden
             
@@ -426,7 +424,6 @@ def loadEntryView(request):
     if request.is_ajax():
         if request.method == "GET":
             entry_id = request.GET['entry']
-            book_id = request.GET['book_id']
             logentry = LogEntry.objects.get(id=entry_id)
             output = {'name':logentry.name, 'supervisor':logentry.supervisor.email,'start':logentry.start, 'end':logentry.end}
             output = json.dumps(output, cls=DjangoJSONEncoder)
@@ -441,32 +438,21 @@ def loadEntryView(request):
 View which handles the request from a user to add a logbook.
 """
 @login_required
-def editLogEntryView(request, pk, log_id):
-    logbook = LogBook.objects.get(id=pk)
-    logentry = LogEntry.objects.get(id = log_id)
-    if logentry == None:
-        return HttpResponseForbidden()
-
-    if logbook.user != request.user.lbuser:
-        return HttpResponseForbidden()
-
-    if request.method == 'POST':
-        editForm = LogEntryForm(request.POST)
-        if editForm.valid():
-            LogEntry.objects.get(id=log_id).update(name=form.cleaned_data['name'],
-                                               supervisor=form.cleaned_data['supervisor'],
-                                               start=form.cleaned_data['start'],
-                                               end=form.cleaned_data['end'],
-                                               updated_at=datetime.datetime.now())
-
+def editLogEntryView(request):
+    if request.method == "POST":
+        editEntryForm = EditLogEntryForm(request.POST)
+        if editEntryForm.is_valid():
+            entry = LogEntry.objects.get(id=1)
+            logbook_id = entry.book.id
+            if logentryPermissionCheck(request.user, entry, 'edit'):
+                print('Yay')
+                return redirect('logbook:view',args=[logbook.id])
+            else:
+                return HttpResponseForbidden
+        else:
+            return HttpResponseForbidden
     else:
-        editForm = LogEntryForm()
-
-    return render(request, 'form.html', {'title':'Edit Log Entry',
-                                         'form':editForm,
-                                         'book':logbook,
-                                         'backUrl':reverse('logbook:view', args=[logbook.id])})
-
+        return HttpResponseForbidden
 
 
 """
@@ -508,6 +494,7 @@ def logentryView(request, pk):
         modelActions(request, LogEntry, logentryPermissionCheck)
 
     addEntryForm = LogEntryForm(org_id = org.id)
+    editEntryForm = EditLogEntryForm(org_id = org.id)
     tempSupervisorForm = TempSupervisorForm()
 
     logentries = {}
@@ -518,6 +505,12 @@ def logentryView(request, pk):
     except LogEntry.DoesNotExist:
         pass
 
+    unapproved_entries = False
+    for entry in logentries:
+        if entry.status == "Unapproved":
+            unapproved_entries = True
+            break
+    
     currentOrder = request.GET.get('order', [])
     #Orders the outputted table based on the sorting of headings user has selected.
     if currentOrder:
@@ -528,10 +521,12 @@ def logentryView(request, pk):
     logentries = orderModels(currentOrder, unformattedHeaderNames, logentries)
 
     return render(request, 'logentry.html', {'entries':logentries,
+                                             'unapproved_entries':unapproved_entries,
                                              'logbooks':logbooks,
                                              'book':logbook,
                                              'headers':headers,
                                              'addentry_form':addEntryForm,
+                                             'edit_form':editEntryForm,
                                              'createsuper_form':tempSupervisorForm})
 
 """

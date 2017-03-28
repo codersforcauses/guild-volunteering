@@ -13,7 +13,6 @@ function loadBook(book_id) {
        contentType:'application/json',
        data: {book_id:book_id},
        success: function(output) {
-           console.log(output);
            $('#edit_form_name').val(output.name);
            //See Django form to see where the id for this comes from
            $('#edit_form_category').val($('#edit_form_category option:contains("'+output.category+'")').index());
@@ -32,9 +31,17 @@ function loadEntry(entry_id) {
        contentType:'application/json',
        data: { entry:entry_id },
        success: function(output) {
-           console.log(output);
+           $('#edit_form_name').val(output.name);
+           //See Django form to see where the id for this comes from
+           
+           $('#edit_form_supervisor').val(output.supervisor);
+           $('#edit_form_start').val(output.start);
+           $('#edit_form_end').val(output.end);
        }
     });
+    
+    $('#edit_form').append('<input type="hidden" id="entry_id" name="entry_id" value="'+ entry_id +'"/>');
+    
     return false;
 }
 

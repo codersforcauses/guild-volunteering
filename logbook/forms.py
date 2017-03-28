@@ -132,8 +132,44 @@ class LogBookForm(forms.Form):
                                           help_text='Choose a category that <strong>best</strong> describes your work.')
     
 
+class EditLogEntryForm(forms.Form):
+    name = name = forms.CharField(label='',required=True, widget=forms.TextInput(attrs={'class':'form-control',
+                                            'id':'edit_form_name','placeholder':'Name Log Entry'}))
+
+    def __init__(self, *args, **kwargs):
+        org_id = kwargs.pop('org_id')
+        super(EditLogEntryForm,self).__init__(*args,**kwargs)
+        # Allow user to select supervisor from a list of supervisors 
+        self.fields['supervisor'].queryset = Supervisor.objects.filter(organisation = org_id).order_by('user__username')
+        self.fields['supervisor'].empty_label = 'Select Supervisor...'
+        
+    supervisor = forms.ModelChoiceField(queryset = [], label='', widget=forms.Select(attrs={'class':'form-control','id':'edit_form_supervisor'}))
+    dateTimeOptions = {
+        'format': 'dd/mm/yyyy hh:ii:00',
+        'weekStart' : '1',
+        'autoclose': True,
+        'showMeridian': True,
+        'minuteStep' : '15',
+        'clearBtn' : True,
+        }
+    
+    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3, attrs={'id':'edit_form_start'}),label='',)
+    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3,attrs={'class':'form-control','id':'edit_form_end','read-only':''}),label='',) 
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        start = cleaned_data.get('start')
+        end = cleaned_data.get('end')
+        if start != None or end != None:
+            timediff = end-start
+            if timediff.total_seconds() < 0:
+                raise ValidationError('Invalid start or end time')
+        
+        return cleaned_data
+
 class LogEntryForm(forms.Form):
-    name = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name Entry'}))
+    name = forms.CharField(label='',required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name Log Entry'}))
 
     def __init__(self, *args, **kwargs):
         org_id = kwargs.pop('org_id')
