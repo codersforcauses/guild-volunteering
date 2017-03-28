@@ -37,6 +37,7 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(LogBook)
 class LogBookAdmin(admin.ModelAdmin):
     list_display = ['user','name','organisation','category','exported','finalised','active','created_at','updated_at',]
+    list_filter = ['active','finalised','exported','category']
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
@@ -71,22 +72,31 @@ Same applies to the mailSupervisorsView, which does the same but for supervisors
 @admin.site.register_view(r'logbook/mass_mail/students', visible='true',name="Mail Students")
 def mailStudents(request):
     if request.method == 'POST':
-        emailForm = EmailForm(request.POST)
+        emailForm = StudentEmailForm(request.POST)
         if emailForm.is_valid():
-            #Could also do the query on AUTH_USER table and check if they are in the student
-            #group, but could be better just to query LBUser as only students are assigned to that.
-            students = LBUser.objects.filter(user__last_login__gt = (timezone.now() - datetime.timedelta(days=2*365))
-                                             ).values('user__email')
+            if emailForm.cleaned_data['unfinalised']:
+                #Generates list of students who have got un-finalised logbooks (logbooks with approved entries but are not finalised)
+                students = LogEntry.objects.filter(status='Approved',book__finalised = False).values('book__user__user__email').distinct()
+                
+            else:
+                #Could also do the query on AUTH_USER table and check if they are in the student
+                #group, but could be better just to query LBUser as only students are assigned to that.
+                students = LBUser.objects.filter(user__last_login__gt = (timezone.now() - datetime.timedelta(days=2*365))
+                                                 ).values('user__email')
 
             #Name of dict element user__email comes from here^^
             email_list = []
+            unfinalised = emailForm.cleaned_data['unfinalised']
             for email in students:
-                email_list.append(email['user__email'])
-            
+                if unfinalised:
+                    email_list.append(email['book__user__user__email'])
+                else:
+                    email_list.append(email['user__email'])
+                                   
             emailData = {}
             emailData['subject'] = emailForm.cleaned_data['subject']
             emailData['message'] = emailForm.cleaned_data['message']
-            emailData['mail_list'] = mail_list
+            emailData['mail_list'] = email_list
 
             #Pass email data to the form to send
             emailForm.sendMail(emailData)
@@ -94,7 +104,7 @@ def mailStudents(request):
             return render(request, 'admin/logbook/action_complete.html',{})
         
     else:
-        emailForm = EmailForm()
+        emailForm = StudentEmailForm()
         
         return render(request, 'admin/logbook/mass_mail.html', {'email_form':emailForm, 'students':True})
     
@@ -102,18 +112,26 @@ def mailStudents(request):
 @admin.site.register_view(r'logbook/mass_mail/supervisors', visible='true',name="Mail Supervisors")
 def mailSupervisors(request):
     if request.method == 'POST':
-        emailForm = EmailForm(request.POST)
+        emailForm = SupervisorEmailForm(request.POST)
         if emailForm.is_valid():
-            #Could also do the query on AUTH_USER table and check if they are in the supervisor
-            #group, but could be better just to query Supervisor as only students are assigned to that.
-            supervisors = Supervisor.objects.filter(user__last_login__gt = (timezone.datetime.now() - datetime.timedelta(days=2*365))
-                                                    ).values('user__email')
+            unapproved = (emailForm.cleaned_data['unapproved'])
+            if unapproved:
+                #Used to send mail to any supervisors which have pending log entries to approve.
+                supervisors = LogEntry.objects.filter(status='Pending').values('supervisor').distinct()
+            else:
+                #Could also do the query on AUTH_USER table and check if they are in the supervisor
+                #group, but could be better just to query Supervisor as only students are assigned to that.
+                supervisors = Supervisor.objects.filter(user__last_login__gt = (timezone.datetime.now() - datetime.timedelta(days=2*365))
+                                                        ).values('user__email')
 
             #Name of dict element user__email comes from here^^
             email_list = []
             for email in supervisors:
-                email_list.append(email['user__email'])
-                
+                if unapproved:
+                    email_list.append(email['supervisor'])
+                else:
+                    email_list.append(email['user__email'])
+                    
             emailData = {}
             emailData['subject'] = emailForm.cleaned_data['subject']
             emailData['message'] = emailForm.cleaned_data['message']
@@ -125,7 +143,7 @@ def mailSupervisors(request):
             return render(request, 'admin/logbook/action_complete.html',{})
         
     else:
-        emailForm = EmailForm()
+        emailForm = SupervisorEmailForm()
         
         return render(request, 'admin/logbook/mass_mail.html', {'email_form':emailForm,'supervisors':True})
 
