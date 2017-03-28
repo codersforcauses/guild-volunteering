@@ -162,9 +162,6 @@ def logbookPermissionCheck(user, logbook, action):
             return True
     return user == logbook.user
 
-def getCreator():
-    return 'Created by Coders for Causes Members: Samuel J S Heath, Lachlan Walking and Zen Ly'
-
 def logentryPermissionCheck(user, logentry, action):
     if logentry.book.finalised == True:
         return False
@@ -222,7 +219,7 @@ def indexView(request):
 Simple view to show the Frequently Asked Questions page
 """
 def faqView(request):
-    return render(request, 'faq.html', {'names':getCreator()})
+    return render(request, 'faq.html', {})
 
 #Function which checks to see if a specific logbook has all its logentries approved,
 #this is a function which is ready to be finalised by the user.

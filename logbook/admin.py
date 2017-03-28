@@ -43,6 +43,7 @@ class LogBookAdmin(admin.ModelAdmin):
 class LogEntryAdmin(admin.ModelAdmin):
     list_display = ['book','name','supervisor','start','end','status',
                     'created_at','updated_at',]
+    list_filter = ['start','status']
 @admin.register(Organisation)
 class OrganisationAdmin(admin.ModelAdmin):
     # Will need to add the Org's Calista code when we add that to model

@@ -69,6 +69,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'logbook.context_processors.search_bar',
+                'logbook.context_processors.creators',
             ],
         },
     },
