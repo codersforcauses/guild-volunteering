@@ -170,7 +170,7 @@ class EditLogEntryForm(forms.Form):
         return cleaned_data
 
 class LogEntryForm(forms.Form):
-    name = forms.CharField(label='',required=True, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name Log Entry'}))
+    name = forms.CharField(label='',required=True, widget=forms.TextInput(attrs={'class':'form-control', 'id':'add_name', 'placeholder':'Name Log Entry'}))
 
     def __init__(self, *args, **kwargs):
         org_id = kwargs.pop('org_id')
@@ -179,10 +179,10 @@ class LogEntryForm(forms.Form):
         self.fields['supervisor'].queryset = Supervisor.objects.filter(organisation = org_id).order_by('user__username')
         self.fields['supervisor'].empty_label = 'Select Supervisor...'
         
-    supervisor = forms.ModelChoiceField(queryset = [], label='', widget=forms.Select(attrs={'class':'form-control'}))
+    supervisor = forms.ModelChoiceField(queryset = [], label='', widget=forms.Select(attrs={'class':'form-control','id':'add_supervisor'}))
     
-    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3),label='',)
-    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3),label='',)        
+    start = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3, attrs={'id':'add_start','readonly':''}),label='',)
+    end = forms.DateTimeField(widget=DateTimeWidget(usel10n=False,options = dateTimeOptions, bootstrap_version=3, attrs={'id':'add_end','readonly':''}),label='',)        
 
     def clean(self):
         cleaned_data = super().clean()

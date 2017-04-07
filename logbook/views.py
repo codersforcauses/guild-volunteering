@@ -33,7 +33,7 @@ import string
 def is_supervisor(user):
     return user.groups.filter(name='LBSupervisor').exists()
 
-#Checks to see if th user passed to the function is a student.
+#Checks to see if the user passed to the function is a student.
 def is_lbuser(user):
     return user.groups.filter(name='LBStudent').exists()
 
@@ -239,8 +239,9 @@ def loadBookView(request):
             
             book_id = request.GET['book_id']
             logbook = LogBook.objects.get(id=book_id)
-            
+            #object
             output = {'name':logbook.name,'category':logbook.category.name}
+            #response
             output = json.dumps(output, cls=DjangoJSONEncoder)
             return HttpResponse(output, content_type='application/json')
         
@@ -262,7 +263,7 @@ def editLogBookView(request):
             book_id = request.POST['book_id']
             logbook = LogBook.objects.get(id=book_id)
 
-            if logbookPermissionCheck(request.user, book_id, 'edit'):
+            if logbookPermissionCheck(request.user, logbook, 'edit'):
                 logbook.name = name_form
                 logbook.category = category_form
 
@@ -299,7 +300,7 @@ def addLogBookView(request):
 def updateHoursList(request):
     if request.is_ajax():
         if request.method == "POST":
-            #modelActions(request, LogEntry, approvePermissionCheck)
+            modelActions(request, LogEntry, approvePermissionCheck)
             logbook = request.POST['book_id']
             data = {'entries':len(LogEntry.objects.filter(book = logbook, status='Pending')),
                     'checkboxid':request.POST['model_selected'], 'book':request.POST['book_id']}
@@ -424,6 +425,7 @@ def loadEntryView(request):
             logentry = LogEntry.objects.get(id=entry_id)
             output = {'name':logentry.name, 'supervisor':logentry.supervisor.email,'start':logentry.start, 'end':logentry.end}
             output = json.dumps(output, cls=DjangoJSONEncoder)
+            print(output)
             return HttpResponse(output, content_type='application/json')
         else:
             return HttpResponseForbidden()

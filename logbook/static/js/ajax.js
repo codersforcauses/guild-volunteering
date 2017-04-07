@@ -24,19 +24,23 @@ function loadBook(book_id) {
     return false;
 }
 
-function loadEntry(entry_id) {
+function loadEntry(entry_id, action) {
     $.ajax({
        type:"get",
        url:"../load_entry/",
        contentType:'application/json',
        data: { entry:entry_id },
        success: function(output) {
-           $('#edit_form_name').val(output.name);
-           //See Django form to see where the id for this comes from
-           
-           $('#edit_form_supervisor').val(output.supervisor);
-           $('#edit_form_start').val(output.start);
-           $('#edit_form_end').val(output.end);
+            if (action === 'edit'){
+                $('#edit_form_name').val(output.name);
+                //See Django form to see where the id for this comes from
+                $('#edit_form_supervisor').val(output.supervisor);
+                $('#edit_form_start').val(output.start);
+                $('#edit_form_end').val(output.end);
+            } else if (action === 'add') {
+                $('#add_name').val('('+output.name+')');
+                $('#add_supervisor').val(output.supervisor);
+            }
        }
     });
     
