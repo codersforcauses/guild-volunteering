@@ -370,10 +370,13 @@ def booksView(request):
         approvedLogbooks = list()
 
         finalisedbooks = LogBook.objects.filter(user__user=request.user, active = True, finalised = True)
-        pastbooks = LogBook.objects.filter(user__user=request.user,active=False, finalised=True)        
+        pastbooks = LogBook.objects.filter(user__user=request.user,active=False, finalised=True)
+        
         for book in logbooks:
-            if hasAllApproved(book):
+            if hasAllApproved(book) and book.finalised == False:
                 approvedLogbooks.append(book)
+                logbooks_list.remove(book)
+            elif book.finalised == True:
                 logbooks_list.remove(book)
                 
         isFinalisable = False

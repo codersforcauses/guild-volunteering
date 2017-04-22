@@ -100,7 +100,7 @@
                 </thead>
                 <tbody>
                     {% for logbook in approvedbooks %}
-                    {% if logbook.active == True %}
+                    {% if logbook.active == True and logbook.finalised == False %}
                     <tr class="success">
                         <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
                         <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
