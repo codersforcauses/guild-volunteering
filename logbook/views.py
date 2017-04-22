@@ -318,7 +318,7 @@ those which they have approved.
 
 Students: See the list of logbooks they have created with different orgs,
 can edit these books to change fields e.g. the category of the volunteering.
-Allows them to finalise books as well as 
+Allows them to finalise books as well as see past books
 """
 @login_required
 def booksView(request):

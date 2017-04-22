@@ -102,8 +102,8 @@
                         {% endif %}
                         <button class="btn btn-primary" type="button" data-toggle="modal" href="#addEntryModal" onclick="loadEntry('{{logentry.id}}','add')"><span class="glyphicon glyphicon-repeat"></span></button>
                         </td>
-                        <td>
-                               <button class="btn btn-primary" type="button" data-toggle="modal" href="#addEntryModal" onclick="loadEntry('{{logentry.id}}','add')"><span class="glyphicon glyphicon-repeat"></span></button>
+                        <td class="visible-xs visible-sm">
+                            <button class="btn btn-primary" type="button" data-toggle="modal" href="#addEntryModal" onclick="loadEntry('{{logentry.id}}','add')"><span class="glyphicon glyphicon-repeat"></span></button>
                         </td>
                     </tr>
                     {% endfor %}

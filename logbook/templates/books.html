@@ -100,9 +100,39 @@
                 </thead>
                 <tbody>
                     {% for logbook in approvedbooks %}
+                    {% if logbook.active == True %}
                     <tr class="success">
                         <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
                         <td><a href="{% url 'logbook:view' logbook.id %}">{{ logbook.name }}</a></td>
+                        {# TODO make this use the headers instead of hardcoded #}
+                        <td><a href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
+			<td>{{ logbook.category }}</td>
+                        <td><button class="btn btn-warning" type="button" onclick="loadBook('{{logbook.id}}')" data-toggle="modal" href="#editBookModal">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </button></td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+            {% if finalisedbooks %}
+                <hr>
+            <h2 class="sub-heading">Finalised Log Books</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        {% for header in headers %}
+                        <th>{{header.0}}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for logbook in finalisedbooks %}
+                    <tr class="success">
+                        <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
+                        <td>{{ logbook.name }}</td>
                         {# TODO make this use the headers instead of hardcoded #}
                         <td><a href="http://www.google.com/search?q={{ logbook.organisation }}">{{ logbook.organisation }}</a></td>
 			<td>{{ logbook.category }}
@@ -111,7 +141,8 @@
                 </tbody>
             </table>
             {% endif %}
-            {% if finalisedbooks %}
+            
+            {% if pastbooks %}
                 <hr>
             <h2 class="sub-heading">Past Log Books</h2>
             <table class="table table-striped">
@@ -124,7 +155,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for logbook in finalisedbooks %}
+                    {% for logbook in pastbooks %}
                     <tr class="success">
                         <td><input type="checkbox" name="model_selected" value="{{ logbook.id }}"></td>
                         <td>{{ logbook.name }}</td>

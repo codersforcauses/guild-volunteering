@@ -33,7 +33,7 @@
             
         <div class="panel-group" id="accordion">
             {% for logbook in logbooks %}
-                <div class="panel panel-default">
+                <div class="panel panel-default" id="entry-{{logbook.book__id}}" >
                     <div class="panel-heading">
                         <h4>
                             <a data-toggle="collapse" data-parent="#accordion" href="#{{logbook.book__id}}"><h4>{{ logbook.book__user__user__first_name }} {{ logbook.book__user__user__last_name }} - {{ logbook.book__user__user__username }} <span class = "label label-danger label-as-badge" id='badge-{{logbook.book__id}}'>{{ logbook.entries_pending }}</span> </h4></a>

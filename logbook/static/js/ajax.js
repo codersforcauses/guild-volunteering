@@ -49,13 +49,20 @@ function loadEntry(entry_id, action) {
     return false;
 }
 
-function doApprove(checkboxid, bookid, action){
+function doAjax(checkboxid, bookid, action){
     
     var rowId = '#row-'+checkboxid;
     var badge = '#badge-'+bookid;
     $(badge).text($(badge).text()-1);
     $(rowId).remove();
-    
+    console.log($(badge).text());
+    if ($(badge).text() === '0') {
+        console.log('Yes');
+        $('#'+bookid).remove();
+        $('#entry-'+bookid).remove();
+        $('#entry-'+bookid).hide();
+    }
+        
     $.ajax({
         type: "post",
         url: "./update_approvals/",
