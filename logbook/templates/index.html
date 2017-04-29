@@ -12,7 +12,7 @@
     <div class="row placeholders">
         <div class="col-xs-4 col-sm-4 col-md-4">
             <a href="{% url 'logbook:list' %}">
-                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Logs">
+                <img src="{% static "images/log_icon.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Logs">
             </a>
             {% if is_super %}
             <h4><a href="{% url 'logbook:list' %}">Approve Volunteer Hours</a></h4>
@@ -24,7 +24,7 @@
         </div>
         <div class="col-xs-4 col-xs-offset-0 col-sm-4 col-sm-offset-0 col-md-4">
             <a href="{% url 'logbook:profile' %}">
-                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <img src="{% static "images/profile_icon.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
             </a>
             <a href="{% url 'logbook:profile' %}">
                 <h4>View Your Profile</h4>
@@ -33,7 +33,7 @@
         </div>
         <div class="col-xs-4 col-xs-offset-0 col-sm-4 col-sm-offset-0 col-md-4">
             <a href="{% url 'logbook:faq' %}">
-                <img src="{% static "images/guild_volunteering_small.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
+                <img src="{% static "images/faq_icon.png" %}" class="img-responsive" width="100%" height="100%" alt="Manage Your Log Books">
             </a>
             <a href="{% url 'logbook:faq' %}">
                 <h4>FAQ</h4>
